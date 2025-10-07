@@ -2,5 +2,6 @@
 
 ## Tecnologías
 - Backend: FastAPI + Python
-- Frontend: React + Vite
+- Frontend: React + Vite + Material UI
 - Bases de Datos: PostgreSQL + MongoDB
+
