@@ -41,12 +41,7 @@ const darkPalette = {
 };
 
 const baseTypography = {
-  fontFamily: [
-    'Roboto',
-    'Helvetica',
-    'Arial',
-    'sans-serif',
-  ].join(','),
+  fontFamily: ['Roboto', 'Helvetica', 'Arial', 'sans-serif'].join(','),
   h1: { fontWeight: 600, fontSize: '2.2rem' },
   h2: { fontWeight: 600, fontSize: '1.8rem' },
   h3: { fontWeight: 500, fontSize: '1.5rem' },
@@ -54,7 +49,7 @@ const baseTypography = {
   button: { textTransform: 'none', fontWeight: 500 },
 };
 
-export const getDesignTokens = (mode) => ({
+export const getDesignTokens = mode => ({
   palette: mode === 'light' ? lightPalette : darkPalette,
   typography: baseTypography,
   components: {
