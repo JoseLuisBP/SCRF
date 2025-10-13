@@ -1,0 +1,24 @@
+# Incluye las dependencias base
+-r requirements.txt
+
+# Framework para ejecutar tests
+pytest==8.4.2
+# Soporte para tests asíncronos
+pytest-asyncio==1.2.0
+# Cobertura de código
+pytest-cov==7.0.0
+httpx==0.28.1
+
+# Linter y formateador de código
+black==25.9.0
+# Análisis estático de código
+flake8==7.3.0
+# Ordena imports automáticamente
+isort==7.0.0
+# Verifica tipos en el código
+mypy==1.18.2
+
+# Consola interactiva
+ipython==9.6.0
+# Depurador interactivo
+ipdb==0.13.13

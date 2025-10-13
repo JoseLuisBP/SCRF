@@ -1,0 +1,41 @@
+# Para construir la API
+fastapi==0.119.0
+# Servidor ASGI que ejecuta FastAPI
+uvicorn[standard]==0.37.0
+# Valida y convierte datos, JSON -> objetos Python
+pydantic==2.12.0
+# Maneja variables de entorno y configuraciones
+pydantic-settings==2.11.0
+
+# ORM, para definir modelos y hacer queries sin SQL directo
+sqlalchemy==2.0.44
+# Driver para PostgreSQL
+psycopg2-binary==2.9.11
+# Migraciones de base de datos
+alembic==1.17.0
+# Driver para MongoDB
+pymongo==4.15.3
+
+# Generación y verificación de tokens JWT
+python-jose[cryptography]==3.5.0
+# Encriptación de contraseñas
+passlib[bcrypt]==1.7.4
+# Manejo de formularios y archivos
+python-multipart==0.0.20
+# Para hashing de contraseñas, utilizado por passlib
+bcrypt==5.0.0
+
+# Librería de machine learning
+scikit-learn==1.7.2
+# Manipulación de datos
+pandas==2.3.3
+numpy==2.3.3
+# Serialización de modelos entrenados
+joblib==1.5.2
+
+# Carga de variables de entorno desde un archivo .env
+python-dotenv==1.1.1
+# Valida formato y existencia de emails
+email-validator==2.3.0
+# Cliente HTTP para hacer requests a otros servicios
+httpx==0.28.1
