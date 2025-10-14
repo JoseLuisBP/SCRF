@@ -19,28 +19,28 @@ def setup_logging():
     )
     
     # Logger raíz
-    logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG if settings.DEBUG else logging.INFO)
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.DEBUG if settings.DEBUG else logging.INFO)
     
     # Handler para consola
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(logging.DEBUG if settings.DEBUG else logging.INFO)
     console_handler.setFormatter(log_format)
-    logger.addHandler(console_handler)
+    root_logger.addHandler(console_handler)
     
     # Handler para archivo
     file_handler = logging.FileHandler(log_dir / "app.log")
     file_handler.setLevel(logging.INFO)
     file_handler.setFormatter(log_format)
-    logger.addHandler(file_handler)
+    root_logger.addHandler(file_handler)
     
     # Handler para errores
     error_handler = logging.FileHandler(log_dir / "error.log")
     error_handler.setLevel(logging.ERROR)
     error_handler.setFormatter(log_format)
-    logger.addHandler(error_handler)
+    root_logger.addHandler(error_handler)
     
-    return logger
+    return root_logger
 
 
 # Instancia del logger
