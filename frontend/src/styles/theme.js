@@ -54,13 +54,28 @@ export const getDesignTokens = mode => ({
   typography: baseTypography,
   components: {
     MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: '10px',
-          padding: '8px 20px',
-        },
+    styleOverrides: {
+      root: {
+        borderRadius: '20px',
+        textTransform: 'none',
+        transition: 'all .2s ease-in-out',
+        minHeight: 'auto',
+      },
+      sizeSmall: {
+        fontSize: '1rem',
+      },
+      sizeMedium: {
+        fontSize: '1.25rem',
+      },
+      sizeLarge: {
+        fontSize: '1.5rem',
       },
     },
+    defaultProps: {
+      disableElevation: false,
+      variant: 'contained',
+    },
+  },
     MuiPaper: {
       styleOverrides: {
         root: {
