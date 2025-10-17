@@ -53,29 +53,84 @@ export const getDesignTokens = mode => ({
   palette: mode === 'light' ? lightPalette : darkPalette,
   typography: baseTypography,
   components: {
+    MuiTextField: {
+      defaultProps: {
+        variant: 'outlined',
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: ({ ownerState }) => ({
+          ...(ownerState.size === 'small' && {
+            fontSize: '1rem',
+          }),
+          ...(ownerState.size === 'medium' && {
+            fontSize: '1.25rem',
+          }),
+          ...(ownerState.size === 'large' && {
+            fontSize: '1.5rem'
+          }),
+        }),
+        input: {
+          padding: 'auto',
+        },
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: ({ ownerState }) => ({
+          ...(ownerState.size === 'small' && {
+            fontSize: '1rem',
+          }),
+          ...(ownerState.size === 'medium' && {
+            fontSize: '1.25rem',
+          }),
+          ...(ownerState.size === 'large' && {
+            fontSize: '1.5rem',
+          }),
+          '&.MuiInputLabel-shrink': {
+            ...(ownerState.size === 'small' && {
+              fontSize: '0.75rem',
+              transform: 'translate(14px, -8px) scale(1)',
+            }),
+            ...(ownerState.size === 'medium' && {
+              fontSize: '0.95rem',
+              transform: 'translate(14px, -12px) scale(1)',
+            }),
+            ...(ownerState.size === 'large' && {
+              fontSize: '1.15rem',
+              transform: 'translate(14px, -14px) scale(1)',
+            }),
+          },
+        }),
+      },
+    },
     MuiButton: {
-    styleOverrides: {
-      root: {
-        borderRadius: '20px',
-        textTransform: 'none',
-        transition: 'all .2s ease-in-out',
-        minHeight: 'auto',
+      styleOverrides: {
+        root: {
+          borderRadius: '20px',
+          textTransform: 'none',
+          transition: 'all .2s ease-in-out',
+          minHeight: 'auto',
+        },
+        sizeSmall: {
+          fontSize: '1rem',
+          padding: '3px 9px',
+        },
+        sizeMedium: {
+          fontSize: '1.25rem',
+          padding: '4px 12px',
+        },
+        sizeLarge: {
+          fontSize: '1.5rem',
+          padding: '5px 15px',
+        },
       },
-      sizeSmall: {
-        fontSize: '1rem',
-      },
-      sizeMedium: {
-        fontSize: '1.25rem',
-      },
-      sizeLarge: {
-        fontSize: '1.5rem',
+      defaultProps: {
+        disableElevation: false,
+        variant: 'contained',
       },
     },
-    defaultProps: {
-      disableElevation: false,
-      variant: 'contained',
-    },
-  },
     MuiPaper: {
       styleOverrides: {
         root: {
