@@ -2,7 +2,7 @@ import TextField from '@mui/material/TextField';
 import PropTypes from 'prop-types';
 
 export default function Input({
-  labelSize = "medium",
+  labelSize = 'medium',
   label,
   value,
   onChange,
@@ -15,11 +15,10 @@ export default function Input({
   helperText = '',
   ...props
 }) {
-
   const sizeMap = {
-    small: "small",
-    medium: "medium",
-    large: "large",
+    small: 'small',
+    medium: 'medium',
+    large: 'large',
   };
 
   return (
@@ -38,9 +37,9 @@ export default function Input({
       InputLabelProps={{
         ...props.InputLabelProps,
         sx: {
-          ...(labelSize === "small" && { fontSize: "1rem" }),
-          ...(labelSize === "medium" && { fontSize: "1.25rem" }),
-          ...(labelSize === "large" && { fontSize: "1.5rem" }),
+          ...(labelSize === 'small' && { fontSize: '1rem' }),
+          ...(labelSize === 'medium' && { fontSize: '1.25rem' }),
+          ...(labelSize === 'large' && { fontSize: '1.5rem' }),
         },
       }}
     />

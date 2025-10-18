@@ -1,38 +1,42 @@
-import React from "react";
-import Button from "@mui/material/Button";
+import Button from '@mui/material/Button';
+import React from 'react';
 
-const CustomButton = ({ variant = "primary", size = "medium", children, ...props }) => {
+const CustomButton = ({
+  variant = 'primary',
+  size = 'medium',
+  children,
+  ...props
+}) => {
   const getVariant = () => {
     switch (variant) {
-      case "primary":
-        return "contained"
-      case "secondary":
-        return "outlined";
-      case "disabled":
-        return "contained";
+      case 'primary':
+        return 'contained';
+      case 'secondary':
+        return 'outlined';
+      case 'disabled':
+        return 'contained';
       default:
-        return "contained";
+        return 'contained';
     }
   };
 
   const getColor = () => {
     switch (variant) {
-      case "primary":
-        return "primary";
-      case "secondary":
-        return "secondary";
+      case 'primary':
+        return 'primary';
+      case 'secondary':
+        return 'secondary';
       default:
-        return "primary";
+        return 'primary';
     }
   };
-
 
   return (
     <Button
       variant={getVariant()}
       color={getColor()}
       size={size}
-      disabled={variant === "disabled"}
+      disabled={variant === 'disabled'}
       {...props}
     >
       {children}

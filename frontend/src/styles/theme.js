@@ -68,7 +68,7 @@ export const getDesignTokens = mode => ({
             fontSize: '1.25rem',
           }),
           ...(ownerState.size === 'large' && {
-            fontSize: '1.5rem'
+            fontSize: '1.5rem',
           }),
         }),
         input: {

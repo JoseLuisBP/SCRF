@@ -1,8 +1,8 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider, CssBaseline } from "@mui/material";
-import theme from "./styles/theme";
+import { ThemeProvider, CssBaseline } from '@mui/material';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-import Home from "./pages/Home";
+import Home from './pages/Home';
+import theme from './styles/theme';
 
 function App() {
   return (

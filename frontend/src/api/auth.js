@@ -1,31 +1,23 @@
-import axiosInstance from "./axios";
+import axiosInstance from './axios';
 
 const authAPI = {
   // Registro de usuario
   register: async userData => {
-    try {
-      const response = await axiosInstance.post('/auth/register', userData);
-      if (response.token) {
-        localStorage.setItem('token', response.token);
-      }
-      return response;
-    } catch (error) {
-      throw error;
+    const response = await axiosInstance.post('/auth/register', userData);
+    if (response.token) {
+      localStorage.setItem('token', response.token);
     }
+    return response;
   },
 
   // Login
   login: async credentials => {
-    try {
-      const response = await axiosInstance.post('/auth/login', credentials);
-      if (response.token) {
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('user', JSON.stringify(response.user));
-      }
-      return response;
-    } catch (error) {
-      throw error;
+    const response = await axiosInstance.post('/auth/login', credentials);
+    if (response.token) {
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('user', JSON.stringify(response.user));
     }
+    return response;
   },
 
   // Logout
@@ -56,63 +48,43 @@ const authAPI = {
 
   // Obtener perfil del usuario
   getProfile: async () => {
-    try {
-      const response = await axiosInstance.get('/auth/profile');
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    const response = await axiosInstance.get('/auth/profile');
+    return response;
   },
 
   // Actualizar perfil
   updateProfile: async profileData => {
-    try {
-      const response = await axiosInstance.put('/auth/profile', profileData);
-      if (response.user) {
-        localStorage.setItem('user', JSON.stringify(response.user));
-      }
-      return response;
-    } catch (error) {
-      throw error;
+    const response = await axiosInstance.put('/auth/profile', profileData);
+    if (response.user) {
+      localStorage.setItem('user', JSON.stringify(response.user));
     }
+    return response;
   },
 
   // Cambiar contraseña
   changePassword: async passwordData => {
-    try {
-      const response = await axiosInstance.put(
-        '/auth/change-password',
-        passwordData
-      );
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    const response = await axiosInstance.put(
+      '/auth/change-password',
+      passwordData
+    );
+    return response;
   },
 
   // Recuperar contraseña
   forgotPassword: async email => {
-    try {
-      const response = await axiosInstance.post('/auth/forgot-password', {
-        email,
-      });
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    const response = await axiosInstance.post('/auth/forgot-password', {
+      email,
+    });
+    return response;
   },
 
   // Resetear contraseña
   resetPassword: async (token, newPassword) => {
-    try {
-      const response = await axiosInstance.post('/auth/reset-password', {
-        token,
-        password: newPassword,
-      });
-      return response;
-    } catch (error) {
-      throw error;
-    }a
+    const response = await axiosInstance.post('/auth/reset-password', {
+      token,
+      password: newPassword,
+    });
+    return response;
   },
 };
 
