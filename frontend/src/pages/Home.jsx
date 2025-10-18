@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import '../styles/Home.css';
+import 'Home.css';
 import { useState } from 'react';
 
 import CustomButton from '../components/common/Button';
