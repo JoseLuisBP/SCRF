@@ -4,7 +4,7 @@ const lightPalette = {
   mode: 'light',
   primary: {
     main: '#6BAA75',
-    contrastText: '#ffffff',
+    contrastText: '#283f4dff',
   },
   secondary: {
     main: '#A0CED9',

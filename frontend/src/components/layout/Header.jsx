@@ -31,8 +31,8 @@ import {
   Settings as SettingsIcon,
   ChevronRight as ChevronRightIcon
 } from '@mui/icons-material';
-import { useAuth } from '../context/AuthContext';
-import { useAccessibility } from '../context/AccessibilityContext';
+import { useAuth } from "../../context/AuthContext";
+import { useAccessibility } from "../../context/AccessibilityContext";
 
 export default function Header({ showSearchBar = false }) {
   const navigate = useNavigate();
@@ -212,7 +212,8 @@ export default function Header({ showSearchBar = false }) {
           ) : (
             <>
               <Button
-                color="inherit"
+                color="secondary"
+                variant="secondary"
                 component={RouterLink}
                 to="/login"
               >
@@ -220,7 +221,7 @@ export default function Header({ showSearchBar = false }) {
               </Button>
               <Button
                 color="secondary"
-                variant="contained"
+                variant="secondary"
                 component={RouterLink}
                 to="/register"
                 sx={{ ml: 1 }}
@@ -284,7 +285,11 @@ export default function Header({ showSearchBar = false }) {
                 primary="Tamaño de fuente"
                 secondary={`Actual: ${fontSize}`}
               />
-              <Button onClick={increaseFontSize}>
+              <Button
+                onClick={increaseFontSize}
+                variant="outlined"
+                sx={{ ml: 3 }}
+              >
                 Aumentar
               </Button>
             </ListItem>

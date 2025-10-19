@@ -1,42 +1,85 @@
-import { Link } from 'react-router-dom';
-import 'Home.css';
-import { useState } from 'react';
-
-import CustomButton from '../components/common/Button';
+import { Box, Container, Typography } from '@mui/material';
+import Header from '../components/layout/Header';
+import Button from '../components/common/Button';
 import Input from '../components/common/Input';
+import { useAuth } from '../context/AuthContext';
 
 export default function Home() {
-  const [name, setName] = useState('');
-  return (
-    <div className="home-container">
-      <section className="home-header">
-        <h1>One day, you'll be cool</h1>
-      </section>
+  const { isLoggedIn, toggleLogin } = useAuth();
 
-      <section className="home-content">
-        <p>Suena música de edit de tiktok</p>
-        <div style={{ flexDirection: 'column', width: '310px' }}>
+  return (
+    <Box
+      sx={{
+        minHeight: '100vh',
+        minWidth: '100vw',
+        background: theme => `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
+        color: 'text.primary',
+      }}
+    >
+      <Header showSearchBar={false} />
+      
+      <Container maxWidth='md' sx={{ mt: 12, mb: 4 }}>
+        <Box sx={{ 
+          textAlign: 'center', 
+          py: 6,
+          px: 2,
+          backgroundColor: 'background.paper',
+          borderRadius: 2,
+          boxShadow: theme => `0 8px 32px ${theme.palette.primary.main}20`,
+          transition: 'transform 0.2s ease',
+          '&:hover': {
+            transform: 'translateY(-3px)'
+          }
+        }}>
+          <Typography 
+            variant="h2" 
+            component="h1" 
+            gutterBottom
+            sx={{
+              fontSize: { xs: '2.5rem', md: '3.75rem' },
+              fontWeight: 'bold'
+            }}
+          >
+            Bienvenido :)
+          </Typography>
+          
+          <Typography 
+            variant="h5" 
+            component="h2" 
+            gutterBottom 
+            color="text.secondary"
+            sx={{ mb: 4 }}
+          >
+            Adaptado para tus necesidades
+          </Typography>
+
           <Input
-            label="Nombre completo"
-            labelSize="small"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            variant="outlined"
+            label="Correo Electrónico"
+            labelSize='small'
+            placeholder="introduce tu correo"
             fullWidth
+            sx={{ maxWidth: 400, mx: 'auto', mb: 3 }}
           />
-        </div>
-        <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-          <CustomButton variant="primary" size="small">
-            Guardar
-          </CustomButton>
-          <CustomButton variant="secondary" size="small">
-            Cancelar
-          </CustomButton>
-          <CustomButton variant="disabled" size="small">
-            Deshabilitado
-          </CustomButton>
-        </div>
-      </section>
-    </div>
+
+          <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'center' }}>
+            <Button 
+              variant={isLoggedIn ? 'secondary' : 'primary'}
+              onClick={toggleLogin}
+              size="small"
+            >
+              {isLoggedIn ? 'Cerrar Sesión' : 'Iniciar Sesión'} (Demo)
+            </Button>
+
+            <Button 
+              variant="primary"
+              size="small"
+            >
+              Explorar
+            </Button>
+          </Box>
+
+        </Box>
+      </Container>
+    </Box>
   );
 }
