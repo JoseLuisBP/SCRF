@@ -4,7 +4,12 @@ import React from 'react';
 const CustomButton = ({
   variant = 'primary',
   size = 'medium',
+  startIcon,
+  endIcon,
+  fullWidth = false,
+  component,
   children,
+  sx,
   ...props
 }) => {
   const getVariant = () => {
@@ -36,7 +41,17 @@ const CustomButton = ({
       variant={getVariant()}
       color={getColor()}
       size={size}
+      startIcon={startIcon}
+      endIcon={endIcon}
+      fullWidth={fullWidth}
+      component={component}
       disabled={variant === 'disabled'}
+      sx={{
+        borderRadius: '8px',
+        textTransform: 'none',
+        fontWeight: 500,
+        ...sx
+      }}
       {...props}
     >
       {children}
