@@ -3,8 +3,8 @@ import ProtectedRoute from './ProtectedRoute';
 
 // Páginas
 import Home from '../pages/Home';
-//import Login from '../pages/Login';
-//import Register from '../pages/Register';
+import Login from '../pages/Login';
+import Register from '../pages/Register';
 //import Dashboard from '../pages/Dashboard';
 //import Routines from '../pages/Routines';
 //import Exercises from '../pages/Exercises';
@@ -15,10 +15,11 @@ export default function AppRoutes() {
         <Routes>
             {/* Rutas públicas */}
             <Route path="/" element={<Home />} />
-            {/*
+            
             <Route path="/login" element={<Login />} />
+            
             <Route path="/register" element={<Register />} />
-            */}
+            
 
             {/* Rutas protegidas
             <Route element={<ProtectedRoute />}>
