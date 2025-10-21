@@ -8,17 +8,17 @@ import AppRoutes from './routes';
 
 function App() {
   return (
-    // Proveedor de tema para MUI
+    /* Proveedor de tema para MUI */
     <ThemeProvider theme={theme}>
-      // Restablece los estilos base de MUI
+      {/* Restablece los estilos base de MUI */}
       <CssBaseline />
-      // Proveedor de autenticación y accesibilidad
+      {/* Proveedor de autenticación */}
       <AuthProvider>
-        // Proveedor de accesibilidad
+        {/* Proveedor de accesibilidad */}
         <AccessibilityProvider>
-          // Enrutador de la aplicación
+          {/* Enrutador de la aplicación */}
           <BrowserRouter>
-            // Rutas de la aplicación
+            {/* Rutas de la aplicación */}
             <AppRoutes />
           </BrowserRouter>
         </AccessibilityProvider>

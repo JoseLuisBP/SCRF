@@ -53,6 +53,51 @@ export const getDesignTokens = mode => ({
   palette: mode === 'light' ? lightPalette : darkPalette,
   typography: baseTypography,
   components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        '*': {
+          boxSizing: 'border-box',
+          margin: 0,
+          padding: 0
+        },
+        html: {
+          WebkitFontSmoothing: 'antialiased',
+          MozOsxFontSmoothing: 'grayscale',
+          height: '100%',
+          width: '100%'
+        },
+        body: {
+          height: '100%',
+          width: '100%',
+          // Personalización del scrollbar
+          '&::-webkit-scrollbar': {
+            width: '8px',
+            height: '8px'
+          },
+          '&::-webkit-scrollbar-track': {
+            background: mode === 'light' ? '#f1f1f1' : '#2c2c2c'
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: mode === 'light' ? '#888' : '#555',
+            borderRadius: '4px',
+            '&:hover': {
+              background: mode === 'light' ? '#555' : '#888'
+            }
+          }
+        },
+        // Clase de utilidad para elementos que solo deben ser visibles para lectores de pantalla
+        '.sr-only': {
+          position: 'absolute',
+          width: '1px',
+          height: '1px',
+          padding: '0',
+          margin: '-1px',
+          overflow: 'hidden',
+          clip: 'rect(0,0,0,0)',
+          border: '0'
+        }
+      }
+    },
     MuiTextField: {
       defaultProps: {
         variant: 'outlined',
