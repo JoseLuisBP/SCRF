@@ -4,18 +4,22 @@ import { AuthProvider } from './context/AuthContext';
 import { AccessibilityProvider } from './context/AccessibilityContext';
 
 import theme from './styles/theme';
-import Home from './pages/Home';
+import AppRoutes from './routes';
 
 function App() {
   return (
+    // Proveedor de tema para MUI
     <ThemeProvider theme={theme}>
+      // Restablece los estilos base de MUI
       <CssBaseline />
+      // Proveedor de autenticación y accesibilidad
       <AuthProvider>
+        // Proveedor de accesibilidad
         <AccessibilityProvider>
+          // Enrutador de la aplicación
           <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Home />} />
-            </Routes>
+            // Rutas de la aplicación
+            <AppRoutes />
           </BrowserRouter>
         </AccessibilityProvider>
       </AuthProvider>
