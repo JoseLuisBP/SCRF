@@ -9,8 +9,8 @@ function Footer() {
         backgroundColor: "#1976d2",
         color: "white",
         textAlign: "center",
-            py: 6,
-            px: 2,
+            py: 3,
+            
         mt: "auto",
       }}
     >
