@@ -1,15 +1,15 @@
 import React from "react";
-import { Facebook, Instagram } from "lucide-react";
+
 
 function Footer() {
   return (
     <footer className="bg-blue-900 text-white text-center p-6 mt-10">
-      <div className="max-w-6xl mx-auto space-y-4">
+      <div className="max-w-6xl mx-auto ">
         {/* Información básica */}
-        <h3 className="text-lg font-semibold">
+        <h3 className="text-lg font-semibold m-2">
           Pagina de Rehabilitación 
         </h3>
-        <p className="text-sm">
+        <p className="text-sm m-4">
           Ejercicios para todas las personas
         </p>
 
@@ -24,32 +24,14 @@ function Footer() {
           <a href="/contacto" className="hover:underline">
             Contacto
           </a>
+           <a href="/privacidad" className="hover:underline">
+            Política de Privacidad
+            </a>
         </div>
 
-        {/* Redes sociales */}
-        <div className="flex justify-center space-x-6 mt-4">
-          <a
-            href="https://www.facebook.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-blue-400 transition-colors"
-          >
-            <Facebook size={24} />
-          </a>
-          <a
-            href="https://www.instagram.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-pink-400 transition-colors"
-          >
-            <Instagram size={24} />
-          </a>
-          
-           
-        </div>
-
+        
         {/* Información de contacto */}
-        <p className="text-sm mt-4">
+        <p className="text-sm">
            
             33 254222
          rehabilitacion@udg.mx
