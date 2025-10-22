@@ -26,7 +26,8 @@ function App() {
           style={{
             display:"flex",
             flexDirection: "column",
-            minHeight:"100vh",
+            minHeight: '100vh',
+            minWidth: '100vw',
           }}
           >
             {/*Contenido Principal */}
