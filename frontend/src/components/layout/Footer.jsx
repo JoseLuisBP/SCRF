@@ -9,11 +9,12 @@ function Footer() {
         backgroundColor: "#1976d2",
         color: "white",
         textAlign: "center",
-        py: 3,
+            py: 6,
+            px: 2,
         mt: "auto",
       }}
     >
-      <Typography variant="h6">Pagina de rehabilitacion </Typography>
+      <Typography variant="h2">Pagina de rehabilitacion </Typography>
       <Typography variant="body2" sx={{ mb: 1 }}>
         © {new Date().getFullYear()} Todos los derechos reservados
       </Typography>
