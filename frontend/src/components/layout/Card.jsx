@@ -1,27 +1,55 @@
 import React from "react";
+import { Card as MuiCard, CardContent, CardMedia, Typography } from "@mui/material";
 
-const Card = ({ image, title, description, link }) => {
+function Card({ title, description, image }) {
   return (
-    <div className="max-w-sm bg-white rounded-2xl shadow-lg overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl">
-      <img
-        className="w-full h-48 object-cover"
-        src={image}
+    <MuiCard
+      sx={{
+        width: 300,
+        borderRadius: 3,
+        boxShadow: 3,
+        transition: "transform 0.3s ease",
+        "&:hover": {
+          transform: "translateY(-5px)",
+        },
+      }}
+    >
+      <CardMedia
+        component="img"
+        height="180"
+        image={image}
         alt={title}
+        sx={{
+          borderTopLeftRadius: 12,
+          borderTopRightRadius: 12,
+        }}
       />
-      <div className="p-5">
-        <h2 className="text-2xl font-bold text-blue-800 mb-2">{title}</h2>
-        <p className="text-gray-700 text-base mb-4">{description}</p>
-        {link && (
-          <a
-            href={link}
-            className="inline-block px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 transition"
-          >
-            Ver mas
-          </a>
-        )}
-      </div>
-    </div>
+
+      <CardContent>
+        <Typography
+          variant="h6"
+          gutterBottom
+          sx={{
+            fontSize: "clamp(16px, 1.2vw, 20px)", // 🔹 Tamaño mínimo de 16 px
+            fontWeight: "bold",
+          }}
+        >
+          {title}
+        </Typography>
+
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{
+            fontSize: "clamp(16px, 1vw, 18px)", // 🔹 También mínimo 16 px
+            lineHeight: 1.5,
+          }}
+        >
+          {description}
+        </Typography>
+      </CardContent>
+    </MuiCard>
   );
-};
+}
 
 export default Card;
