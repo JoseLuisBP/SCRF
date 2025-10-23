@@ -4,6 +4,8 @@ import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 import { useAuth } from '../context/AuthContext';
 
+import ejercicioImg from '../assets/images/ejercicio.jpeg';
+
 import Card from '../components/layout/Card';
 
 export default function Home() {
@@ -94,12 +96,12 @@ export default function Home() {
           <Card
             title="Que es "
             description="Terapia"
-            image=""
+            image={ejercicioImg}
           />
           <Card
             title="Para que"
             description="Ejercicios"
-            image=""
+            image={ejercicioImg}
           />  
            </Box>
 
