@@ -12,6 +12,9 @@ export default function Home() {
   const { isLoggedIn, toggleLogin } = useAuth();
 
   return (
+
+      
+
     <Box
       sx={{
         minHeight: '100vh',
@@ -83,8 +86,7 @@ export default function Home() {
           </Box> 
         </Box>
 
-        
-        <Box
+         <Box
           sx={{
             mt: 8,
             display: 'flex',
@@ -95,7 +97,7 @@ export default function Home() {
         >
           <Card
             title="Que es "
-            description="Terapia"
+            description="Es un sistema accesible que facilite la recuperación, conservación y fortalecimiento de movilidad, fuerza y flexibilidad en adultos mayores, personas en rehabilitación física y población interesada en prevenir riesgos de salud."
             image={ejercicioImg}
           />
           <Card
@@ -104,6 +106,8 @@ export default function Home() {
             image={ejercicioImg}
           />  
            </Box>
+
+       
 
 
       </Container>
