@@ -94,7 +94,7 @@ export default function Home() {
               description="Es una rehabilitacion"
               
               />
-              <Card 
+              <card 
                 title="Para que sirve"
                 description="Estos ejercicion"
               />
