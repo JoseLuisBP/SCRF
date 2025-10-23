@@ -89,12 +89,12 @@ export default function Home() {
               mt: 8,
             }}
             >
-              <card
+              <Card
               title= "Que es "
               description="Es una rehabilitacion"
               
               />
-              <card 
+              <Card 
                 title="Para que sirve"
                 description="Estos ejercicion"
               />
