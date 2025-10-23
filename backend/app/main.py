@@ -32,6 +32,14 @@ def root():
         "docs": "/docs",
     }
 
+@app.get("/health")
+def health_check():
+    """Health check endpoints"""
+    return {
+        "status": "healthy",
+        "version": settings.VERSION,
+        "environment": settings.ENVIRONMENT
+    }
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
