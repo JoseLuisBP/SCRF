@@ -22,23 +22,7 @@ function App() {
           {/* Enrutador de la aplicación */}
           <BrowserRouter>
 
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                minHeight: '100vh',
-                minWidth: '100vw',
-              }}
-            >
-              {/*Contenido Principal */}
-              <main style={{ flex: 1, padding: "2rem", textAlign: "center" }}>
-                <h1>Pagina de rehabilitacion</h1>
-              </main>
-              {/* Rutas de la aplicación */}
-              <AppRoutes />
-
-              <Footer />
-            </div>
+            
           </BrowserRouter>
         </AccessibilityProvider>
       </AuthProvider>
