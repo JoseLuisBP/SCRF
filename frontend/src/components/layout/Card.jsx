@@ -1,12 +1,26 @@
 import React from "react";
 import { Card as MuiCard, CardContent, CardMedia, Typography } from "@mui/material";
+import { useAccessibility } from "../../context/AccessibilityContext"; // 👈 importa el contexto
 
 function Card({ title, description, image }) {
+  const { fontSize } = useAccessibility(); // 👈 obtiene el tamaño actual del contexto
+
+  // Map de tamaños según tu escala
+  const fontSizeMap = {
+    small: "0.9rem",
+    medium: "1rem",
+    large: "1.2rem",
+    xlarge: "1.4rem",
+  };
+
+  const appliedFontSize = fontSizeMap[fontSize] || "1rem";
+
   return (
     <MuiCard
       sx={{
-        width: "clamp(250px, 30vw, 350px)", 
+        width: "clamp(250px, 30vw, 350px)",
         boxShadow: 3,
+        borderRadius: 2,
         transition: "transform 0.3s ease",
         "&:hover": {
           transform: "translateY(-5px)",
@@ -19,28 +33,31 @@ function Card({ title, description, image }) {
         image={image}
         alt={title}
         sx={{
-          borderTopLeftRadius: 12,
-          borderTopRightRadius: 12,
+          borderTopLeftRadius: 8,
+          borderTopRightRadius: 8,
+          objectFit: "cover",
         }}
       />
 
       <CardContent>
-        <Typography
-          variant="h6"
-          gutterBottom
-          sx={{
-            fontSize: "clamp(16px, 1.2vw, 20px)", 
-            fontWeight: "bold",
-          }}
-        >
-          {title}
-        </Typography>
+        {title && (
+          <Typography
+            variant="h6"
+            gutterBottom
+            sx={{
+              fontSize: `calc(${appliedFontSize} + 0.25rem)`,
+              fontWeight: "bold",
+            }}
+          >
+            {title}
+          </Typography>
+        )}
 
         <Typography
           variant="body2"
           color="text.secondary"
           sx={{
-            fontSize: "clamp(16px, 1vw, 18px)", 
+            fontSize: appliedFontSize,
             lineHeight: 1.5,
           }}
         >
