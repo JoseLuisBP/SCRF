@@ -1,10 +1,8 @@
 import React from "react";
 import { Card as MuiCard, CardContent, CardMedia, Typography } from "@mui/material";
-import { useAccessibility } from "../../context/AccessibilityContext"; // 👈 importa el contexto
-
+import { useAccessibility } from "../../context/AccessibilityContext"; 
 function Card({ title, description, image }) {
-  const { fontSize } = useAccessibility(); // 👈 obtiene el tamaño actual del contexto
-
+  const { fontSize } = useAccessibility(); 
   // Map de tamaños según tu escala
   const fontSizeMap = {
     small: "0.9rem",
