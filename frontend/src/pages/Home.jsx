@@ -4,6 +4,8 @@ import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 import { useAuth } from '../context/AuthContext';
 
+import Card from '../components/layout/Card';
+
 export default function Home() {
   const { isLoggedIn, toggleLogin } = useAuth();
 
@@ -78,6 +80,28 @@ export default function Home() {
             </Button>
           </Box>
 
+          <Box 
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: 3,
+              flexWrap: 'wrap',
+              mt: 8,
+            }}
+            >
+              <card
+              title= "Que es "
+              description="Es una rehabilitacion"
+              
+              />
+              <Card 
+                title="Para que sirve"
+                description="Estos ejercicion"
+              />
+                
+              
+
+            </Box>
         </Box>
       </Container>
     </Box>
