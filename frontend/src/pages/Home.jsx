@@ -13,9 +13,6 @@ export default function Home() {
   const { isLoggedIn, toggleLogin } = useAuth();
 
   return (
-
-      
-
     <Box
       sx={{
         minHeight: '100vh',
