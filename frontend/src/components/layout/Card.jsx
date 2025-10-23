@@ -3,7 +3,7 @@ import { Card as MuiCard, CardContent, CardMedia, Typography } from "@mui/materi
 import { useAccessibility } from "../../context/AccessibilityContext"; 
 function Card({ title, description, image }) {
   const { fontSize } = useAccessibility(); 
-  // Map de tamaños según tu escala
+ 
   const fontSizeMap = {
     small: "0.9rem",
     medium: "1rem",
