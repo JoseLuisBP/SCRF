@@ -5,6 +5,7 @@ import Input from '../components/common/Input';
 import { useAuth } from '../context/AuthContext';
 
 import ejercicioImg from '../assets/images/ejercicio.jpeg';
+import ejercicio1Img from '../assets/images/ejercicio1.jpeg';
 
 import Card from '../components/layout/Card';
 
@@ -110,12 +111,12 @@ export default function Home() {
             gap: 3,
           }}
         >
-          
+
         </Box>
           <Card
             title=""
             description="Es un sistema accesible que facilite la recuperación, conservación y fortalecimiento de movilidad, fuerza y flexibilidad en adultos mayores, personas en rehabilitación física y población interesada en prevenir riesgos de salud."
-            image={ejercicioImg}
+            image={ejercicio1Img}
           />  
            </Box>
 
