@@ -5,8 +5,7 @@ function Card({ title, description, image }) {
   return (
     <MuiCard
       sx={{
-        width: "clamp(250px, 30vw, 350px)", // 🔹 Ancho adaptable entre 250px y 350px
-        borderRadius: 3,
+        width: "clamp(250px, 30vw, 350px)", 
         boxShadow: 3,
         transition: "transform 0.3s ease",
         "&:hover": {
@@ -30,7 +29,7 @@ function Card({ title, description, image }) {
           variant="h6"
           gutterBottom
           sx={{
-            fontSize: "clamp(16px, 1.2vw, 20px)", // 🔹 Tamaño mínimo 16px
+            fontSize: "clamp(16px, 1.2vw, 20px)", 
             fontWeight: "bold",
           }}
         >
@@ -41,7 +40,7 @@ function Card({ title, description, image }) {
           variant="body2"
           color="text.secondary"
           sx={{
-            fontSize: "clamp(16px, 1vw, 18px)", // 🔹 Tamaño mínimo 16px
+            fontSize: "clamp(16px, 1vw, 18px)", 
             lineHeight: 1.5,
           }}
         >
