@@ -1,30 +1,26 @@
-from fastapi FastAPI
+from fastapi import FastAPI
+from contextlib import asynccontextmanager
 
 from app.core.config import settings
 from app.core.logging import logger
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Eventos de inicio y cierre de la aplicación"""
+    logger.info(f"Iniciando {settings.PROJECT_NAME} v{settings.VERSION}")
+    logger.info(f"Entorno: {settings.ENVIRONMENT}")
+    logger.info("Documentación disponible en /docs y /redoc")
+    yield
+    logger.info("Cerrando la aplicación...")
 
 app = FastAPI(
+    lifespan=lifespan,
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
     description="API backend de la aplicación",
     docs_url="/docs",
     redoc_url="/redoc",
 )
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Evento que se ejecuta al iniciar la aplicación"""
-    logger.info(f"Iniciando {settings.PROJECT_NAME} v{settings.VERSION}")
-    logger.info(f"Entorno: {settings.ENVIRONMENT}")
-    logger.info(f"Documentación disponible en /docs y /redoc")
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Evento que se ejecuta al apagar la aplicación"""
-    logger.info(f"Cerrando {settings.PROJECT_NAME}")
-
 
 @app.get("/")
 def root():
