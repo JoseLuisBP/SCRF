@@ -9,13 +9,22 @@ function Footer() {
         backgroundColor: "#1976d2",
         color: "white",
         textAlign: "center",
-            py: 3,
+            py: 6,
+            px: 2,
             
         mt: "auto",
+        boxShadow: (theme) => `0 -8px 24px ${theme.palette.primary.main}40`,
       }}
     >
-      <Typography variant="h2">Pagina de rehabilitacion </Typography>
-      <Typography variant="body2" sx={{ mb: 1 }}>
+      <Typography 
+        variant="h4"
+        sx={{
+          fontWeight:"bold",
+          mb: 2,
+          fontSize: {xs: "0.9rem", md: "1rem"},
+          opacity: 0.9,
+        }}
+      >
         © {new Date().getFullYear()} Todos los derechos reservados
       </Typography>
 
