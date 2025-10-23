@@ -80,28 +80,9 @@ export default function Home() {
             </Button>
           </Box>
 
-          <Box 
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: 3,
-              flexWrap: 'wrap',
-              mt: 8,
-            }}
-            >
-              <Card
-              title= "Que es "
-              description="Es una rehabilitacion"
-              
-              />
-              <Card 
-                title="Para que sirve"
-                description="Estos ejercicion"
-              />
-                
-              
+         
 
-            </Box>
+            
         </Box>
       </Container>
     </Box>
