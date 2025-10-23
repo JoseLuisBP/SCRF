@@ -4,7 +4,6 @@ import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 import { useAuth } from '../context/AuthContext';
 
-import Card from '../components/layout/Card';
 
 export default function Home() {
   const { isLoggedIn, toggleLogin } = useAuth();
@@ -78,11 +77,7 @@ export default function Home() {
             >
               Explorar
             </Button>
-          </Box>
-
-         
-
-            
+          </Box> 
         </Box>
       </Container>
     </Box>
