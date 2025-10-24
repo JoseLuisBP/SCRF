@@ -5,14 +5,14 @@ import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 import Card from '../components/layout/Card';
 import { useAuth } from '../context/AuthContext';
-import { AccessibilityContext } from '../context/AccessibilityContext'; // 👈 importante
+import { AccessibilityContext } from '../context/AccessibilityContext'; 
 
 import ejercicioImg from '../assets/images/ejercicio.jpeg';
 import ejercicio1Img from '../assets/images/ejercicio1.jpeg';
 
 export default function Home() {
   const { isLoggedIn, toggleLogin } = useAuth();
-  const { fontSize } = useContext(AccessibilityContext); // 👈 usamos el tamaño actual de fuente
+  const { fontSize } = useContext(AccessibilityContext); 
 
   return (
     <Box
