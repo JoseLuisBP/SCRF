@@ -6,7 +6,6 @@ import { AccessibilityProvider } from './context/AccessibilityContext';
 
 import theme from './styles/theme';
 import AppRoutes from './routes';
-import Footer from './components/layout/Footer';
 
 function App() {
   return (
@@ -21,8 +20,8 @@ function App() {
         <AccessibilityProvider>
           {/* Enrutador de la aplicación */}
           <BrowserRouter>
-
-            
+          {/* Rutas de la aplicación */}
+          <AppRoutes />
           </BrowserRouter>
         </AccessibilityProvider>
       </AuthProvider>
