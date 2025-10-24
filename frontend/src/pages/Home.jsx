@@ -9,6 +9,7 @@ import { AccessibilityContext } from '../context/AccessibilityContext';
 
 import ejercicioImg from '../assets/images/ejercicio.jpeg';
 import ejercicio1Img from '../assets/images/ejercicio1.jpeg';
+import Footer from '../components/layout/Footer';
 
 export default function Home() {
   const { isLoggedIn, toggleLogin } = useAuth();
@@ -87,7 +88,7 @@ export default function Home() {
           </Box>
         </Box>
 
-        {/* 🔽 Cards que se adaptan según el tamaño de fuente */}
+        
         <Box
           sx={{
             mt: 8,
@@ -134,8 +135,11 @@ export default function Home() {
               flexGrow: 1,
             }}
           />
+
         </Box>
       </Container>
+      <Footer />
     </Box>
+    
   );
 }
