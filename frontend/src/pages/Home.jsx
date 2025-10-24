@@ -1,11 +1,10 @@
 import { Box, Container, Typography } from '@mui/material';
-import { useContext } from 'react';
 import Header from '../components/layout/Header';
 import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 import Card from '../components/layout/Card';
 import { useAuth } from '../context/AuthContext';
-import { AccessibilityContext } from '../context/AccessibilityContext'; 
+import { useAccessibility } from '../context/AccessibilityContext';
 
 import ejercicioImg from '../assets/images/ejercicio.jpeg';
 import ejercicio1Img from '../assets/images/ejercicio1.jpeg';
@@ -13,7 +12,7 @@ import Footer from '../components/layout/Footer';
 
 export default function Home() {
   const { isLoggedIn, toggleLogin } = useAuth();
-  const { fontSize } = useContext(AccessibilityContext); 
+  const { fontSize } = useAccessibility();
 
   return (
     <Box
