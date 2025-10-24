@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Typography, IconButton } from "@mui/material";
 import { Facebook, Instagram, Twitter } from "@mui/icons-material";
 
-function Footer() {
+function Footer ()  {
   return (
     <Box
       sx={{
@@ -16,6 +16,10 @@ function Footer() {
         boxShadow: (theme) => `0 -8px 24px ${theme.palette.primary.main}40`,
       }}
     >
+      <Typography variant="h6" gutterBottom>
+        Pagina de rehabilitación
+      </Typography>
+
       <Typography 
         variant="h4"
         sx={{
