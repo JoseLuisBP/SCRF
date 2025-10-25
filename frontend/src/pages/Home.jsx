@@ -8,6 +8,8 @@ import { useAccessibility } from '../context/AccessibilityContext';
 
 import ejercicioImg from '../assets/images/ejercicio.jpeg';
 import ejercicio1Img from '../assets/images/ejercicio1.jpeg';
+import ejercicio2Img from '../assets/images/ejercicio2.jpeg';
+
 import Footer from '../components/layout/Footer';
 
 export default function Home() {
@@ -97,6 +99,26 @@ export default function Home() {
             gap: fontSize > 18 ? 5 : 3, // más separación si la fuente es grande
           }}
         >
+          
+          <Card
+            title="ONU"
+            description=" La importancia de la actividad física en la prevención  de enfermedades crónicas y en la mejora de la calidad de vida en adultos mayores. Según la Organización Mundial de la Salud (OMS), el envejecimiento activo se basa en la optimización de las oportunidades de salud, participación y seguridad. Proyectos tecnológicos similares, como aplicaciones de fisioterapia o plataformas de ejercicio, suelen carecer de una orientación especializada hacia personas mayores o en rehabilitación, por lo que el presente sistema busca cubrir esa brecha mediante un enfoque inclusivo, accesible y sustentado en inteligencia artificial."
+            image={ejercicio2Img}
+            sx={{
+              flexBasis: {
+                xs: '100%',
+                sm: fontSize > 18 ? '100%' : '45%',
+                md: fontSize > 20 ? '100%' : '40%',
+              },
+              maxWidth: {
+                xs: '100%',
+                sm: fontSize > 18 ? '100%' : '45%',
+                md: fontSize > 20 ? '100%' : '40%',
+              },
+              flexGrow: 1,
+            }}
+          />
+
           <Card
             title=""
             description="La rehabilitación es un apoyo para recuperar fuerza, movilidad y bienestar después de una lesión, una enfermedad o simplemente para mantenerse activo. No solo se trata de terapias en clínicas, también puedes practicar ejercicios en casa que ayudan a mejorar tu flexibilidad, equilibrio y resistencia. A diferencia de un tratamiento médico, que busca curar una enfermedad, la rehabilitación se enfoca en recuperar tus capacidades y prevenir futuros problemas, acompañándote en el camino hacia una vida más saludable y activa."
@@ -134,6 +156,8 @@ export default function Home() {
               flexGrow: 1,
             }}
           />
+
+             
 
         </Box>
       </Container>
