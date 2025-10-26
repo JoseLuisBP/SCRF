@@ -1,3 +1,19 @@
+-- Limpiar tablas si existen
+DROP TABLE IF EXISTS auditoria_admin CASCADE;
+DROP TABLE IF EXISTS rutina_detalle CASCADE;
+DROP TABLE IF EXISTS historial_progreso CASCADE;
+DROP TABLE IF EXISTS reseñas CASCADE;
+DROP TABLE IF EXISTS ejercicios CASCADE;
+DROP TABLE IF EXISTS multimedia CASCADE;
+DROP TABLE IF EXISTS rutinas CASCADE;
+DROP TABLE IF EXISTS perfil_medico CASCADE;
+DROP TABLE IF EXISTS configuracion CASCADE;
+DROP TABLE IF EXISTS usuarios CASCADE;
+DROP TABLE IF EXISTS roles CASCADE;
+
+ALTER TABLE multimedia
+  ADD CONSTRAINT multimedia_ejercicio_fk FOREIGN KEY (id_ejercicio) 
+  REFERENCES ejercicios(id_ejercicio) ON DELETE SET NULL;
 
 -- Tabla Rutinas
 CREATE TABLE rutinas (
@@ -120,3 +136,24 @@ CREATE TABLE perfil_medico (
   cifrado_hash       VARCHAR(512)
 );
 
+-- Indices
+CREATE INDEX idx_historial_usuario_fecha ON historial_progreso (id_usuario, fecha);
+CREATE INDEX idx_rutina_creado_por ON rutinas (creado_por);
+CREATE INDEX idx_ejercicios_categoria ON ejercicios (categoria);
+CREATE INDEX idx_usuarios_correo ON usuarios (correo);
+CREATE INDEX idx_usuarios_rol ON usuarios (id_rol);
+CREATE INDEX idx_reseñas_rutina ON reseñas (id_rutina);
+CREATE INDEX idx_reseñas_usuario ON reseñas (id_usuario);
+
+-- Comentarios
+COMMENT ON TABLE roles IS 'Roles del sistema (admin, usuario, etc.)';
+COMMENT ON TABLE usuarios IS 'Usuarios de la aplicación';
+COMMENT ON TABLE perfil_medico IS 'Información médica sensible de usuarios';
+COMMENT ON TABLE multimedia IS 'Archivos multimedia (imágenes, videos)';
+COMMENT ON TABLE ejercicios IS 'Catálogo de ejercicios';
+COMMENT ON TABLE rutinas IS 'Rutinas de entrenamiento';
+COMMENT ON TABLE rutina_detalle IS 'Ejercicios dentro de cada rutina';
+COMMENT ON TABLE historial_progreso IS 'Registro de entrenamientos completados';
+COMMENT ON TABLE reseñas IS 'Valoraciones de rutinas por usuarios';
+COMMENT ON TABLE auditoria_admin IS 'Log de acciones administrativas';
+COMMENT ON TABLE configuracion IS 'Preferencias personalizadas de usuarios';
