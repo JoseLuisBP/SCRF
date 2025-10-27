@@ -1,3 +1,5 @@
+"""Gestor de conexión MongoDB asíncrono usando Motor - Singleton"""
+
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import ConnectionError, OperationFailure
 from typing import Optional
