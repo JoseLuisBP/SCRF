@@ -9,6 +9,7 @@ import { useAccessibility } from '../context/AccessibilityContext';
 import ejercicioImg from '../assets/images/ejercicio.jpeg';
 import ejercicio1Img from '../assets/images/ejercicio1.jpeg';
 import ejercicio2Img from '../assets/images/ejercicio2.jpeg';
+import ejecicio3Img  from '../assets/images/ejecicio3.jpeg';
 
 import Footer from '../components/layout/Footer';
 
@@ -43,7 +44,7 @@ export default function Home() {
           <Card
             title="Tu cuerpo no necesitan un gimnasio, solo gana de moverse."
             description=" ¿Quieres sentirte mejor, tener mas energia y cuida tu salud sin salir de casa ? ¡Estas en el lugar correcto! Activate en casa encontraras rutinas simples, efectivas y adaptadas para cualquier persona, sin importar la edad o condicion fisica."
-            horizontal
+             image={ejercicio3Img}
             sx={{
 
               flexBasis: {
