@@ -18,7 +18,7 @@ class Usuario(Base):
     nivel_fisico = Column(String(100), nullable=True)
 
     tiempo_disponible = Column(Integer, nullable=True)
-    fecha_registro = Column(Date, server_default=func.current_date())
+    fecha_registro = Column(Date, server_default=func.current_date)
     confirmado = Column(Boolean, default=False)
     id_rol = Column(Integer, ForeignKey("roles.id_rol", ondelete="SET NULL"), nullable=True)
 
