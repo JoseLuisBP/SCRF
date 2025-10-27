@@ -9,7 +9,7 @@ import { useAccessibility } from '../context/AccessibilityContext';
 import ejercicioImg from '../assets/images/ejercicio.jpeg';
 import ejercicio1Img from '../assets/images/ejercicio1.jpeg';
 import ejercicio2Img from '../assets/images/ejercicio2.jpeg';
-import ejercicio3Img from '../assets/images/ejercicio3.jpeg';
+import ejercicio3Img from '../assets/images/ejecicio3.jpeg';
 
 import Footer from '../components/layout/Footer';
 
