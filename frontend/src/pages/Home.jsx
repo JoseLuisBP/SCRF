@@ -41,6 +41,40 @@ export default function Home() {
         >
           
           <Card
+            title="Tu cuerpo no necesitan un gimnasio, solo gana de moverse."
+            description=" ¿Quieres sentirte mejor, tener mas energia y cuida tu salud sin salir de casa ? ¡Estas en el lugar correcto! Activate en casa encontraras rutinas simples, efectivas y adaptadas para cualquier persona, sin importar la edad o condicion fisica."
+            horizontal
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems:"center",
+              width:"100%",
+              maxWidth:"900px",
+              minHeight:"200px",
+              textAlign:"left",
+              backgroundColor:"background.paper",
+              borderRadius:3,
+              p:3,
+              boxShadow:3,
+              gap: 3,
+              margin:"auto",
+
+              flexBasis: {
+                xs: '100%',
+                sm: fontSize > 18 ? '100%' : '45%',
+                md: fontSize > 20 ? '100%' : '40%',
+              },
+              maxWidth: {
+                xs: '100%',
+                sm: fontSize > 18 ? '100%' : '45%',
+                md: fontSize > 20 ? '100%' : '40%',
+              },
+              flexGrow: 1,
+            }}
+          />
+
+
+          <Card
             title="ONU"
             description=" La importancia de la actividad física en la prevención  de enfermedades crónicas y en la mejora de la calidad de vida en adultos mayores. Según la Organización Mundial de la Salud (OMS), el envejecimiento activo se basa en la optimización de las oportunidades de salud, participación y seguridad. Proyectos tecnológicos similares, como aplicaciones de fisioterapia o plataformas de ejercicio, suelen carecer de una orientación especializada hacia personas mayores o en rehabilitación, por lo que el presente sistema busca cubrir esa brecha mediante un enfoque inclusivo, accesible y sustentado en inteligencia artificial."
             image={ejercicio2Img}
