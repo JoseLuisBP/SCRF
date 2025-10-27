@@ -29,68 +29,8 @@ export default function Home() {
       <Header showSearchBar={false} />
 
       <Container maxWidth="md" sx={{ mt: 12, mb: 4 }}>
-        <Box
-          sx={{
-            textAlign: 'center',
-            py: 6,
-            px: 2,
-            backgroundColor: 'background.paper',
-            borderRadius: 2,
-            boxShadow: (theme) => `0 8px 32px ${theme.palette.primary.main}20`,
-            transition: 'transform 0.2s ease',
-            '&:hover': { transform: 'translateY(-3px)' },
-          }}
-        >
-          <Typography
-            variant="h2"
-            component="h1"
-            gutterBottom
-            sx={{
-              fontSize: { xs: `${fontSize * 2}px`, md: `${fontSize * 2.5}px` },
-              fontWeight: 'bold',
-            }}
-          >
-            Bienvenido :)
-          </Typography>
-
-          <Typography
-            variant="h5"
-            component="h2"
-            gutterBottom
-            color="text.secondary"
-            sx={{
-              mb: 4,
-              fontSize: `${fontSize * 1.2}px`,
-            }}
-          >
-            Adaptado para tus necesidades
-          </Typography>
-
-          <Input
-            label="Correo Electrónico"
-            labelSize="small"
-            placeholder="Introduce tu correo"
-            fullWidth
-            sx={{ maxWidth: 400, mx: 'auto', mb: 3 }}
-          />
-
-          <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'center' }}>
-            <Button
-              variant={isLoggedIn ? 'secondary' : 'primary'}
-              onClick={toggleLogin}
-              size="small"
-            >
-              {isLoggedIn ? 'Cerrar Sesión' : 'Iniciar Sesión'} (Demo)
-            </Button>
-
-            <Button variant="primary" size="small">
-              Explorar
-            </Button>
-          </Box>
-        </Box>
-
         
-        <Box
+          <Box
           sx={{
             mt: 8,
             display: 'flex',
@@ -160,6 +100,70 @@ export default function Home() {
              
 
         </Box>
+
+
+        <Box
+          sx={{
+            textAlign: 'center',
+            py: 6,
+            px: 2,
+            backgroundColor: 'background.paper',
+            borderRadius: 2,
+            boxShadow: (theme) => `0 8px 32px ${theme.palette.primary.main}20`,
+            transition: 'transform 0.2s ease',
+            '&:hover': { transform: 'translateY(-3px)' },
+          }}
+        >
+          <Typography
+            variant="h2"
+            component="h1"
+            gutterBottom
+            sx={{
+              fontSize: { xs: `${fontSize * 2}px`, md: `${fontSize * 2.5}px` },
+              fontWeight: 'bold',
+            }}
+          >
+            Bienvenido :)
+          </Typography>
+
+          <Typography
+            variant="h5"
+            component="h2"
+            gutterBottom
+            color="text.secondary"
+            sx={{
+              mb: 4,
+              fontSize: `${fontSize * 1.2}px`,
+            }}
+          >
+            Adaptado para tus necesidades
+          </Typography>
+
+          <Input
+            label="Correo Electrónico"
+            labelSize="small"
+            placeholder="Introduce tu correo"
+            fullWidth
+            sx={{ maxWidth: 400, mx: 'auto', mb: 3 }}
+          />
+
+          <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'center' }}>
+            <Button
+              variant={isLoggedIn ? 'secondary' : 'primary'}
+              onClick={toggleLogin}
+              size="small"
+            >
+              {isLoggedIn ? 'Cerrar Sesión' : 'Iniciar Sesión'} (Demo)
+            </Button>
+
+            <Button variant="primary" size="small">
+              Explorar
+            </Button>
+          </Box>
+        </Box>
+
+        
+      
       </Container>
       <Footer />
     </Box>
