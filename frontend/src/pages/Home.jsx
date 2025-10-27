@@ -45,31 +45,18 @@ export default function Home() {
             description=" ¿Quieres sentirte mejor, tener mas energia y cuida tu salud sin salir de casa ? ¡Estas en el lugar correcto! Activate en casa encontraras rutinas simples, efectivas y adaptadas para cualquier persona, sin importar la edad o condicion fisica."
             horizontal
             sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems:"center",
-              width:"100%",
-              maxWidth:"900px",
-              minHeight:"200px",
-              textAlign:"left",
-              backgroundColor:"background.paper",
-              borderRadius:3,
-              p:3,
-              boxShadow:3,
-              gap: 3,
-              margin:"auto",
 
               flexBasis: {
                 xs: '100%',
-                sm: fontSize > 18 ? '100%' : '100%',
-                md: fontSize > 20 ? '100%' : '100%',
+                sm: fontSize > 18 ? '100%' : '45%',
+                md: fontSize > 20 ? '100%' : '40%',
               },
               maxWidth: {
                 xs: '100%',
-                sm: fontSize > 18 ? '100%' : '100%',
-                md: fontSize > 20 ? '100%' : '100%',
+                sm: fontSize > 18 ? '100%' : '45%',
+                md: fontSize > 20 ? '100%' : '40%',
               },
-              //flexGrow: 1,
+              flexGrow: 1,
             }}
           />
 
