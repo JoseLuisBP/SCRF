@@ -11,6 +11,50 @@ DROP TABLE IF EXISTS configuracion CASCADE;
 DROP TABLE IF EXISTS usuarios CASCADE;
 DROP TABLE IF EXISTS roles CASCADE;
 
+-- Tabla Roles
+CREATE TABLE roles (
+  id_rol           SERIAL PRIMARY KEY,
+  nombre_rol       VARCHAR(100) NOT NULL,
+  descripcion      TEXT
+);
+
+-- Tabla Usuarios
+CREATE TABLE usuarios (
+  id_usuario           SERIAL PRIMARY KEY,
+  nombre               VARCHAR(200) NOT NULL,
+  correo               VARCHAR(255) UNIQUE NOT NULL,
+  contrasena_hash      VARCHAR(512) NOT NULL,
+  edad                 INTEGER,
+  peso                 REAL,
+  estatura             REAL,
+  nivel_fisico         VARCHAR(100),
+  tiempo_disponible    INTEGER,
+  fecha_registro       DATE DEFAULT CURRENT_DATE,
+  confirmado           BOOLEAN DEFAULT FALSE, -- Indica si el usuario ha aceptado los términos y condiciones
+  is_active           BOOLEAN DEFAULT TRUE, -- Indica si la cuenta del usuario está activa
+  id_rol               INTEGER REFERENCES roles(id_rol) ON DELETE SET NULL
+);
+
+-- Tabla Configuración por Usuario
+CREATE TABLE configuracion (
+  id_configuracion   SERIAL PRIMARY KEY,
+  id_usuario         INTEGER UNIQUE REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+  modo_visual        VARCHAR(50) DEFAULT 'light',
+  tamano_fuente      VARCHAR(50) DEFAULT 'medium',
+  notificaciones     BOOLEAN DEFAULT TRUE,
+  preferencia_privacidad BOOLEAN DEFAULT FALSE
+);
+
+-- Tabla Perfil Medico
+CREATE TABLE perfil_medico (
+  id_perfil_medico   SERIAL PRIMARY KEY,
+  id_usuario         INTEGER NOT NULL UNIQUE REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+  condiciones_fisicas TEXT,
+  lesiones           TEXT,
+  limitaciones       TEXT,
+  cifrado_hash       VARCHAR(512)
+);
+
 -- Tabla Rutinas
 CREATE TABLE rutinas (
   id_rutina         SERIAL PRIMARY KEY,
@@ -21,18 +65,6 @@ CREATE TABLE rutinas (
   categoria         VARCHAR(100),
   creado_por        INTEGER REFERENCES usuarios(id_usuario) ON DELETE SET NULL,
   fecha_creacion    DATE DEFAULT CURRENT_DATE
-);
-
--- Tabla Rutina_Ejercicio
-CREATE TABLE rutina_ejercicio (
-  id_rutina_ejercicio SERIAL PRIMARY KEY,
-  id_rutina          INTEGER NOT NULL REFERENCES rutinas(id_rutina) ON DELETE CASCADE,
-  id_ejercicio       INTEGER NOT NULL REFERENCES ejercicios(id_ejercicio) ON DELETE CASCADE,
-  series             INTEGER,
-  repeticiones       INTEGER,
-  duracion_segundos  INTEGER,
-  orden              INTEGER NOT NULL,
-  CONSTRAINT unica_rutina_ejercicio UNIQUE (id_rutina, orden)
 );
 
 -- Tabla Multimedia
@@ -58,15 +90,16 @@ CREATE TABLE ejercicios (
   activo            BOOLEAN DEFAULT TRUE
 );
 
--- Tabla Historial_Progreso
-CREATE TABLE historial_progreso (
-  id_historial      SERIAL PRIMARY KEY,
-  id_usuario        INTEGER NOT NULL REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
-  id_rutina         INTEGER NOT NULL REFERENCES rutinas(id_rutina) ON DELETE SET NULL,
-  fecha             DATE DEFAULT CURRENT_DATE,
-  duracion_real     INTEGER,
-  estado            VARCHAR(50),
-  notas             TEXT
+-- Tabla Rutina_Ejercicio
+CREATE TABLE rutina_ejercicio (
+  id_rutina_ejercicio SERIAL PRIMARY KEY,
+  id_rutina          INTEGER NOT NULL REFERENCES rutinas(id_rutina) ON DELETE CASCADE,
+  id_ejercicio       INTEGER NOT NULL REFERENCES ejercicios(id_ejercicio) ON DELETE CASCADE,
+  series             INTEGER,
+  repeticiones       INTEGER,
+  duracion_segundos  INTEGER,
+  orden              INTEGER NOT NULL,
+  CONSTRAINT unica_rutina_ejercicio UNIQUE (id_rutina, orden)
 );
 
 -- Tabla Reseñas
@@ -79,6 +112,17 @@ CREATE TABLE resenas (
   fecha_resena     DATE DEFAULT CURRENT_DATE
 );
 
+-- Tabla Historial_Progreso
+CREATE TABLE historial_progreso (
+  id_historial      SERIAL PRIMARY KEY,
+  id_usuario        INTEGER NOT NULL REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+  id_rutina         INTEGER NOT NULL REFERENCES rutinas(id_rutina) ON DELETE SET NULL,
+  fecha             DATE DEFAULT CURRENT_DATE,
+  duracion_real     INTEGER,
+  estado            VARCHAR(50),
+  notas             TEXT
+);
+
 -- Tabla Auditoria Administradores
 CREATE TABLE auditoria_admin (
   id_auditoria        SERIAL PRIMARY KEY,
@@ -88,51 +132,6 @@ CREATE TABLE auditoria_admin (
   fecha_accion        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   descripcion         TEXT
 );
-
--- Tabla Configuración por Usuario
-CREATE TABLE configuracion (
-  id_configuracion   SERIAL PRIMARY KEY,
-  id_usuario         INTEGER UNIQUE REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
-  modo_visual        VARCHAR(50) DEFAULT 'light',
-  tamano_fuente      VARCHAR(50) DEFAULT 'medium',
-  notificaciones     BOOLEAN DEFAULT TRUE,
-  preferencia_privacidad BOOLEAN DEFAULT FALSE
-);
-
--- Tabla Roles
-CREATE TABLE roles (
-  id_rol           SERIAL PRIMARY KEY,
-  nombre_rol       VARCHAR(100) NOT NULL,
-  descripcion      TEXT
-);
-
--- Tabla Usuarios
-CREATE TABLE usuarios (
-  id_usuario           SERIAL PRIMARY KEY,
-  nombre               VARCHAR(200) NOT NULL,
-  correo               VARCHAR(255) UNIQUE NOT NULL,
-  contrasena_hash      VARCHAR(512) NOT NULL,
-  edad                 INTEGER,
-  peso                 REAL,
-  estatura             REAL,
-  nivel_fisico         VARCHAR(100),
-  tiempo_disponible    INTEGER,
-  fecha_registro       DATE DEFAULT CURRENT_DATE,
-  confirmado           BOOLEAN DEFAULT FALSE, -- Indica si el usuario ha aceptado los términos y condiciones
-  is_active           BOOLEAN DEFAULT TRUE, -- Indica si la cuenta del usuario está activa
-  id_rol               INTEGER REFERENCES roles(id_rol) ON DELETE SET NULL
-);
-
--- Tabla Perfil Medico
-CREATE TABLE perfil_medico (
-  id_perfil_medico   SERIAL PRIMARY KEY,
-  id_usuario         INTEGER NOT NULL UNIQUE REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
-  condiciones_fisicas TEXT,
-  lesiones           TEXT,
-  limitaciones       TEXT,
-  cifrado_hash       VARCHAR(512)
-);
-
 
 ALTER TABLE multimedia
   ADD CONSTRAINT multimedia_ejercicio_fk FOREIGN KEY (id_ejercicio) 
