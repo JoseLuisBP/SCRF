@@ -1,5 +1,5 @@
 -- Roles
-INSERT INTO roles (name, description) VALUES
+INSERT INTO roles (nombre_rol, descripcion) VALUES
   ('user', 'Usuario normal'),
   ('entrenador', 'Entrenador profesional'),
   ('admin', 'Administrador');

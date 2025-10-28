@@ -1,6 +1,7 @@
-from fastapi import Depends
-from sqlalchemy.ext.asyncio import AsyncSession
+'''Gestor de sesiones para bases de datos PostgreSQL y MongoDB.'''
 from typing import AsyncGenerator, Optional
+from sqlalchemy.ext.asyncio import AsyncSession
+from pymongo.database import Database
 from .postgresql import postgresql
 from .mongodb import mongodb
 
@@ -12,7 +13,7 @@ class SessionManager:
     
     def __init__(self):
         self._pg_session: Optional[AsyncSession] = None
-        self._mongo_db = mongodb.db
+        self._mongo_db: Database = mongodb.db
 
     @property
     def mongo(self):
@@ -37,21 +38,15 @@ class SessionManager:
             self._pg_session = None
 
 async def get_session_manager() -> AsyncGenerator[SessionManager, None]:
-    """
-    Dependencia para obtener un gestor de sesiones.
-    Uso:
-        @app.get("/ruta")
-        async def endpoint(session_manager: SessionManager = Depends(get_session_manager)):
-            # Usar session_manager.mongo o session_manager.pg_session
-    """
+    """Generador de dependencias para SessionManager"""
     manager = SessionManager()
     
     try:
-        async with postgresql.get_session() as pg_session:
-            await manager.set_pg_session(pg_session)
-            yield manager
+        pg_session = await postgresql.get_session()
+        await manager.set_pg_session(pg_session)
+        yield manager
     finally:
         await manager.close()
 
 # Para uso con FastAPI Depends
-get_db = get_session_manager
+get_sesion = get_session_manager

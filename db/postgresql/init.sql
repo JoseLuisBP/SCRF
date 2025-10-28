@@ -122,7 +122,8 @@ CREATE TABLE usuarios (
   nivel_fisico         VARCHAR(100),
   tiempo_disponible    INTEGER,
   fecha_registro       DATE DEFAULT CURRENT_DATE,
-  confirmado           BOOLEAN DEFAULT FALSE,
+  confirmado           BOOLEAN DEFAULT FALSE, -- Indica si el usuario ha aceptado los términos y condiciones
+  is_active           BOOLEAN DEFAULT TRUE, -- Indica si la cuenta del usuario está activa
   id_rol               INTEGER REFERENCES roles(id_rol) ON DELETE SET NULL
 );
 
