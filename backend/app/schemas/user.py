@@ -36,7 +36,9 @@ class UserChangePassword(BaseModel):
 class UserResponse(UserBase):
     id_usuario: int = Field(..., description="ID único del usuario")
     fecha_registro: datetime = Field(..., description="Fecha de registro del usuario")
-    confirmado: bool = Field(..., description="Indica si el usuario ha confirmado los términos y condiciones")
+    confirmado: bool = Field(..., description="Indica si el usuario ha aceptado los términos y condiciones de uso")
+    is_active: bool = Field(..., description="Indica si la cuenta del usuario está activa")
+    is_admin: bool = Field(..., description="Indica si el usuario tiene privilegios administrativos")
     id_rol: Optional[int] = Field(None, description="ID del rol asignado al usuario")
 
     model_config = ConfigDict(from_attributes=True)
