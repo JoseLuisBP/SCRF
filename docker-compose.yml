@@ -50,10 +50,11 @@ services:
       - ./db/postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./db/postgresql/seed.sql:/docker-entrypoint-initdb.d/seed.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin"]
+      test: ["CMD-SHELL", "pg_isready -U admin -d app_db"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 10s
     networks:
       - app_network
 
@@ -73,7 +74,8 @@ services:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 10s
     networks:
       - app_network
 
