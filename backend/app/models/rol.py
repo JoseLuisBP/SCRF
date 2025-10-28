@@ -10,7 +10,7 @@ class Rol(Base):
     descripcion = Column(Text, nullable=True)
     
     # Relación inversa a Usuario
-    usuarios = relationship("Usuario", back_populates="rol", cascade="all, delete")
+    usuarios = relationship("User", back_populates="rol", cascade="all, delete")
 
     def __repr__(self):
         return f"<Rol(id_rol={self.id_rol}, nombre_rol='{self.nombre_rol}')>"
