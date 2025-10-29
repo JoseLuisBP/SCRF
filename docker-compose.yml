@@ -1,4 +1,4 @@
-version: "3.9"
+
 services:
   backend:
     build:
@@ -40,19 +40,21 @@ services:
     image: postgres:17
     container_name: postgres_db
     environment:
-      - POSTGRES_USER = admin
-      - POSTGRES_PASSWORD = admin
-      - POSTGRES_DB = app_db
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=app_db
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./db/postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/postgresql/seed.sql:/docker-entrypoint-initdb.d/seed.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin"]
+      test: ["CMD-SHELL", "pg_isready -U admin -d app_db"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 10s
     networks:
       - app_network
 
@@ -60,9 +62,9 @@ services:
     image: mongo:7
     container_name: mongo_db
     environment:
-      - MONGO_INITDB_ROOT_USERNAME = admin
-      - MONGO_INITDB_ROOT_PASSWORD = admin
-      - MONGO_INITDB_DATABASE = app_mongo
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+      - MONGO_INITDB_DATABASE=app_mongo
     ports:
       - "27017:27017"
     volumes:
@@ -72,7 +74,8 @@ services:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 10s
     networks:
       - app_network
 

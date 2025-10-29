@@ -1,14 +1,16 @@
-from fastapi import FastAPI
 from contextlib import asynccontextmanager
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.logging import logger
+from backend.app.api.v1 import auth, users
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(application: FastAPI):
     """Eventos de inicio y cierre de la aplicación"""
-    logger.info(f"Iniciando {settings.PROJECT_NAME} v{settings.VERSION}")
-    logger.info(f"Entorno: {settings.ENVIRONMENT}")
+    logger.info("Iniciando %s v%s", settings.PROJECT_NAME, settings.VERSION)
+    logger.info("Entorno: %s", settings.ENVIRONMENT)
     logger.info("Documentación disponible en /docs y /redoc")
     yield
     logger.info("Cerrando la aplicación...")
@@ -20,6 +22,26 @@ app = FastAPI(
     description="API backend de la aplicación",
     docs_url="/docs",
     redoc_url="/redoc",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.BACKEND_CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(
+    auth.router,
+    prefix=f"{settings.API_V1_PREFIX}/auth",
+    tags=["Authentication"]
+)
+
+app.include_router(
+    users.router,
+    prefix=f"{settings.API_V1_PREFIX}/users",
+    tags=["Users"]
 )
 
 @app.get("/")
@@ -42,7 +64,7 @@ def health_check():
     }
 
 @app.exception_handler(Exception)
-async def global_exception_handler(request, exc):
+async def global_exception_handler(_request, exc):
     """Manejador global de excepciones"""
     logger.error(f"Error inesperado: {exc}")
     return {

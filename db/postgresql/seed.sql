@@ -1,5 +1,5 @@
 -- Roles
-INSERT INTO roles (name, description) VALUES
+INSERT INTO roles (nombre_rol, descripcion) VALUES
   ('user', 'Usuario normal'),
   ('entrenador', 'Entrenador profesional'),
   ('admin', 'Administrador');
@@ -71,7 +71,7 @@ INSERT INTO rutinas (nombre_rutina, descripcion, nivel, duracion_estimado, categ
 
 -- Rutina_Ejercicios
 -- Rutina 1: Principiantes - Cuerpo Completo
-INSERT INTO rutina_detalle (id_rutina, orden, id_ejercicio, repeticiones, duracion_segundos) VALUES
+INSERT INTO rutina_ejercicio (id_rutina, orden, id_ejercicio, repeticiones, duracion_segundos) VALUES
   (1, 1, 2, 12, NULL),   -- Flexiones
   (1, 2, 9, 10, NULL),   -- Sentadillas
   (1, 3, 6, 10, NULL),   -- Remo con Barra
@@ -80,7 +80,7 @@ INSERT INTO rutina_detalle (id_rutina, orden, id_ejercicio, repeticiones, duraci
   (1, 6, 21, 15, NULL);  -- Abdominales
 
 -- Rutina 2: Push (Empuje)
-INSERT INTO rutina_detalle (id_rutina, orden, id_ejercicio, repeticiones, duracion_segundos) VALUES
+INSERT INTO rutina_ejercicio (id_rutina, orden, id_ejercicio, repeticiones, duracion_segundos) VALUES
   (2, 1, 1, 8, NULL),    -- Press de Banca
   (2, 2, 3, 10, NULL),   -- Press Inclinado
   (2, 3, 13, 10, NULL),  -- Press Militar
@@ -88,7 +88,7 @@ INSERT INTO rutina_detalle (id_rutina, orden, id_ejercicio, repeticiones, duraci
   (2, 5, 18, 12, NULL);  -- Extensiones Tríceps
 
 -- Rutina 3: Avanzado - Día de Pecho
-INSERT INTO rutina_detalle (id_rutina, orden, id_ejercicio, repeticiones, duracion_segundos) VALUES
+INSERT INTO rutina_ejercicio (id_rutina, orden, id_ejercicio, repeticiones, duracion_segundos) VALUES
   (3, 1, 1, 6, NULL),    -- Press de Banca (pesado)
   (3, 2, 3, 10, NULL),   -- Press Inclinado
   (3, 3, 4, 12, NULL),   -- Aperturas
@@ -96,7 +96,7 @@ INSERT INTO rutina_detalle (id_rutina, orden, id_ejercicio, repeticiones, duraci
   (3, 5, 19, 10, NULL);  -- Fondos
 
 -- Rutina 4: HIIT
-INSERT INTO rutina_detalle (id_rutina, orden, id_ejercicio, repeticiones, duracion_segundos) VALUES
+INSERT INTO rutina_ejercicio (id_rutina, orden, id_ejercicio, repeticiones, duracion_segundos) VALUES
   (4, 1, 25, 20, NULL),  -- Burpees
   (4, 2, 27, 30, NULL),  -- Mountain Climbers
   (4, 3, 10, 20, NULL),  -- Zancadas
@@ -104,7 +104,7 @@ INSERT INTO rutina_detalle (id_rutina, orden, id_ejercicio, repeticiones, duraci
   (4, 5, 26, NULL, 120); -- Saltar cuerda
 
 -- Rutina 5: Core
-INSERT INTO rutina_detalle (id_rutina, orden, id_ejercicio, repeticiones, duracion_segundos) VALUES
+INSERT INTO rutina_ejercicio (id_rutina, orden, id_ejercicio, repeticiones, duracion_segundos) VALUES
   (5, 1, 20, NULL, 60),  -- Plancha
   (5, 2, 21, 25, NULL),  -- Crunches
   (5, 3, 22, 30, NULL),  -- Russian Twist
@@ -120,7 +120,7 @@ INSERT INTO historial_progreso (id_rutina, id_usuario, fecha, duracion_real, est
   (4, 2, CURRENT_DATE - INTERVAL '1 day', 22, 'completado', 'HIIT brutal pero efectivo');
 
 -- Reseñas
-INSERT INTO reseñas (id_usuario, id_rutina, calificacion, comentario, fecha_creacion) VALUES
+INSERT INTO resenas (id_usuario, id_rutina, calificacion, comentario, fecha_creacion) VALUES
   (2, 1, 5, 'Excelente rutina para empezar. Muy bien explicada.', CURRENT_DATE - INTERVAL '5 days'),
   (3, 1, 5, 'Perfecta para principiantes como yo. La recomiendo 100%', CURRENT_DATE - INTERVAL '2 days'),
   (2, 4, 4, 'HIIT muy intenso pero efectivo. Me ayudó a quemar grasa.', CURRENT_DATE - INTERVAL '1 day'),
