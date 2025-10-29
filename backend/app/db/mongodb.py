@@ -1,9 +1,8 @@
 """Gestor de conexión MongoDB asíncrono usando Motor - Singleton"""
-
-from motor.motor_asyncio import AsyncIOMotorClient
-from pymongo.errors import ConnectionError, OperationFailure
 from typing import Optional
 import logging
+from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo.errors import ConnectionFailure, OperationFailure
 from ..core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -27,7 +26,7 @@ class MongoDBManager:
                 # Verificar conexión
                 await self._client.admin.command('ping')
                 logger.info("Conexión exitosa a MongoDB")
-        except ConnectionError as e:
+        except ConnectionFailure as e:
             logger.error(f"Error al conectar a MongoDB: {e}")
             raise
         except Exception as e:
@@ -46,7 +45,7 @@ class MongoDBManager:
     def db(self):
         """Retorna la instancia de la base de datos"""
         if not self._client:
-            raise ConnectionError("No hay conexión activa con MongoDB")
+            raise ConnectionFailure("No hay conexión activa con MongoDB")
         return self._db
 
     async def get_collection(self, collection_name: str):

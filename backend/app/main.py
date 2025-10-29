@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.logging import logger
-from backend.app.api.v1 import auth, users
+from app.api.v1 import auth, users
 
 @asynccontextmanager
 async def lifespan(application: FastAPI):
