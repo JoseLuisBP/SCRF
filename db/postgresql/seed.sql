@@ -62,7 +62,7 @@ INSERT INTO ejercicios (nombre_ejercicio, descripcion, repeticiones, tiempo, cat
   ('Mountain Climbers', 'Ejercicio cardiovascular y de core.', 30, NULL, 'cardio', NULL, TRUE);
 
 -- Rutinas
-INSERT INTO rutinas (nombre_rutina, descripcion, nivel, duracion_estimado, categoria, creado_por) VALUES
+INSERT INTO rutinas (nombre_rutina, descripcion, nivel, duracion_estimada, categoria, creado_por) VALUES
   ('Principiantes - Cuerpo Completo', 'Rutina ideal para personas que inician en el gimnasio. 3 veces por semana.', 'beginner', 45, 'fuerza', 4),
   ('Intermedio - Push Pull Legs', 'Rutina dividida en empuje, tirón y piernas. 6 días a la semana.', 'intermediate', 60, 'fuerza', 4),
   ('Avanzado - Hipertrofia', 'Rutina enfocada en ganancia muscular. 5 días a la semana.', 'advanced', 75, 'hipertrofia', 4),
@@ -120,7 +120,7 @@ INSERT INTO historial_progreso (id_rutina, id_usuario, fecha, duracion_real, est
   (4, 2, CURRENT_DATE - INTERVAL '1 day', 22, 'completado', 'HIIT brutal pero efectivo');
 
 -- Reseñas
-INSERT INTO resenas (id_usuario, id_rutina, calificacion, comentario, fecha_creacion) VALUES
+INSERT INTO resenas (id_usuario, id_rutina, calificacion, comentario, fecha_resena) VALUES
   (2, 1, 5, 'Excelente rutina para empezar. Muy bien explicada.', CURRENT_DATE - INTERVAL '5 days'),
   (3, 1, 5, 'Perfecta para principiantes como yo. La recomiendo 100%', CURRENT_DATE - INTERVAL '2 days'),
   (2, 4, 4, 'HIIT muy intenso pero efectivo. Me ayudó a quemar grasa.', CURRENT_DATE - INTERVAL '1 day'),
