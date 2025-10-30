@@ -71,12 +71,12 @@ export default function Home() {
               flexBasis: {
                 xs: '100%',
                 sm: fontSize > 18 ? '100%' : '45%',
-                md: fontSize > 20 ? '100%' : '65%',
+                md: fontSize > 20 ? '100%' : '90%',
               },
               maxWidth: {
                 xs: '100%',
                 sm: fontSize > 18 ? '100%' : '45%',
-                md: fontSize > 20 ? '100%' : '65%',
+                md: fontSize > 20 ? '100%' : '90%',
               },
               flexGrow: 1,
             }}
@@ -90,12 +90,12 @@ export default function Home() {
               flexBasis: {
                 xs: '100%',
                 sm: fontSize > 18 ? '100%' : '45%',
-                md: fontSize > 20 ? '100%' : '65%',
+                md: fontSize > 20 ? '100%' : '90%',
               },
               maxWidth: {
                 xs: '100%',
                 sm: fontSize > 18 ? '100%' : '45%',
-                md: fontSize > 20 ? '100%' : '65%',
+                md: fontSize > 20 ? '100%' : '90%',
               },
               flexGrow: 1,
             }}
