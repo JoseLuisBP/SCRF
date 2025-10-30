@@ -70,8 +70,8 @@ export default function Home() {
             sx={{
               flexBasis: {
                 xs: '100%',
-                sm: fontSize > 18 ? '100%' : '45%',
-                md: fontSize > 20 ? '100%' : '40%',
+                sm: fontSize > 18 ? '100%' : '48%',
+                md: fontSize > 20 ? '100%' : '45%',
               },
               maxWidth: {
                 xs: '100%',
