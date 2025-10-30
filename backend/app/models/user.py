@@ -1,5 +1,5 @@
 '''Modelo de datos para la entidad Usuario en la base de datos PostgreSQL'''
-from sqlalchemy import Column, Date, Integer, String, Boolean, Float, ForeignKey, text
+from sqlalchemy import Column, Date, Integer, String, Boolean, Float, ForeignKey, func
 from sqlalchemy.orm import relationship
 from app.db.postgresql import Base
 
@@ -20,7 +20,7 @@ class User(Base):
     tiempo_disponible = Column(Integer, nullable=True)
 
     # Estado y permisos
-    fecha_registro = Column(Date, server_default=text("CURRENT_DATE"))
+    fecha_registro = Column(Date, server_default=func.current_date)
     confirmado = Column(Boolean, default=False, comment="Indica si el usuario ha aceptado los términos y condiciones")
     is_active = Column(Boolean, default=True, comment="Indica si la cuenta del usuario está activa")
     id_rol = Column(Integer, ForeignKey("roles.id_rol", ondelete="SET NULL"))
