@@ -1,0 +1,10 @@
+backend/app/logs/*
+backend/app/__pycache__/
+*.pyc
+.vscode/
+.idea/
+.DS_Store
+.env
+.env.*
+coverage
+.coverage.*
