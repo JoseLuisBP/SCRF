@@ -1,4 +1,4 @@
-import React from "react";
+/*import React from "react";
 import { Card as MuiCard, CardContent, Typography, Box } from "@mui/material";
 import { useAccessibility } from "../../context/AccessibilityContext";
 
@@ -79,10 +79,10 @@ function Card({ title, description, image, sx = {} }) {
 
 export default Card;
 
+*/
 
 
-
-/*import React from "react";
+import React from "react";
 import { Card as MuiCard, CardContent, CardMedia, Typography } from "@mui/material";
 import { useAccessibility } from "../../context/AccessibilityContext"; 
 function Card({ title, description, image }) {
@@ -151,4 +151,3 @@ function Card({ title, description, image }) {
 }
 
 export default Card;
-*/
