@@ -35,9 +35,22 @@ export default function Home() {
           sx={{
            mt: 8,
             display: 'flex',
-            flexWrap: 'wrap',
+            /*flexWrap: 'wrap',
             justifyContent: 'center',
-            gap: fontSize > 18 ? 5 : 3, 
+            gap: fontSize > 18 ? 5 : 3, */
+            flexDirection: 'row', 
+    flexWrap: 'nowrap',   
+    overflowX: 'auto',    
+    justifyContent: 'flex-start',
+    alignItems: 'stretch',
+    gap: 3,
+    px: 2,
+    scrollBehavior: 'smooth',
+    '&::-webkit-scrollbar': { height: 8 },
+    '&::-webkit-scrollbar-thumb': {
+      backgroundColor: '#888',
+      borderRadius: 4,
+    },
           }}
         >
           
