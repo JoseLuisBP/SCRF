@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { useAccessibility } from '../context/AccessibilityContext';
 
 import ejercicioImg from '../assets/images/ejercicio.jpeg';
-import ejercicio1Img from '../assets/images/ejercicio1.jpeg';
+import sistemaImg from '../assets/images/sistema.jpeg';
 import ejercicio2Img from '../assets/images/ejercicio2.jpeg';
 import ejercicio3Img from '../assets/images/ejecicio3.jpeg';
 
@@ -104,7 +104,7 @@ export default function Home() {
           <Card
             title=""
             description="Es un sistema accesible que facilite la recuperación, conservación y fortalecimiento de movilidad, fuerza y flexibilidad en adultos mayores, personas en rehabilitación física y población interesada en prevenir riesgos de salud."
-            image={ejercicio1Img}
+            image={sistemaImg}
             sx={{
               flexBasis: {
                 xs: '100%',
