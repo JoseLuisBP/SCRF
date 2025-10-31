@@ -1,6 +1,8 @@
 from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy.future import select
+from sqlalchemy.exc import IntegrityError
 
 from app.core.config import settings
 from app.core.security import (
@@ -16,9 +18,8 @@ from app.api.deps import get_current_user
 
 router = APIRouter()
 
-
 @router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
-def register(user_data: UserCreate, db: Session = Depends(postgresql.get_session)):
+async def register(user_data: UserCreate, db: Session = Depends(postgresql.get_session)):
     """
     Registrar un nuevo usuario
     
@@ -33,21 +34,16 @@ def register(user_data: UserCreate, db: Session = Depends(postgresql.get_session
         HTTPException: Si el email o username ya existen
     """
     # Verificar si el email ya existe
-    existing_user = db.query(User).filter(User.correo == user_data.correo).first()
+    result = await db.execute(select(User).where(User.correo == user_data.correo))
+    existing_user = result.scalar_one_or_none()
     if existing_user:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="El email ya está registrado"
-        )
-
-    # Verificar si el nombre de usuario ya existe
-    existing_username = db.query(User).filter(User.nombre == user_data.nombre).first()
-    if existing_username:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="El nombre de usuario ya está en uso"
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="El email ya está registrado", 
+            headers={"WWW-Authenticate": "Bearer"}
         )
     
+
     # Crear nuevo usuario
     db_user = User(
         correo=user_data.correo,
@@ -60,13 +56,23 @@ def register(user_data: UserCreate, db: Session = Depends(postgresql.get_session
     )
     
     db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
+
+    try:
+        await db.commit()
+        await db.refresh(db_user)
+    except IntegrityError as e:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El email ya está registrado",
+            headers={"WWW-Authenticate": "Bearer"}
+        ) from e
+
     
     # Crear token de acceso
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": str(db_user.id)}, 
+        data={"sub": str(db_user.id)},
         expires_delta=access_token_expires
     )
     
@@ -77,7 +83,7 @@ def register(user_data: UserCreate, db: Session = Depends(postgresql.get_session
 
 
 @router.post("/login", response_model=Token)
-def login(login_data: LoginRequest, db: Session = Depends(postgresql.get_session)):
+async def login(login_data: LoginRequest, db: Session = Depends(postgresql.get_session)):
     """
     Iniciar sesión con email y contraseña
     
@@ -92,12 +98,13 @@ def login(login_data: LoginRequest, db: Session = Depends(postgresql.get_session
         HTTPException: Si las credenciales son incorrectas
     """
     # Buscar usuario por correo
-    user = db.query(User).filter(User.correo == login_data.correo).first()
+    result = await db.execute(select(User).where(User.correo == login_data.correo))
+    user = result.scalar_one_or_none()
 
     if not user or not verify_password(login_data.contrasena, user.contrasena_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Correo o contraseña incorrectos",
+            detail="Credenciales incorrectas",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
@@ -121,7 +128,7 @@ def login(login_data: LoginRequest, db: Session = Depends(postgresql.get_session
 
 
 @router.get("/verify", response_model=UserResponse)
-def verify_token(current_user: User = Depends(get_current_user)):
+async def verify_token(current_user: User = Depends(get_current_user)):
     """
     Verificar token JWT y obtener información del usuario actual
     
@@ -135,7 +142,7 @@ def verify_token(current_user: User = Depends(get_current_user)):
 
 
 @router.get("/me", response_model=UserResponse)
-def get_current_user_info(current_user: User = Depends(get_current_user)):
+async def get_current_user_info(current_user: User = Depends(get_current_user)):
     """
     Obtener información del usuario actual
     
@@ -149,7 +156,7 @@ def get_current_user_info(current_user: User = Depends(get_current_user)):
 
 
 @router.post("/logout")
-def logout():
+async def logout():
     """
     Cerrar sesión (endpoint simbólico)
     

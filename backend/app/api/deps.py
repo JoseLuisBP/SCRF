@@ -1,12 +1,9 @@
-from typing import AsyncGenerator, Optional
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from sqlalchemy.ext.asyncio import AsyncSession
-from datetime import datetime
 
 from ..core.config import settings
-from ..core.security import verify_password
 from ..db.session import get_sesion
 from ..models.user import User
 from ..schemas.token import TokenData
