@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Typography, IconButton } from "@mui/material";
-import { Facebook, Instagram, Twitter } from "@mui/icons-material";
+import { Facebook, Instagram, Email, Phone, Twitter } from "@mui/icons-material";
 
 function Footer ()  {
   return (
@@ -34,6 +34,20 @@ function Footer ()  {
 
       {/* Iconos de redes sociales */}
       <Box>
+        <IconButton
+          href="paginacontacto@rehabilitacion.com"
+          color="inherit"
+        >
+          <Email />
+        </IconButton>
+
+        <IconButton
+          href="tel:3314789570"
+          color="inherit"
+        >
+          <Phone />
+        </IconButton>
+
         <IconButton
           href="https://www.facebook.com"
           target="_blank"
