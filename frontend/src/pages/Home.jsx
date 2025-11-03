@@ -6,10 +6,10 @@ import Card from '../components/layout/Card';
 import { useAuth } from '../context/AuthContext';
 import { useAccessibility } from '../context/AccessibilityContext';
 
+import gimnasioImg from '../assets/images/gimnasio.jpeg';
 import ejercicioImg from '../assets/images/ejercicio.jpeg';
-import sistemaImg from '../assets/images/sistema.jpeg';
-import onuImg from '../assets/images/onu.jpeg';
-import cuerpoImg from '../assets/images/cuerpo.jpeg';
+import onuImg from '../assets/images/onu.jpg';
+import cuerpoImg from '../assets/images/cuerpo.jpg';
 import funcionImg from '../assets/images/funcion.jpg';
 
 import Footer from '../components/layout/Footer';
@@ -86,7 +86,7 @@ export default function Home() {
            <Card
             title="Funcion de la Pagina"
             description="Es un sistema accesible que facilite la recuperación, conservación y fortalecimiento de movilidad, fuerza y flexibilidad en adultos mayores, personas en rehabilitación física y población interesada en prevenir riesgos de salud."
-            image={sistemaImg}
+            image={ejercicioImg}
             sx={{
               flexBasis: {
                 xs: '100%',
@@ -126,7 +126,7 @@ export default function Home() {
           <Card
             title=""
             description="La rehabilitación es un apoyo para recuperar fuerza, movilidad y bienestar después de una lesión, una enfermedad o simplemente para mantenerse activo. No solo se trata de terapias en clínicas, también puedes practicar ejercicios en casa que ayudan a mejorar tu flexibilidad, equilibrio y resistencia. A diferencia de un tratamiento médico, que busca curar una enfermedad, la rehabilitación se enfoca en recuperar tus capacidades y prevenir futuros problemas, acompañándote en el camino hacia una vida más saludable y activa."
-            image={ejercicioImg}
+            image={gimnasioImg}
             sx={{
               flexBasis: {
                 xs: '100%',
