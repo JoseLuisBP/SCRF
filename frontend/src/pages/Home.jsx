@@ -10,7 +10,7 @@ import ejercicioImg from '../assets/images/ejercicio.jpeg';
 import sistemaImg from '../assets/images/sistema.jpeg';
 import ejercicio2Img from '../assets/images/ejercicio2.jpeg';
 import ejercicio3Img from '../assets/images/ejecicio3.jpeg';
-import funcionImg    from '../assets/images/funcion.jpeg';
+import funcionImg from '../assets/images/funcion.jpg';
 
 import Footer from '../components/layout/Footer';
 
