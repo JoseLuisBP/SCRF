@@ -8,8 +8,8 @@ import { useAccessibility } from '../context/AccessibilityContext';
 
 import ejercicioImg from '../assets/images/ejercicio.jpeg';
 import sistemaImg from '../assets/images/sistema.jpeg';
-import ejercicio2Img from '../assets/images/ejercicio2.jpeg';
-import ejercicio3Img from '../assets/images/ejecicio3.jpeg';
+import onuImg from '../assets/images/onu.jpeg';
+import cuerpoImg from '../assets/images/cuerpo.jpeg';
 import funcionImg from '../assets/images/funcion.jpg';
 
 import Footer from '../components/layout/Footer';
@@ -46,7 +46,7 @@ export default function Home() {
           <Card
             title="Tu cuerpo no necesitan un gimnasio, solo gana de moverse."
             description=" ¿Quieres sentirte mejor, tener mas energia y cuida tu salud sin salir de casa ? ¡Estas en el lugar correcto! Activate en casa encontraras rutinas simples, efectivas y adaptadas para cualquier persona, sin importar la edad o condicion fisica."
-             image={ejercicio3Img}
+             image={cuerpoImg}
             sx={{
 
               flexBasis: {
@@ -107,7 +107,7 @@ export default function Home() {
           <Card
             title="ONU"
             description=" La importancia de la actividad física en la prevención  de enfermedades crónicas y en la mejora de la calidad de vida en adultos mayores. Según la Organización Mundial de la Salud (OMS), el envejecimiento activo se basa en la optimización de las oportunidades de salud, participación y seguridad. Proyectos tecnológicos similares, como aplicaciones de fisioterapia o plataformas de ejercicio, suelen carecer de una orientación especializada hacia personas mayores o en rehabilitación, por lo que el presente sistema busca cubrir esa brecha mediante un enfoque inclusivo, accesible y sustentado en inteligencia artificial."
-            image={ejercicio2Img}
+            image={onuImg}
             sx={{
               flexBasis: {
                 xs: '100%',
