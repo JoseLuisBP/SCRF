@@ -6,8 +6,8 @@ import Card from '../components/layout/Card';
 import { useAuth } from '../context/AuthContext';
 import { useAccessibility } from '../context/AccessibilityContext';
 
-import gimnasioImg from '../assets/images/gimnasio.jpeg';
-import ejercicioImg from '../assets/images/ejercicio.jpeg';
+import gimnasioImg from '../assets/images/gimnasio.jpg';
+import ejercicioImg from '../assets/images/ejercicio.jpg';
 import onuImg from '../assets/images/onu.jpg';
 import cuerpoImg from '../assets/images/cuerpo.jpg';
 import funcionImg from '../assets/images/funcion.jpg';
