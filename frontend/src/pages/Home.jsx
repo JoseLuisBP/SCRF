@@ -10,6 +10,7 @@ import ejercicioImg from '../assets/images/ejercicio.jpeg';
 import sistemaImg from '../assets/images/sistema.jpeg';
 import ejercicio2Img from '../assets/images/ejercicio2.jpeg';
 import ejercicio3Img from '../assets/images/ejecicio3.jpeg';
+import funcionImg    from '../assets/images/funcion.jpeg';
 
 import Footer from '../components/layout/Footer';
 
@@ -62,6 +63,46 @@ export default function Home() {
             }}
           />
 
+             <Card
+            title="Descripcion de Pagina "
+            description="Esta pagina web esta diseñada para la ayuda a cualquier persona en su proceso de rehabilitacion fisica a realizar ejercicios desde la comodidad de su hogar, con orientacion segura y personalidad. Su funcionamiento se basa en ofrecer contenido accesibles, visual e interactivo que guia al usuario paso a paso. "
+            image={funcionImg}
+            sx={{
+              flexBasis: {
+                xs: '100%',
+                sm: fontSize > 18 ? '100%' : '45%',
+                md: fontSize > 20 ? '100%' : '50%',
+              },
+              maxWidth: {
+                xs: '100%',
+                sm: fontSize > 18 ? '100%' : '45%',
+                md: fontSize > 20 ? '100%' : '50%',
+              },
+              flexGrow: 1,
+            }}
+          />
+
+
+           <Card
+            title="Funcion de la Pagina"
+            description="Es un sistema accesible que facilite la recuperación, conservación y fortalecimiento de movilidad, fuerza y flexibilidad en adultos mayores, personas en rehabilitación física y población interesada en prevenir riesgos de salud."
+            image={sistemaImg}
+            sx={{
+              flexBasis: {
+                xs: '100%',
+                sm: fontSize > 18 ? '100%' : '45%',
+                md: fontSize > 20 ? '100%' : '50%',
+              },
+              maxWidth: {
+                xs: '100%',
+                sm: fontSize > 18 ? '100%' : '45%',
+                md: fontSize > 20 ? '100%' : '50%',
+              },
+              flexGrow: 1,
+            }}
+          />
+
+            
 
           <Card
             title="ONU"
@@ -101,25 +142,7 @@ export default function Home() {
             }}
           />
 
-          <Card
-            title=""
-            description="Es un sistema accesible que facilite la recuperación, conservación y fortalecimiento de movilidad, fuerza y flexibilidad en adultos mayores, personas en rehabilitación física y población interesada en prevenir riesgos de salud."
-            image={sistemaImg}
-            sx={{
-              flexBasis: {
-                xs: '100%',
-                sm: fontSize > 18 ? '100%' : '45%',
-                md: fontSize > 20 ? '100%' : '50%',
-              },
-              maxWidth: {
-                xs: '100%',
-                sm: fontSize > 18 ? '100%' : '45%',
-                md: fontSize > 20 ? '100%' : '50%',
-              },
-              flexGrow: 1,
-            }}
-          />
-
+          
              
 
         </Box>
