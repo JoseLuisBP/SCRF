@@ -11,6 +11,8 @@ pydantic-settings==2.11.0
 sqlalchemy==2.0.44
 # Driver para PostgreSQL
 psycopg2-binary==2.9.11
+# Driver asíncrono para PostgreSQ
+asyncpg==0.30.0
 # Migraciones de base de datos
 alembic==1.17.0
 # Driver para MongoDB
@@ -25,7 +27,6 @@ passlib[bcrypt]==1.7.4
 # Manejo de formularios y archivos
 python-multipart==0.0.20
 # Para hashing de contraseñas, utilizado por passlib
-passlib==1.7.4
 bcrypt==4.0.1
 
 # Librería de machine learning

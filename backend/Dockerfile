@@ -18,8 +18,7 @@ COPY requirements.txt .
 
 # Instala las dependencias de Python
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir asyncpg
+    pip install --no-cache-dir -r requirements.txt
 
 # Copiar código de la aplicación
 COPY . .
