@@ -48,7 +48,7 @@ export default function Home() {
           <Card
             title="Tu cuerpo no necesitan un gimnasio, solo gana de moverse."
             description=" ¿Quieres sentirte mejor, tener mas energia y cuida tu salud sin salir de casa ? ¡Estas en el lugar correcto! Activate en casa encontraras rutinas simples, efectivas y adaptadas para cualquier persona, sin importar la edad o condicion fisica."
-             images={cuerpoImg}
+             image={cuerpoImg}
             sx={{
               flexBasis: {
                 xs: '100%',
