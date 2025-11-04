@@ -60,6 +60,7 @@ export default function Home() {
                 md: fontSize > 20 ? '100%' : '90%',
               },
               flexGrow: 1,
+              
             }}
           />
 
