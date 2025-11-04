@@ -72,7 +72,7 @@ async def register(user_data: UserCreate, db: Session = Depends(postgresql.get_s
     # Crear token de acceso
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": str(db_user.id)},
+        data={"sub": str(db_user.id_usuario)},
         expires_delta=access_token_expires
     )
     
@@ -117,7 +117,7 @@ async def login(login_data: LoginRequest, db: Session = Depends(postgresql.get_s
     # Crear token de acceso
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": str(user.id)}, 
+        data={"sub": str(user.id_usuario)}, 
         expires_delta=access_token_expires
     )
     

@@ -25,7 +25,8 @@ passlib[bcrypt]==1.7.4
 # Manejo de formularios y archivos
 python-multipart==0.0.20
 # Para hashing de contraseñas, utilizado por passlib
-bcrypt==5.0.0
+passlib==1.7.4
+bcrypt==4.0.1
 
 # Librería de machine learning
 scikit-learn==1.7.2

@@ -1,10 +1,13 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from fastapi.responses import JSONResponse
 from app.core.config import settings
 from app.core.logging import logger
 from app.api.v1 import auth, users
+from app.db.postgresql import postgresql
+from app.api.v1 import test_db
+
 
 @asynccontextmanager
 async def lifespan(application: FastAPI):
@@ -12,8 +15,19 @@ async def lifespan(application: FastAPI):
     logger.info("Iniciando %s v%s", settings.PROJECT_NAME, settings.VERSION)
     logger.info("Entorno: %s", settings.ENVIRONMENT)
     logger.info("Documentación disponible en /docs y /redoc")
-    yield
-    logger.info("Cerrando la aplicación...")
+
+    # Inicializar PostgreSQL aquí
+    try:
+        postgresql.initialize()
+        logger.info("Conexión PostgreSQL inicializada correctamente.")
+    except Exception as e:
+        logger.error(f"Error al inicializar PostgreSQL: {e}")
+
+    yield  # Aquí corre la app
+
+    # Cierre de conexiones al apagar
+    await postgresql.close()
+    logger.info("Cerrando la aplicación y conexiones PostgreSQL...")
 
 app = FastAPI(
     lifespan=lifespan,
@@ -67,10 +81,14 @@ def health_check():
 async def global_exception_handler(_request, exc):
     """Manejador global de excepciones"""
     logger.error(f"Error inesperado: {exc}")
-    return {
-        "detail": "Error interno del servidor",
-        "message": str(exc) if settings.DEBUG else "Ha ocurrido un error inesperado"
-    }
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "Error interno del servidor",
+            "message": str(exc) if settings.DEBUG else "Ha ocurrido un error inesperado"
+        }
+    )
+
 
 if __name__ == "__main__":
     import uvicorn

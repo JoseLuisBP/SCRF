@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     # PostgreSQL
-    POSTGRES_SERVER: str = "postgres_db"
+    POSTGRES_SERVER: str = "postgres"
     POSTGRES_USER: str = "admin"
     POSTGRES_PASSWORD: str = "admin"
     POSTGRES_DB: str = "app_db"
@@ -35,6 +35,12 @@ class Settings(BaseSettings):
 
     # CORS
     BACKEND_CORS_ORIGINS: Any = ["http://localhost:5173", "http://localhost:3000"]
+
+    # Database engine config
+    DB_ECHO_LOG: bool = False          # Muestra consultas SQL en consola si True
+    DB_POOL_SIZE: int = 5              # Tamaño del pool de conexiones
+    DB_MAX_OVERFLOW: int = 10          # Conexiones extra permitidas
+
 
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     @classmethod
@@ -71,6 +77,7 @@ class Settings(BaseSettings):
         env_file = ".env"
         case_sensitive = True
         extra = "ignore"
+        
 
 # Instancia global de settings
 settings = Settings()

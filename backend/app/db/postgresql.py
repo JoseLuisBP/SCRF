@@ -36,7 +36,7 @@ class PostgreSQLManager:
         try:
             if not self._engine:
                 self._engine = create_async_engine(
-                    settings.DATABASE_URL,
+                    settings.ASYNC_DATABASE_URL,
                     echo=settings.DB_ECHO_LOG,
                     pool_size=settings.DB_POOL_SIZE,
                     max_overflow=settings.DB_MAX_OVERFLOW
