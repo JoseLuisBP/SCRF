@@ -46,25 +46,11 @@ export default function Home() {
           }}
         >
           
-          <Card
+          <CardCarrusel
             title="Tu cuerpo no necesitan un gimnasio, solo gana de moverse."
             description=" ¿Quieres sentirte mejor, tener mas energia y cuida tu salud sin salir de casa ? ¡Estas en el lugar correcto! Activate en casa encontraras rutinas simples, efectivas y adaptadas para cualquier persona, sin importar la edad o condicion fisica."
              images={[cuerpoImg,cuerpo2Img,cuerpo3Img]}
-            sx={{
-
-              flexBasis: {
-                xs: '100%',
-                sm: fontSize > 18 ? '100%' : '45%',
-                md: fontSize > 20 ? '100%' : '90%',
-              },
-              maxWidth: {
-                xs: '100%',
-                sm: fontSize > 18 ? '100%' : '45%',
-                md: fontSize > 20 ? '100%' : '90%',
-              },
-              flexGrow: 1,
-              
-            }}
+            
           />
 
              <Card
