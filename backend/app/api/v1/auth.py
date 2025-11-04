@@ -19,7 +19,7 @@ from app.api.deps import get_current_user
 router = APIRouter()
 
 @router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
-async def register(user_data: UserCreate, db: Session = Depends(postgresql.get_session)):
+async def register(user_data: UserCreate, session_manager: SessionManager = Depends(get_session)):
     """
     Registrar un nuevo usuario
     
@@ -33,6 +33,7 @@ async def register(user_data: UserCreate, db: Session = Depends(postgresql.get_s
     Raises:
         HTTPException: Si el email o username ya existen
     """
+    db = session_manager.pg_session
     # Verificar si el email ya existe
     result = await db.execute(select(User).where(User.correo == user_data.correo))
     existing_user = result.scalar_one_or_none()
@@ -83,7 +84,7 @@ async def register(user_data: UserCreate, db: Session = Depends(postgresql.get_s
 
 
 @router.post("/login", response_model=Token)
-async def login(login_data: LoginRequest, db: Session = Depends(postgresql.get_session)):
+async def login(login_data: LoginRequest, session_manager: SessionManager = Depends(get_session)):
     """
     Iniciar sesión con email y contraseña
     
@@ -97,6 +98,7 @@ async def login(login_data: LoginRequest, db: Session = Depends(postgresql.get_s
     Raises:
         HTTPException: Si las credenciales son incorrectas
     """
+    db = session_manager.pg_session
     # Buscar usuario por correo
     result = await db.execute(select(User).where(User.correo == login_data.correo))
     user = result.scalar_one_or_none()

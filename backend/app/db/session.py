@@ -42,11 +42,10 @@ async def get_session_manager() -> AsyncGenerator[SessionManager, None]:
     manager = SessionManager()
     
     try:
-        pg_session = await postgresql.get_session()
-        await manager.set_pg_session(pg_session)
-        yield manager
+        async for pg_session in postgresql.get_session():
+            await manager.set_pg_session(pg_session)
+            yield manager
+            break
     finally:
         await manager.close()
 
-# Para uso con FastAPI Depends
-get_sesion = get_session_manager

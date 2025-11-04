@@ -22,6 +22,7 @@ async def lifespan(application: FastAPI):
         logger.info("Conexión PostgreSQL inicializada correctamente.")
     except Exception as e:
         logger.error(f"Error al inicializar PostgreSQL: {e}")
+        raise # Detiene la ejecución de la aplicación
 
     yield  # Aquí corre la app
 

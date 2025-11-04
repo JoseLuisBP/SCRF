@@ -1,9 +1,10 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy.future import select
 
 from app.core.security import get_password_hash, verify_password
-from app.db.postgresql import postgresql
+from app.db.session import SessionManager, get_session
 from app.models.user import User
 from app.schemas.user import UserResponse, UserUpdate, UserChangePassword
 from app.api.deps import get_current_user, get_current_superuser
@@ -12,7 +13,7 @@ router = APIRouter()
 
 
 @router.get("/me", response_model=UserResponse)
-def get_my_profile(current_user: User = Depends(get_current_user)):
+async def get_my_profile(current_user: User = Depends(get_current_user)):
     """
     Obtener perfil del usuario actual
     
@@ -26,10 +27,10 @@ def get_my_profile(current_user: User = Depends(get_current_user)):
 
 
 @router.put("/me", response_model=UserResponse)
-def update_my_profile(
+async def update_my_profile(
     user_update: UserUpdate,
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(postgresql.get_session)
+    session_manager: SessionManager = Depends(get_session)
 ):
     """
     Actualizar perfil del usuario actual
@@ -45,6 +46,7 @@ def update_my_profile(
     Raises:
         HTTPException: Si el email/username ya están en uso
     """
+    db = session_manager.pg_session
     # Verificar si el nuevo email ya existe (si se está cambiando)
     if user_update.correo and user_update.correo != current_user.correo:
         existing_email = db.query(User).filter(User.correo == user_update.correo).first()
@@ -67,17 +69,17 @@ def update_my_profile(
     if user_update.nivel_fisico is not None:
         current_user.nivel_fisico = user_update.nivel_fisico
 
-    db.commit()
-    db.refresh(current_user)
+    await db.commit()
+    await db.refresh(current_user)
     
     return current_user
 
 
 @router.post("/me/change-password")
-def change_password(
+async def change_password(
     password_data: UserChangePassword,
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(postgresql.get_session)
+    session_manager: SessionManager = Depends(get_session)
 ):
     """
     Cambiar contraseña del usuario actual
@@ -93,6 +95,7 @@ def change_password(
     Raises:
         HTTPException: Si la contraseña actual es incorrecta
     """
+    db = session_manager.pg_session
     # Verificar contraseña actual
     if not verify_password(password_data.contrasena_actual, current_user.contrasena_hash):
         raise HTTPException(
@@ -102,15 +105,15 @@ def change_password(
     
     # Actualizar contraseña
     current_user.contrasena_hash = get_password_hash(password_data.nueva_contrasena)
-    db.commit()
+    await db.commit()
     
     return {"message": "Contraseña actualizada exitosamente"}
 
 
 @router.delete("/me")
-def delete_my_account(
+async def delete_my_account(
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(postgresql.get_session)
+    session_manager: SessionManager = Depends(get_session)
 ):
     """
     Eliminar cuenta del usuario actual
@@ -122,8 +125,9 @@ def delete_my_account(
     Returns:
         Mensaje de confirmación
     """
-    db.delete(current_user)
-    db.commit()
+    db = session_manager.pg_session
+    await db.delete(current_user)
+    await db.commit()
     
     return {"message": "Cuenta eliminada exitosamente"}
 
@@ -133,11 +137,11 @@ def delete_my_account(
 # ============================================
 
 @router.get("/", response_model=List[UserResponse])
-def get_all_users(
+async def get_all_users(
     skip: int = 0,
     limit: int = 100,
     current_user: User = Depends(get_current_superuser),
-    db: Session = Depends(postgresql.get_session)
+    session_manager: SessionManager = Depends(get_session)
 ):
     """
     Obtener todos los usuarios (solo admin)
@@ -151,15 +155,20 @@ def get_all_users(
     Returns:
         Lista de usuarios
     """
-    users = db.query(User).offset(skip).limit(limit).all()
+    db = session_manager.pg_session
+
+    result = await db.execute(
+        select(User).offset(skip).limit(limit)
+    )
+    users = result.scalars().all()
     return users
 
 
 @router.get("/{user_id}", response_model=UserResponse)
-def get_user_by_id(
+async def get_user_by_id(
     user_id: int,
     current_user: User = Depends(get_current_superuser),
-    db: Session = Depends(postgresql.get_session)
+    session_manager: SessionManager = Depends(get_session)
 ):
     """
     Obtener usuario por ID (solo admin)
@@ -175,7 +184,9 @@ def get_user_by_id(
     Raises:
         HTTPException: Si el usuario no existe
     """
-    user = db.query(User).filter(User.id == user_id).first()
+    db = session_manager.pg_session
+
+    user = await db.get(User, user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -185,10 +196,10 @@ def get_user_by_id(
 
 
 @router.delete("/{user_id}")
-def delete_user(
+async def delete_user(
     user_id: int,
     current_user: User = Depends(get_current_superuser),
-    db: Session = Depends(postgresql.get_session)
+    session_manager: SessionManager = Depends(get_session)
 ):
     """
     Eliminar usuario por ID (solo admin)
@@ -204,14 +215,16 @@ def delete_user(
     Raises:
         HTTPException: Si el usuario no existe
     """
-    user = db.query(User).filter(User.id == user_id).first()
+    db = session_manager.pg_session
+
+    user = await db.get(User, user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Usuario no encontrado"
         )
     
-    db.delete(user)
-    db.commit()
+    await db.delete(user)
+    await db.commit()
     
     return {"message": "Usuario eliminado exitosamente"}

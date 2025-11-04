@@ -99,3 +99,9 @@ async def check_user_role(
             detail=f"Se requiere el rol {required_role}"
         )
     return True
+
+async def get_session() -> AsyncGenerator[SessionManager, None]:
+    """Generador de dependencias para la sesión de base de datos"""
+    async for pg_session in postgresql.get_session():
+        yield pg_session
+        break
