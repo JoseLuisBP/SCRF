@@ -6,7 +6,6 @@ from app.core.config import settings
 from app.core.logging import logger
 from app.api.v1 import auth, users
 from app.db.postgresql import postgresql
-from app.api.v1 import test_db
 
 
 @asynccontextmanager

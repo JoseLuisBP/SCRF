@@ -16,6 +16,8 @@ from app.schemas.user import UserCreate, UserResponse
 from app.schemas.token import Token, LoginRequest
 from app.api.deps import get_current_user
 
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
+
 router = APIRouter()
 
 @router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
@@ -78,7 +80,8 @@ async def register(user_data: UserCreate, db: Session = Depends(postgresql.get_s
     
     return {
         "access_token": access_token,
-        "token_type": "bearer"
+        "token_type": "bearer",
+        "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60
     }
 
 
