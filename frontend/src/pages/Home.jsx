@@ -3,6 +3,7 @@ import Header from '../components/layout/Header';
 import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 import Card from '../components/layout/Card';
+import CardCarrusel from '../components/layout/CardCarrusel';
 import { useAuth } from '../context/AuthContext';
 import { useAccessibility } from '../context/AccessibilityContext';
 
@@ -10,6 +11,8 @@ import gimnasioImg from '../assets/images/gimnasio.jpg';
 import ejercicioImg from '../assets/images/ejercicios.jpg';
 import onuImg from '../assets/images/onu.jpg';
 import cuerpoImg from '../assets/images/cuerpo.jpg';
+import cuerpo2Img from '../assets/images/cuerpo2.jpg';
+import cuerpo3Img from '../assets/images/cuerpo3.jpg';
 import funcionImg from '../assets/images/funcion.jpg';
 
 import Footer from '../components/layout/Footer';
@@ -46,7 +49,7 @@ export default function Home() {
           <Card
             title="Tu cuerpo no necesitan un gimnasio, solo gana de moverse."
             description=" ¿Quieres sentirte mejor, tener mas energia y cuida tu salud sin salir de casa ? ¡Estas en el lugar correcto! Activate en casa encontraras rutinas simples, efectivas y adaptadas para cualquier persona, sin importar la edad o condicion fisica."
-             image={cuerpoImg}
+             images={[cuerpoImg,cuerpo2Img,cuerpo3Img]}
             sx={{
 
               flexBasis: {
