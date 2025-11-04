@@ -10,6 +10,8 @@ import gimnasioImg from '../assets/images/gimnasio.jpg';
 import ejercicioImg from '../assets/images/ejercicios.jpg';
 import onuImg from '../assets/images/onu.jpg';
 import cuerpoImg from '../assets/images/cuerpo.jpg';
+import cuerpo2Img from '../assets/images/cuerpo2.jpg';
+import cuerpo3Img from '../assets/images/cuerpo3.jpg';
 import funcionImg from '../assets/images/funcion.jpg';
 
 import Footer from '../components/layout/Footer';
@@ -48,7 +50,6 @@ export default function Home() {
             description=" ¿Quieres sentirte mejor, tener mas energia y cuida tu salud sin salir de casa ? ¡Estas en el lugar correcto! Activate en casa encontraras rutinas simples, efectivas y adaptadas para cualquier persona, sin importar la edad o condicion fisica."
              image={cuerpoImg}
             sx={{
-
               flexBasis: {
                 xs: '100%',
                 sm: fontSize > 18 ? '100%' : '45%',
