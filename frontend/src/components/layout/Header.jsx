@@ -20,7 +20,8 @@ import {
   useTheme,
   useMediaQuery,
   Popover,
-  Stack
+  Stack,
+  ListItemButton
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -97,8 +98,7 @@ export default function Header({ showSearchBar = false }) {
     <Box sx={{ width: 250 }} role="presentation">
       <List>
         {navigationItems.map((item) => (
-          <ListItem 
-            button 
+          <ListItemButton
             key={item.text} 
             component={RouterLink} 
             to={item.path}
@@ -106,7 +106,7 @@ export default function Header({ showSearchBar = false }) {
           >
             <ListItemText primary={item.text} />
             <ChevronRightIcon />
-          </ListItem>
+          </ListItemButton>
         ))}
       </List>
     </Box>
@@ -146,7 +146,7 @@ export default function Header({ showSearchBar = false }) {
               placeholder="Buscar ejercicios..."
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
-              onKeyPress={handleSearch}
+              onKeyDown={handleSearch}
               aria-label="Buscar ejercicios"
               sx={{
                 color: 'inherit',
