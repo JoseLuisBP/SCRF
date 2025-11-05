@@ -34,7 +34,13 @@ class Settings(BaseSettings):
     MONGODB_DB: str = "app_mongo"
 
     # CORS
-    BACKEND_CORS_ORIGINS: Any = ["http://localhost:5173", "http://localhost:3000"]
+    BACKEND_CORS_ORIGINS: List[str] = [
+        "http://localhost",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://172.18.0.5:5173", 
+        "http://localhost:3000"
+        ]
 
     # Database engine config
     DB_ECHO_LOG: bool = False          # Muestra consultas SQL en consola si True
