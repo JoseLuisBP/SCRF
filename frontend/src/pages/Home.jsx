@@ -31,7 +31,7 @@ export default function Home() {
 
       <Container maxWidth="md" sx={{ mt: 12, mb: 4 }}>
 
-        {/* 🏠 INICIO */}
+        {/*  INICIO */}
         <Box id="inicio" sx={{ mt: 8 }}>
           <Card
             title="Tu cuerpo no necesita un gimnasio, solo ganas de moverse."
@@ -40,7 +40,7 @@ export default function Home() {
           />
         </Box>
 
-        {/* 👥 SOBRE NOSOTROS */}
+        {/*  SOBRE NOSOTROS */}
         <Box id="sobre-nosotros" sx={{ mt: 10 }}>
           <Card
             title="Sobre Nosotros"
@@ -49,7 +49,7 @@ export default function Home() {
           />
         </Box>
 
-        {/* 💪 BENEFICIOS */}
+        {/*  BENEFICIOS */}
         <Box id="beneficios" sx={{ mt: 10 }}>
           <Card
             title="Beneficios"
@@ -58,7 +58,7 @@ export default function Home() {
           />
         </Box>
 
-        {/* 📞 CONTACTO */}
+        {/*  CONTACTO */}
         <Box id="contacto" sx={{ mt: 10 }}>
           <Card
             title="Contáctanos"
