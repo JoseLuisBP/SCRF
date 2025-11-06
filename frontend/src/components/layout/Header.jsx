@@ -20,8 +20,7 @@ import {
   useTheme,
   useMediaQuery,
   Popover,
-  Stack,
-  ListItemButton
+  Stack
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -39,7 +38,7 @@ export default function Header({ showSearchBar = false }) {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
+  
   const { isLoggedIn, user, logout } = useAuth();
   const { 
     fontSize, 
@@ -52,17 +51,10 @@ export default function Header({ showSearchBar = false }) {
 
   // Estados locales para menús
   const [mobileOpen, setMobileOpen] = useState(false);
- const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const [accessibilityAnchor, setAccessibilityAnchor] = useState(null);
   const [searchValue, setSearchValue] = useState('');
 
-  const handleScrollToSection = (id) => {
-    const element = document.getElementById(id);
-    if (element){
-      element.scrollIntoView({ behavior: 'smooth', block: 'start'});
-    }
-  }
-  
   const handleSearch = (e) => {
     if (e.key === 'Enter') {
       // Implementar búsqueda aquí
@@ -95,39 +87,26 @@ export default function Header({ showSearchBar = false }) {
         { text: 'Progreso', path: '/progreso' }
       ]
     : [
-        { text: 'Inicio', section: 'inicio' },
-        { text: 'Sobre nosotros', section: 'sobre-nosotros' },
-        { text: 'Beneficios', section: 'beneficios' },
-        { text: 'Contacto', section: 'contacto' }
+        { text: 'Inicio', path: '/' },
+        { text: 'Sobre nosotros', path: '/about' },
+        { text: 'Beneficios', path: '/beneficios' },
+        { text: 'Contacto', path: '/contacto' }
       ];
-
-      
 
   const drawer = (
     <Box sx={{ width: 250 }} role="presentation">
       <List>
         {navigationItems.map((item) => (
-<<<<<<< Updated upstream
-          <ListItemButton
-=======
           <ListItem 
->>>>>>> Stashed changes
+            button 
             key={item.text} 
-            disablePadding >
-            <ListItemButton
-            onClick={() => {
-              handleScrollToSection (item.path);
-              handleDrawerToggle();
-            }}
+            component={RouterLink} 
+            to={item.path}
+            onClick={handleDrawerToggle}
           >
             <ListItemText primary={item.text} />
             <ChevronRightIcon />
-<<<<<<< Updated upstream
-          </ListItemButton>
-=======
-            </ ListItemButton>
           </ListItem>
->>>>>>> Stashed changes
         ))}
       </List>
     </Box>
@@ -149,9 +128,14 @@ export default function Header({ showSearchBar = false }) {
 
         <Typography
           variant="h6"
-          component= "div"
-          sx={{ textDecoration: 'none', color: 'inherit', flexGrow: 0, mr: 2, cursor: 'pointer'}}
-          onClick={() => handleScrollToSection(isLoggedIn ? 'dashboard' : 'inicio')}
+          component={RouterLink}
+          to={isLoggedIn ? '/dashboard' : '/'}
+          sx={{
+            textDecoration: 'none',
+            color: 'inherit',
+            flexGrow: 0,
+            mr: 2
+          }}
         >
           LOGO
         </Typography>
@@ -162,7 +146,7 @@ export default function Header({ showSearchBar = false }) {
               placeholder="Buscar ejercicios..."
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
-              onKeyDown={handleSearch}
+              onKeyPress={handleSearch}
               aria-label="Buscar ejercicios"
               sx={{
                 color: 'inherit',
@@ -183,7 +167,8 @@ export default function Header({ showSearchBar = false }) {
               <Button
                 key={item.text}
                 color="inherit"
-                onClick={() => handleScrollToSection(item.path)} 
+                component={RouterLink}
+                to={item.path}
               >
                 {item.text}
               </Button>
