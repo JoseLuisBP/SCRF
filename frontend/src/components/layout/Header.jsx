@@ -37,6 +37,7 @@ import { useAccessibility } from "../../context/AccessibilityContext";
 export default function Header({ showSearchBar = false }) {
   const navigate = useNavigate();
   const theme = useTheme();
+   const location = useLocation();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
   const { isLoggedIn, user, logout } = useAuth();
@@ -55,13 +56,7 @@ export default function Header({ showSearchBar = false }) {
   const [accessibilityAnchor, setAccessibilityAnchor] = useState(null);
   const [searchValue, setSearchValue] = useState('');
 
-   const handleScrollToSection = (id) => {
-    const section = document.getElementById(id);
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
+   
   const handleSearch = (e) => {
     if (e.key === 'Enter') {
       // Implementar búsqueda aquí
@@ -86,6 +81,22 @@ export default function Header({ showSearchBar = false }) {
     setMobileOpen(!mobileOpen);
   };
 
+   //  Scroll suave a secciones del Home
+  const handleScrollToSection = (sectionId) => {
+    if (location.pathname !== "/") {
+      navigate("/");
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) element.scrollIntoView({ behavior: "smooth" });
+      }, 300);
+    } else {
+      const element = document.getElementById(sectionId);
+      if (element) element.scrollIntoView({ behavior: "smooth" });
+    }
+    setMobileOpen(false);
+  };
+
+
   const navigationItems = isLoggedIn
     ? [
         { text: 'Dashboard', path: '/dashboard' },
@@ -107,15 +118,10 @@ export default function Header({ showSearchBar = false }) {
           <ListItem 
             button 
             key={item.text} 
-            onClick={() => {
-              if (isLoggedIn){
-                navigate (item.path);
-              } else {
-                handleScrollToSection(item.path);
-              }
-              handleDrawerToggle ();
-            }}
-          >
+            onClick={() => 
+             isLoggedIn ? navigate(item.path) : handleScrollToSection(item.path) 
+            }
+             >
             <ListItemText primary={item.text} />
             <ChevronRightIcon />
           </ListItem>
@@ -130,7 +136,7 @@ export default function Header({ showSearchBar = false }) {
         {isMobile && (
           <IconButton
             color="inherit"
-          //  aria-label="abrir menú"
+            aria-label="abrir menú"
             edge="start"
             onClick={handleDrawerToggle}
           >
@@ -142,7 +148,7 @@ export default function Header({ showSearchBar = false }) {
           variant="h6"
           //component={RouterLink}
           component='div'
-          //to={isLoggedIn ? '/dashboard' : '/'}
+          to={isLoggedIn ? '/dashboard' : '/'}
           sx={{
             textDecoration: 'none',
             color: 'inherit',
@@ -199,7 +205,7 @@ export default function Header({ showSearchBar = false }) {
             <IconButton
               color="inherit"
               onClick={handleAccessibilityMenu}
-             // aria-label="opciones de accesibilidad"
+             aria-label="opciones de accesibilidad"
             >
               <AccessibilityIcon />
             </IconButton>
@@ -208,7 +214,7 @@ export default function Header({ showSearchBar = false }) {
           {isLoggedIn && (
              <Tooltip title="Notificaciones">
               <IconButton color="inherit" >
-              //aria-label="notificaciones"
+              aria-label="notificaciones"
               <NotificationsIcon/>
               </IconButton>
             </Tooltip>
@@ -219,7 +225,7 @@ export default function Header({ showSearchBar = false }) {
               <IconButton
                 onClick={handleProfileMenu}
                 color="inherit"
-                //aria-label="menú de usuario"
+                aria-label="menú de usuario"
               >
                 {user?.avatar ? (
                   <Avatar alt={user.name} src={user.avatar} />
@@ -232,8 +238,8 @@ export default function Header({ showSearchBar = false }) {
             <>
               <Button
                 color="secondary"
-                //variant="secondary"
-                variant="outlined"
+                variant="secondary"
+              
                 component={RouterLink}
                 to="/login"
               >
@@ -241,8 +247,8 @@ export default function Header({ showSearchBar = false }) {
               </Button>
               <Button
                 color="secondary"
-                //variant="secondary"
-                variant="outlined"
+                variant="secondary"
+                
                 component={RouterLink}
                 to="/register"
                 sx={{ ml: 1 }}
