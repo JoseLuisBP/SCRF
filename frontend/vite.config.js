@@ -10,6 +10,12 @@ export default defineConfig({
     strictPort: true,
     watch: {
       usePolling: true  // Para hot-reload en Docker
+    },
+    proxy: {
+      '/api': {
+        target: 'http://backend:8000',
+        changeOrigin: true,
+      }
     }
   }
 });
