@@ -30,6 +30,17 @@ export default function Home() {
       <Header showSearchBar={false} />
 
       <Container maxWidth="md" sx={{ mt: 12, mb: 4 }}>
+        <Box
+          sx={{
+           mt: 8,
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            gap: fontSize > 18 ? 5 : 3, 
+            
+          }}
+        >
+
 
         {/*  INICIO */}
         <Box id="inicio" 
@@ -127,6 +138,7 @@ export default function Home() {
             }}
 
           />
+        </Box>
         </Box>
 
         {/* Bienvenida */}
