@@ -39,6 +39,20 @@ export default function Home() {
             title="Tu cuerpo no necesita un gimnasio, solo ganas de moverse."
             description="¿Quieres sentirte mejor, tener más energía y cuidar tu salud sin salir de casa? ¡Estás en el lugar correcto!"
             image={cuerpoImg}
+             sx={{
+              flexBasis: {
+                xs: '100%',
+                sm: fontSize > 18 ? '100%' : '45%',
+                md: fontSize > 20 ? '100%' : '90%',
+              },
+              maxWidth: {
+                xs: '100%',
+                sm: fontSize > 18 ? '100%' : '45%',
+                md: fontSize > 20 ? '100%' : '90%',
+              },
+              flexGrow: 1,
+            }}
+
           />
         </Box>
 
@@ -50,6 +64,20 @@ export default function Home() {
             title="Sobre Nosotros"
             description="Esta página está diseñada para ayudar a cualquier persona en su proceso de rehabilitación física desde casa, de forma accesible y segura."
             image={funcionImg}
+             sx={{
+              flexBasis: {
+                xs: '100%',
+                sm: fontSize > 18 ? '100%' : '45%',
+                md: fontSize > 20 ? '100%' : '90%',
+              },
+              maxWidth: {
+                xs: '100%',
+                sm: fontSize > 18 ? '100%' : '45%',
+                md: fontSize > 20 ? '100%' : '90%',
+              },
+              flexGrow: 1,
+            }}
+
           />
         </Box>
 
@@ -60,6 +88,20 @@ export default function Home() {
             title="Beneficios"
             description="Facilita la recuperación, conservación y fortalecimiento de la movilidad, fuerza y flexibilidad en adultos mayores y personas en rehabilitación."
             image={ejercicioImg}
+             sx={{
+              flexBasis: {
+                xs: '100%',
+                sm: fontSize > 18 ? '100%' : '45%',
+                md: fontSize > 20 ? '100%' : '90%',
+              },
+              maxWidth: {
+                xs: '100%',
+                sm: fontSize > 18 ? '100%' : '45%',
+                md: fontSize > 20 ? '100%' : '90%',
+              },
+              flexGrow: 1,
+            }}
+
           />
         </Box>
 
@@ -70,6 +112,20 @@ export default function Home() {
             title="Contáctanos"
             description="¿Tienes dudas o comentarios? Escríbenos para obtener más información sobre nuestros programas de rehabilitación."
             image={onuImg}
+             sx={{
+              flexBasis: {
+                xs: '100%',
+                sm: fontSize > 18 ? '100%' : '45%',
+                md: fontSize > 20 ? '100%' : '90%',
+              },
+              maxWidth: {
+                xs: '100%',
+                sm: fontSize > 18 ? '100%' : '45%',
+                md: fontSize > 20 ? '100%' : '90%',
+              },
+              flexGrow: 1,
+            }}
+
           />
         </Box>
 
