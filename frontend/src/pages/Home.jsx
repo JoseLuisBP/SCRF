@@ -33,7 +33,7 @@ export default function Home() {
 
         {/*  INICIO */}
         <Box id="inicio" 
-        sx={{mt:20}}
+        sx={{mt:10}}
         >
           <Card
             title="Tu cuerpo no necesita un gimnasio, solo ganas de moverse."
@@ -44,7 +44,7 @@ export default function Home() {
 
         {/*  SOBRE NOSOTROS */}
         <Box id="sobre-nosotros" 
-        sx={{ mt:20 }}
+        sx={{ mt:10 }}
          >
           <Card
             title="Sobre Nosotros"
@@ -55,7 +55,7 @@ export default function Home() {
 
         {/*  BENEFICIOS */}
         <Box id="beneficios" 
-        sx={{ mt:20 }}>
+        sx={{ mt:10 }}>
           <Card
             title="Beneficios"
             description="Facilita la recuperación, conservación y fortalecimiento de la movilidad, fuerza y flexibilidad en adultos mayores y personas en rehabilitación."
@@ -65,7 +65,7 @@ export default function Home() {
 
         {/*  CONTACTO */}
         <Box id="contacto" 
-        sx={{ mt:20 }}>
+        sx={{ mt:10 }}>
           <Card
             title="Contáctanos"
             description="¿Tienes dudas o comentarios? Escríbenos para obtener más información sobre nuestros programas de rehabilitación."
