@@ -32,7 +32,15 @@ export default function Home() {
       <Container maxWidth="md" sx={{ mt: 12, mb: 4 }}>
 
         {/*  INICIO */}
-        <Box id="inicio" sx={{ mt: 8 }}>
+        <Box id="inicio" 
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems:"center",
+          justifyContent:"center",
+          scrollMarginTop: "100px",
+         }}
+        >
           <Card
             title="Tu cuerpo no necesita un gimnasio, solo ganas de moverse."
             description="¿Quieres sentirte mejor, tener más energía y cuidar tu salud sin salir de casa? ¡Estás en el lugar correcto!"
@@ -41,7 +49,15 @@ export default function Home() {
         </Box>
 
         {/*  SOBRE NOSOTROS */}
-        <Box id="sobre-nosotros" sx={{ mt: 10 }}>
+        <Box id="sobre-nosotros" 
+        sx={{ 
+          minHeight: "100vh",
+          display: "flex",
+          alignItems:"center",
+          justifyContent:"center",
+          scrollMarginTop: "100px",
+         }}
+         >
           <Card
             title="Sobre Nosotros"
             description="Esta página está diseñada para ayudar a cualquier persona en su proceso de rehabilitación física desde casa, de forma accesible y segura."
@@ -50,7 +66,14 @@ export default function Home() {
         </Box>
 
         {/*  BENEFICIOS */}
-        <Box id="beneficios" sx={{ mt: 10 }}>
+        <Box id="beneficios" 
+        sx={{ 
+          minHeight: "100vh",
+          display: "flex",
+          alignItems:"center",
+          justifyContent:"center",
+          scrollMarginTop: "100px",
+         }}>
           <Card
             title="Beneficios"
             description="Facilita la recuperación, conservación y fortalecimiento de la movilidad, fuerza y flexibilidad en adultos mayores y personas en rehabilitación."
@@ -59,7 +82,14 @@ export default function Home() {
         </Box>
 
         {/*  CONTACTO */}
-        <Box id="contacto" sx={{ mt: 10 }}>
+        <Box id="contacto" 
+        sx={{ 
+          minHeight: "100vh",
+          display: "flex",
+          alignItems:"center",
+          justifyContent:"center",
+          scrollMarginTop: "100px",
+        }}>
           <Card
             title="Contáctanos"
             description="¿Tienes dudas o comentarios? Escríbenos para obtener más información sobre nuestros programas de rehabilitación."
