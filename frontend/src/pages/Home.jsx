@@ -54,12 +54,12 @@ export default function Home() {
               flexBasis: {
                 xs: '100%',
                 sm: fontSize > 18 ? '100%' : '45%',
-                md: fontSize > 20 ? '100%' : '90%',
+                md: fontSize > 20 ? '100%' : '100%',
               },
               maxWidth: {
                 xs: '100%',
                 sm: fontSize > 18 ? '100%' : '45%',
-                md: fontSize > 20 ? '100%' : '90%',
+                md: fontSize > 20 ? '100%' : '100%',
               },
               flexGrow: 1,
             }}
