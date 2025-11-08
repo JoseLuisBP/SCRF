@@ -34,8 +34,11 @@ export default function Home() {
 
       <Container maxWidth="lg" sx={{ mt: 12, mb: 4 }}>
 
-       <Box id="inicio" sx={{ textAlign: 'center', mb: 8 }}>
+      
+
        
+          
+          <Box id="inicio" sx={{ textAlign: 'center', mb: 8 }}>
           <Box
             id="sobre-nosotros"
           sx={{
@@ -47,7 +50,7 @@ export default function Home() {
             
           }}
         >
-          
+           
           <Card
             
             title="Sobre Nosotros"
@@ -193,7 +196,7 @@ export default function Home() {
           </Box>
         </Box>
         </Box>
-        
+      
       
       </Container>
       <Footer />
