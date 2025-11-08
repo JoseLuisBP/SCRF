@@ -10,7 +10,10 @@ import gimnasioImg from '../assets/images/gimnasio.jpg';
 import ejercicioImg from '../assets/images/ejercicios.jpg';
 import onuImg from '../assets/images/onu.jpg';
 import cuerpoImg from '../assets/images/cuerpo.jpg';
+import cuerpo2Img from '../assets/images/cuerpo2.jpg';
+import cuerpo3Img from '../assets/images/cuerpo3.jpg';
 import funcionImg from '../assets/images/funcion.jpg';
+
 import Footer from '../components/layout/Footer';
 
 export default function Home() {
@@ -29,8 +32,15 @@ export default function Home() {
     >
       <Header showSearchBar={false} />
 
-      <Container maxWidth="md" sx={{ mt: 12, mb: 4 }}>
-        <Box
+      <Container maxWidth="lg" sx={{ mt: 12, mb: 4 }}>
+
+       <Box id="inicio" sx={{ textAlign: 'center', mb: 8 }}>
+
+         
+        
+        
+          <Box
+            id="sobre-nosotros"
           sx={{
            mt: 8,
             display: 'flex',
@@ -40,109 +50,93 @@ export default function Home() {
             
           }}
         >
-
-
-        {/*  INICIO */}
-        <Box id="inicio" 
-        sx={{mt:10}}
-        >
+          
           <Card
-            title="Tu cuerpo no necesita un gimnasio, solo ganas de moverse."
-            description="¿Quieres sentirte mejor, tener más energía y cuidar tu salud sin salir de casa? ¡Estás en el lugar correcto!"
-            image={cuerpoImg}
-             sx={{
-              flexBasis: {
-                xs: '100%',
-                sm: fontSize > 18 ? '100%' : '150%',
-                md: fontSize > 20 ? '100%' : '120%',
-              },
-              maxWidth: {
-                xs: '100%',
-                sm: fontSize > 18 ? '100%' : '150%',
-                md: fontSize > 20 ? '100%' : '120%',
-              },
-              flexGrow: 1,
-            }}
-
-          />
-        </Box>
-
-        {/*  SOBRE NOSOTROS */}
-        <Box id="sobre-nosotros" 
-        sx={{ mt:10 }}
-         >
-          <Card
+            
             title="Sobre Nosotros"
-            description="Esta página está diseñada para ayudar a cualquier persona en su proceso de rehabilitación física desde casa, de forma accesible y segura."
-            image={funcionImg}
-             sx={{
+            description=" ¿Quieres sentirte mejor, tener mas energia y cuida tu salud sin salir de casa ? ¡Estas en el lugar correcto! Activate en casa encontraras rutinas simples, efectivas y adaptadas para cualquier persona, sin importar la edad o condicion fisica."
+             image={cuerpoImg}
+            sx={{
               flexBasis: {
                 xs: '100%',
-                sm: fontSize > 18 ? '100%' : '45%',
+                sm: fontSize > 18 ? '100%' : '80%',
                 md: fontSize > 20 ? '100%' : '90%',
               },
               maxWidth: {
                 xs: '100%',
-                sm: fontSize > 18 ? '100%' : '45%',
+                sm: fontSize > 18 ? '100%' : '80%',
                 md: fontSize > 20 ? '100%' : '90%',
               },
               flexGrow: 1,
             }}
-
           />
-        </Box>
-
-        {/*  BENEFICIOS */}
-        <Box id="beneficios" 
-        sx={{ mt:10 }}>
-          <Card
+          </Box>
+          
+               <Box
+            id="beneficios"
+          sx={{
+           mt: 8,
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            gap: fontSize > 18 ? 5 : 3, 
+            
+          }}
+        >
+           <Card
             title="Beneficios"
-            description="Facilita la recuperación, conservación y fortalecimiento de la movilidad, fuerza y flexibilidad en adultos mayores y personas en rehabilitación."
+            description="Es un sistema accesible que facilite la recuperación, conservación y fortalecimiento de movilidad, fuerza y flexibilidad en adultos mayores, personas en rehabilitación física y población interesada en prevenir riesgos de salud."
             image={ejercicioImg}
-             sx={{
+            sx={{
               flexBasis: {
                 xs: '100%',
-                sm: fontSize > 18 ? '100%' : '45%',
+                sm: fontSize > 18 ? '100%' : '80%',
                 md: fontSize > 20 ? '100%' : '90%',
               },
               maxWidth: {
                 xs: '100%',
-                sm: fontSize > 18 ? '100%' : '45%',
+                sm: fontSize > 18 ? '100%' : '80%',
                 md: fontSize > 20 ? '100%' : '90%',
               },
               flexGrow: 1,
             }}
-
           />
-        </Box>
+          </Box>
 
-        {/*  CONTACTO */}
-        <Box id="contacto" 
-        sx={{ mt:10 }}>
+             <Box
+            id="contacto"
+          sx={{
+           mt: 8,
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            gap: fontSize > 18 ? 5 : 3, 
+            
+          }}
+        >
+         
+
           <Card
-            title="Contáctanos"
-            description="¿Tienes dudas o comentarios? Escríbenos para obtener más información sobre nuestros programas de rehabilitación."
+            title="contacto"
+            description=" La importancia de la actividad física en la prevención  de enfermedades crónicas y en la mejora de la calidad de vida en adultos mayores. Según la Organización Mundial de la Salud (OMS), el envejecimiento activo se basa en la optimización de las oportunidades de salud, participación y seguridad. Proyectos tecnológicos similares, como aplicaciones de fisioterapia o plataformas de ejercicio, suelen carecer de una orientación especializada hacia personas mayores o en rehabilitación, por lo que el presente sistema busca cubrir esa brecha mediante un enfoque inclusivo, accesible y sustentado en inteligencia artificial."
             image={onuImg}
-             sx={{
+            sx={{
               flexBasis: {
                 xs: '100%',
-                sm: fontSize > 18 ? '100%' : '45%',
+                sm: fontSize > 18 ? '100%' : '80%',
                 md: fontSize > 20 ? '100%' : '90%',
               },
               maxWidth: {
                 xs: '100%',
-                sm: fontSize > 18 ? '100%' : '45%',
+                sm: fontSize > 18 ? '100%' : '80%',
                 md: fontSize > 20 ? '100%' : '90%',
               },
               flexGrow: 1,
             }}
-
           />
-        </Box>
-        </Box>
-
-        {/* Bienvenida */}
-        <Box
+        </Box> 
+          
+          <Box
           sx={{
             textAlign: 'center',
             py: 6,
@@ -152,7 +146,6 @@ export default function Home() {
             boxShadow: (theme) => `0 8px 32px ${theme.palette.primary.main}20`,
             transition: 'transform 0.2s ease',
             '&:hover': { transform: 'translateY(-3px)' },
-            mt: 12,
           }}
         >
           <Typography
@@ -189,7 +182,11 @@ export default function Home() {
           />
 
           <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'center' }}>
-            <Button variant={isLoggedIn ? 'secondary' : 'primary'} onClick={toggleLogin} size="small">
+            <Button
+              variant={isLoggedIn ? 'secondary' : 'primary'}
+              onClick={toggleLogin}
+              size="small"
+            >
               {isLoggedIn ? 'Cerrar Sesión' : 'Iniciar Sesión'} (Demo)
             </Button>
 
@@ -198,9 +195,12 @@ export default function Home() {
             </Button>
           </Box>
         </Box>
+        </Box>
+        
+      
       </Container>
-
       <Footer />
     </Box>
+    
   );
 }
