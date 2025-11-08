@@ -35,10 +35,7 @@ export default function Home() {
       <Container maxWidth="lg" sx={{ mt: 12, mb: 4 }}>
 
        <Box id="inicio" sx={{ textAlign: 'center', mb: 8 }}>
-
-         
-        
-        
+       
           <Box
             id="sobre-nosotros"
           sx={{
