@@ -1,9 +1,13 @@
 import axios from 'axios';
 
+const baseURL = import.meta.env.PROD
+  ? import.meta.env.VITE_API_URL || 'url-real-front' // para producción
+  : '/api'; // desarrollo usando proxy
+
 // Configuración base de Axios
 const axiosInstance = axios.create({
   // Dirección base de la API, a donde se harán las solicitudes
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL,
   timeout: 5000,
   // Encabezado que indica que el contenido de la solicitud es JSON
   headers: {

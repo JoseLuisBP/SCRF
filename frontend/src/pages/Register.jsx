@@ -16,6 +16,7 @@ import {
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import Header from '../components/layout/Header';
+import { authAPI } from '../api';
 
 export default function Register() {
   // Estados para los campos del formulario
@@ -60,44 +61,35 @@ export default function Register() {
     }
 
     try {
-      const res = await fetch(`/api/v1/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nombre,
-          correo,
-          contrasena: password,
-          edad: parseInt(age),
-          peso: parseFloat(peso) || null,
-          estatura: parseFloat(estatura) || null,
-          nivel_fisico: nivelFisico || null,
-          tiempo_disponible: parseInt(tiempoDisponible) || 0,
-        }),
-      });
+      const userData = {
+        nombre,
+        correo,
+        contrasena: password,
+        edad: parseInt(age),
+        peso: parseFloat(peso) || null,
+        estatura: parseFloat(estatura) || null,
+        nivel_fisico: nivelFisico || null,
+        tiempo_disponible: parseInt(tiempoDisponible) || 0,
+      };
 
-      const data = await res.json();
+      await authAPI.register(userData);
 
-      if (res.ok) {
-        localStorage.setItem('token', data.access_token);
-        setSnackbar({ open: true, message: 'Usuario registrado correctamente.', severity: 'success' });
+      setSnackbar({ open: true, message: 'Usuario registrado correctamente.', severity: 'success' });
 
-        // Limpia los campos
-        setNombre('');
-        setCorreo('');
-        setPassword('');
-        setConfirmPassword('');
-        setAge('');
-        setPeso('');
-        setEstatura('');
-        setNivelFisico('');
-        setTiempoDisponible('');
-        setAcceptedTerms(false);
-      } else {
-        setSnackbar({ open: true, message: data.detail || 'Error al registrar usuario.', severity: 'error' });
-      }
+      setNombre('');
+      setCorreo('');
+      setPassword('');
+      setConfirmPassword('');
+      setAge('');
+      setPeso('');
+      setEstatura('');
+      setNivelFisico('');
+      setTiempoDisponible('');
+      setAcceptedTerms(false);
     } catch (error) {
       console.error(error);
-      setSnackbar({ open: true, message: 'Error de conexión con el servidor.', severity: 'error' });
+      const errorMessage = error.response?.data?.detail || 'Error al registrar usuario.';
+      setSnackbar({ open: true, message: errorMessage, severity: 'error' });
     }
   };
 
@@ -178,25 +170,25 @@ export default function Register() {
       <Dialog open={openTerms} onClose={handleCloseTerms} maxWidth="sm" fullWidth>
         <DialogTitle>Términos y Condiciones</DialogTitle>
         <DialogContent dividers>
-          <Typography variant="body2" paragraph>
+          <Typography variant="body2" component="p" sx={{ mb: 2 }}>
             Al registrarte en nuestra plataforma, aceptas los siguientes términos:
           </Typography>
-          <Typography variant="body2" paragraph>
+          <Typography variant="body2" component="p" sx={{ mb: 2 }}>
             1. Tus datos personales serán utilizados únicamente para crear tu cuenta y ofrecerte una mejor experiencia.
           </Typography>
-          <Typography variant="body2" paragraph>
+          <Typography variant="body2" component="p" sx={{ mb: 2 }}>
             2. Te comprometes a usar la aplicación de manera responsable y respetuosa.
           </Typography>
-          <Typography variant="body2" paragraph>
+          <Typography variant="body2" component="p" sx={{ mb: 2 }}>
             3. Nos reservamos el derecho de actualizar estos términos en cualquier momento.
           </Typography>
-          <Typography variant="body2" paragraph>
+          <Typography variant="body2" component="p" sx={{ mb: 2 }}>
             4. Puedes solicitar la eliminación de tu cuenta en cualquier momento.
           </Typography>
-          <Typography variant="body2" paragraph>
+          <Typography variant="body2" component="p" sx={{ mb: 2 }}>
             5. El usuario reconoce que toda actividad física conlleva un riesgo de lesión.
           </Typography>
-          <Typography variant="body2" paragraph>
+          <Typography variant="body2" component="p" sx={{ mb: 2 }}>
             Se recomienda que cualquier entrenamiento se realice bajo la supervisión de un profesional o persona capacitada que pueda asistir en caso de requerir ayuda. 
           </Typography>
         </DialogContent>

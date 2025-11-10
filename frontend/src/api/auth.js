@@ -3,16 +3,17 @@ import axiosInstance from './axios';
 const authAPI = {
   // Registro de usuario
   register: async userData => {
-    const response = await axiosInstance.post('/api/v1/auth/register', userData);
-    if (response.token) {
-      localStorage.setItem('token', response.token);
+    const response = await axiosInstance.post('/v1/auth/register', userData);
+    const { access_token } = response.data;
+    if (access_token) {
+      localStorage.setItem('token', access_token);
     }
-    return response;
+    return response.data;
   },
 
   // Login
   login: async credentials => {
-    const response = await axiosInstance.post('/api/v1/auth/login', credentials);
+    const response = await axiosInstance.post('/v1/auth/login', credentials);
     if (response.token) {
       localStorage.setItem('token', response.token);
       localStorage.setItem('user', JSON.stringify(response.user));
