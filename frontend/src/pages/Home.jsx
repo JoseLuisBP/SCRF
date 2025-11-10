@@ -6,6 +6,14 @@ import Card from '../components/layout/Card';
 import { useAuth } from '../context/AuthContext';
 import { useAccessibility } from '../context/AccessibilityContext';
 
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
+
+
+
+
 import gimnasioImg from '../assets/images/gimnasio.jpg';
 import ejercicioImg from '../assets/images/ejercicios.jpg';
 import onuImg from '../assets/images/onu.jpg';
@@ -19,6 +27,20 @@ import Footer from '../components/layout/Footer';
 export default function Home() {
   const { isLoggedIn, toggleLogin } = useAuth();
   const { fontSize } = useAccessibility();
+
+  //configuracion del carrusel 
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 700,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 4000,
+    arrows: true,
+    adaptiveHeight: true,
+  };
+
 
   return (
     <Box
@@ -70,7 +92,30 @@ export default function Home() {
               flexGrow: 1,
             }}
           />
+
+        /*Carrsel de imagenes 
+          <Box sx={{ width: '90%', mt: 4}}>
+            <Slider {...sliderSettings}>
+              {[cuerpoImg,cuerpo2Img,cuerpo3Img,funcionImg].map((img,index)=>(
+                <Box key={index}>
+                  <img 
+                  src={img}
+                  alt={'Imagen ${index + 1}'}
+                  style={{
+                    width: '100%',
+                    height: '400%',
+                    objectFit: 'cover',
+                    borderRadius: '16px',
+                  }}
+                    />
+                    </Box>
+              ))}
+            </Slider>
+           </Box> 
           </Box>
+
+
+         
           
                <Box
             id="beneficios"
