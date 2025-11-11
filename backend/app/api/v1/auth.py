@@ -126,7 +126,9 @@ async def login(login_data: LoginRequest, db: Session = Depends(postgresql.get_s
     
     return {
         "access_token": access_token,
-        "token_type": "bearer"
+        "token_type": "bearer",
+        "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        "refresh_token": None,  # opcional, solo para cumplir con el modelo
     }
 
 
