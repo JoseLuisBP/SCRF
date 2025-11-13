@@ -10,7 +10,7 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     """Schema para los datos contenidos en el token"""
-    user_id: Optional[int] = None
+    user_id: int
 
 class LoginRequest(BaseModel):
     """Schema para la petición de login"""

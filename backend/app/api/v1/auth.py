@@ -10,7 +10,7 @@ from app.core.security import (
     get_password_hash,
     create_access_token
 )
-from app.db.postgresql import postgresql
+from app.db.session import get_session, SessionManager
 from app.models.user import User
 from app.schemas.user import UserCreate, UserResponse
 from app.schemas.token import Token, LoginRequest
@@ -21,22 +21,19 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60
 router = APIRouter()
 
 @router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
-async def register(user_data: UserCreate, db: Session = Depends(postgresql.get_session)):
+async def register(user_data: UserCreate, session_manager: SessionManager = Depends(get_session)):
     """
     Registrar un nuevo usuario
-    
     Args:
         user_data: Datos del usuario a crear
         db: Sesión de base de datos
-    
     Returns:
         Token de acceso JWT
-    
     Raises:
-        HTTPException: Si el email o username ya existen
+        HTTPException: Si el email ya existe
     """
     # Verificar si el email ya existe
-    result = await db.execute(select(User).where(User.correo == user_data.correo))
+    result = await session_manager.pg_session.execute(select(User).where(User.correo == user_data.correo))
     existing_user = result.scalar_one_or_none()
     if existing_user:
         raise HTTPException(
@@ -44,7 +41,6 @@ async def register(user_data: UserCreate, db: Session = Depends(postgresql.get_s
             detail="El email ya está registrado", 
             headers={"WWW-Authenticate": "Bearer"}
         )
-    
 
     # Crear nuevo usuario
     db_user = User(
@@ -57,21 +53,20 @@ async def register(user_data: UserCreate, db: Session = Depends(postgresql.get_s
         nivel_fisico=user_data.nivel_fisico,
     )
     
-    db.add(db_user)
+    session_manager.pg_session.add(db_user)
 
     try:
-        await db.commit()
-        await db.refresh(db_user)
+        await session_manager.pg_session.commit()
+        await session_manager.pg_session.refresh(db_user)
     except IntegrityError as e:
-        await db.rollback()
+        await session_manager.pg_session.rollback()
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="El email ya está registrado",
             headers={"WWW-Authenticate": "Bearer"}
         ) from e
-
     
-    # Crear token de acceso
+    # Crear token de acceso con el id del usuario
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": str(db_user.id_usuario)},
@@ -86,22 +81,19 @@ async def register(user_data: UserCreate, db: Session = Depends(postgresql.get_s
 
 
 @router.post("/login", response_model=Token)
-async def login(login_data: LoginRequest, db: Session = Depends(postgresql.get_session)):
+async def login(login_data: LoginRequest, session_manager: SessionManager = Depends(get_session)):
     """
     Iniciar sesión con email y contraseña
-    
     Args:
         login_data: Credenciales de login (email y password)
         db: Sesión de base de datos
-    
     Returns:
         Token de acceso JWT
-    
     Raises:
         HTTPException: Si las credenciales son incorrectas
     """
     # Buscar usuario por correo
-    result = await db.execute(select(User).where(User.correo == login_data.correo))
+    result = await session_manager.pg_session.execute(select(User).where(User.correo == login_data.correo))
     user = result.scalar_one_or_none()
 
     if not user or not verify_password(login_data.contrasena, user.contrasena_hash):
@@ -128,7 +120,7 @@ async def login(login_data: LoginRequest, db: Session = Depends(postgresql.get_s
         "access_token": access_token,
         "token_type": "bearer",
         "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-        "refresh_token": None,  # opcional, solo para cumplir con el modelo
+        "refresh_token": None,  # opcional
     }
 
 
@@ -136,10 +128,8 @@ async def login(login_data: LoginRequest, db: Session = Depends(postgresql.get_s
 async def verify_token(current_user: User = Depends(get_current_user)):
     """
     Verificar token JWT y obtener información del usuario actual
-    
     Args:
         current_user: Usuario actual obtenido del token
-    
     Returns:
         Información del usuario autenticado
     """
@@ -150,10 +140,8 @@ async def verify_token(current_user: User = Depends(get_current_user)):
 async def get_current_user_info(current_user: User = Depends(get_current_user)):
     """
     Obtener información del usuario actual
-    
     Args:
         current_user: Usuario actual obtenido del token
-    
     Returns:
         Información del usuario autenticado
     """
@@ -164,9 +152,7 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
 async def logout():
     """
     Cerrar sesión (endpoint simbólico)
-    
     En JWT, el logout se maneja en el cliente eliminando el token.
-    
     Returns:
         Mensaje de confirmación
     """

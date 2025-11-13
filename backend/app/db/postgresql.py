@@ -1,10 +1,11 @@
 """Gestor de conexión PostgreSQL asíncrono usando SQLAlchemy - Singleton"""
 
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator
+import logging
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy import MetaData
-from typing import AsyncGenerator
-import logging
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -51,13 +52,15 @@ class PostgreSQLManager:
         except Exception as e:
             logger.error(f"Error al inicializar PostgreSQL: {e}")
             raise
-
+    
+    @asynccontextmanager
     async def get_session(self) -> AsyncGenerator[AsyncSession, None]:
         """
         Generador de sesiones asíncronas.
         Uso:
             async with postgresql.get_session() as session:
                 # usar la sesión
+                result = await session.execute(select(User))
         """
         if not self._async_session_factory:
             raise RuntimeError("PostgreSQL no está inicializado")

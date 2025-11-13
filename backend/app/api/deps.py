@@ -1,12 +1,17 @@
-
+import logging
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
+from pydantic import ValidationError
+from sqlalchemy.future import select
 
 from ..core.config import settings
-from ..db.session import get_sesion
+from ..db.session import get_session, SessionManager
 from ..models.user import User
 from ..schemas.token import TokenData
+
+# Configurar logger
+logger = logging.getLogger(__name__)
 
 # Configuración de OAuth2
 oauth2_scheme = OAuth2PasswordBearer(
@@ -15,10 +20,15 @@ oauth2_scheme = OAuth2PasswordBearer(
 
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
-    session_manager = Depends(get_sesion)
+    session_manager: SessionManager = Depends(get_session)
 ) -> User:
     """
     Valida el token JWT y retorna el usuario actual.
+    Args:
+        token: Token JWT del header Authorization
+        session_manager: Gestor de sesiones de base de datos
+    Returns:
+        Usuario autenticado
     Raises:
         HTTPException: Si el token es inválido o el usuario no existe
     """
@@ -29,38 +39,62 @@ async def get_current_user(
     )
     
     try:
+        logger.debug(f"Decodificando token...")
         # Decodificar el token JWT
         payload = jwt.decode(
             token,
             settings.SECRET_KEY,
             algorithms=[settings.ALGORITHM]
         )
-        token_data = TokenData(user_id=payload.get("sub"))
-        
-        if not token_data.user_id:
+
+        logger.debug(f"Payload: {payload}")
+
+        user_id = payload.get("sub")
+        if user_id is None:
+            logger.error("No se encontró 'sub' en el payload")
             raise credentials_exception
-            
-    except JWTError:
-        raise credentials_exception
         
-    # Obtener el usuario de la base de datos
-    async with session_manager.pg_session as session:
-        user = await session.get(User, token_data.user_id)
+        user_id_int = int(user_id)
+        logger.debug(f"Buscando usuario con id_usuario={user_id_int}")
+
+        token_data = TokenData(user_id = user_id_int)
+        # Obtener el usuario de la base de datos
+        result = await session_manager.pg_session.execute(select(User).where(User.id_usuario == token_data.user_id))
+        user = result.scalar_one_or_none()
+
+        logger.debug(f"Usuario encontrado: {user is not None}")
         
         if user is None:
+            logger.error(f"Usuario con id_usuario={user_id_int} no encontrado en BD")
             raise credentials_exception
-            
+        
+        if not user.is_active:
+            logger.warning(f"Usuario {user_id_int} está inactivo")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Usuario inactivo"
+            )
+        logger.debug(f"Usuario autenticado: {user.correo}")
         return user
+    except (JWTError, ValueError, ValidationError) as exc:
+        logger.error(f"Error al validar token: {exc}")
+        raise credentials_exception from exc
 
 async def get_current_active_user(
     current_user: User = Depends(get_current_user),
 ) -> User:
     """
     Verifica que el usuario actual esté activo.
+    Args:
+        current_user: Usuario obtenido del token
+    Returns:
+        Usuario activo
+    Raises:
+        HTTPException: Si el usuario está inactivo
     """
     if not current_user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Usuario inactivo"
         )
     return current_user

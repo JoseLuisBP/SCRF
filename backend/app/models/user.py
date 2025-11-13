@@ -28,5 +28,12 @@ class User(Base):
     # Relaciones
     rol = relationship("Rol", back_populates="usuarios", lazy="joined")
 
+    @property
+    def is_admin(self) -> bool:
+        nombre_rol = getattr(self.rol, "nombre_rol", None)
+        if not nombre_rol:
+            return False
+        return nombre_rol.strip().casefold() == "admin" # puede usarse ...casefold() in {"admin", "administrador"}
+
     def __repr__(self):
         return f"<Usuario(id_usuario={self.id_usuario}, correo='{self.correo}', nombre='{self.nombre}')>"
