@@ -6,7 +6,7 @@ export function AuthProvider({ children }) {
   const [authState, setAuthState] = useState({
     isLoggedIn: false,
     user: null,
-    token: localStorage.getItem('token')
+    token: null
   });
 
   useEffect(() => {
@@ -22,25 +22,33 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const login = (userData) => {
-    const token = 'mock-jwt-token'; // Simulado
-    localStorage.setItem('token', token);
+  const login = (loginData) => {
+    const { access_token, ...userData } = loginData;
+
+    if (!access_token) {
+      console.error('No se recibió access_token en loginData');
+      return;
+    }
+
+    // El token ya fue guardado en authAPI.login()
+    // Solo actualizamos el estado
     setAuthState({
       isLoggedIn: true,
       user: userData,
-      token
+      token: access_token
     });
   };
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setAuthState({
       isLoggedIn: false,
       user: null,
       token: null
     });
   };
-
+  // Borrar esto cuando Home.jsx este completo
   const toggleLogin = () => {
     if (authState.isLoggedIn) {
       logout();
@@ -57,7 +65,7 @@ export function AuthProvider({ children }) {
     ...authState,
     login,
     logout,
-    toggleLogin
+    toggleLogin // Borrar esta linea cuando se borre toggleLogin
   };
 
   return (

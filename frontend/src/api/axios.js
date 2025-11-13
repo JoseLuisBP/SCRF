@@ -8,7 +8,7 @@ const baseURL = import.meta.env.PROD
 const axiosInstance = axios.create({
   // Dirección base de la API, a donde se harán las solicitudes
   baseURL,
-  timeout: 5000,
+  timeout: 10000,
   // Encabezado que indica que el contenido de la solicitud es JSON
   headers: {
     'Content-Type': 'application/json',
@@ -20,13 +20,18 @@ axiosInstance.interceptors.request.use(
   config => {
     // Obtiene el token del almacenamiento local del navegador
     const token = localStorage.getItem('token');
+    console.log('🔑 Interceptor - Token:', token ? 'Existe' : 'No existe');
     if (token) {
       // Porta el token en el encabezado Authorization
       config.headers['Authorization'] = `Bearer ${token}`;
+      console.log('✅ Header Authorization agregado');
+    } else {
+      console.warn('⚠️ No hay token en localStorage');
     }
     return config;
   },
   error => {
+    console.error('❌ Error en request interceptor:', error);
     return Promise.reject(error);
   }
 );
@@ -44,7 +49,7 @@ axiosInstance.interceptors.response.use(
           break;
         case 401:
           localStorage.removeItem('token');
-          window.location.href = '/login';
+          //window.location.href = '/login';
           break;
         case 403:
           alert('No tienes permiso para realizar esta acción.');
