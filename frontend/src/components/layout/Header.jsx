@@ -58,7 +58,7 @@ export default function Header({ showSearchBar = false }) {
     if (e.key === 'Enter') console.log('Buscando:', searchValue);
   };
 
-  // 🔽 Scroll suave a secciones del Home
+  // Scroll suave a secciones del Home
   const handleScrollToSection = (sectionId) => {
     if (location.pathname !== "/") {
       navigate("/");
@@ -78,7 +78,7 @@ export default function Header({ showSearchBar = false }) {
     ? [
         { text: 'Dashboard', path: '/dashboard' },
         { text: 'Rutinas', path: '/rutinas' },
-        { text: 'Ejercicios', path: '/ejercicios' },
+        { text: 'Ejercicios', path: '/Exercises' },
         { text: 'Progreso', path: '/progreso' },
       ]
     : [

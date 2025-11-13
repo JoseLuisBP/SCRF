@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from app.core.config import settings
 from app.core.logging import logger
 from app.api.v1 import auth, users
+from app.api.v1 import exercises
 from app.db.postgresql import postgresql
 
 
@@ -55,6 +56,11 @@ app.include_router(
     users.router,
     prefix=f"{settings.API_V1_PREFIX}/users",
     tags=["Users"]
+)
+
+app.include_router(
+    exercises.router, 
+    prefix="/api/v1"
 )
 
 @app.get("/")

@@ -7,7 +7,7 @@ import Login from '../pages/Login';
 import Register from '../pages/Register';
 import Dashboard from '../pages/Dashboard';
 //import Routines from '../pages/Routines';
-//import Exercises from '../pages/Exercises';
+import Exercises from '../pages/Exercises';
 //import Profile from '../pages/Profile';
 
 export default function AppRoutes() {
@@ -22,8 +22,8 @@ export default function AppRoutes() {
             {/* Rutas protegidas*/}
             <Route element={<ProtectedRoute />}>
                 <Route path="/dashboard" element={<Dashboard />} />
-                {/*<Route path="/routines" element={<Routines />} />
                 <Route path="/exercises" element={<Exercises />} />
+                {/*<Route path="/routines" element={<Routines />} />
                 <Route path="/profile" element={<Profile />} />*/}
             </Route>
             
