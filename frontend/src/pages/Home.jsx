@@ -93,7 +93,7 @@ export default function Home() {
             }}
           />
 
-        /*Carrsel de imagenes 
+        {/*Carrusel de imagenes*/} 
           <Box sx={{ width: '90%', mt: 4}}>
             <Slider {...sliderSettings}>
               {[cuerpoImg,cuerpo2Img,cuerpo3Img,funcionImg].map((img,index)=>(
