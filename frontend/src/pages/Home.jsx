@@ -56,196 +56,196 @@ export default function Home() {
 
       <Container maxWidth="lg" sx={{ mt: 12, mb: 4 }}>
 
-      
 
-       
-          
-          <Box id="inicio" sx={{ textAlign: 'center', mb: 8 }}>
+
+
+
+        <Box id="inicio" sx={{ textAlign: 'center', mb: 8 }}>
           <Box
             id="sobre-nosotros"
-          sx={{
-           mt: 8,
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            gap: fontSize > 18 ? 5 : 3, 
-            
-          }}
-        >
-           
-          <Card
-            
-            title="Sobre Nosotros"
-            description=" ¿Quieres sentirte mejor, tener mas energia y cuida tu salud sin salir de casa ? ¡Estas en el lugar correcto! Activate en casa encontraras rutinas simples, efectivas y adaptadas para cualquier persona, sin importar la edad o condicion fisica."
-             image={cuerpoImg}
             sx={{
-              flexBasis: {
-                xs: '100%',
-                sm: fontSize > 18 ? '100%' : '80%',
-                md: fontSize > 20 ? '100%' : '90%',
-              },
-              maxWidth: {
-                xs: '100%',
-                sm: fontSize > 18 ? '100%' : '80%',
-                md: fontSize > 20 ? '100%' : '90%',
-              },
-              flexGrow: 1,
-            }}
-          />
+              mt: 8,
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              gap: fontSize > 18 ? 5 : 3,
 
-        {/*Carrusel de imagenes*/} 
-          <Box sx={{ width: '90%', mt: 4}}>
-            <Slider {...sliderSettings}>
-              {[cuerpoImg,cuerpo2Img,cuerpo3Img,funcionImg].map((img,index)=>(
-                <Box key={index}>
-                  <img 
-                  src={img}
-                  alt={'Imagen ${index + 1}'}
-                  style={{
-                    width: '100%',
-                    height: '400%',
-                    objectFit: 'cover',
-                    borderRadius: '16px',
-                  }}
+            }}
+          >
+
+            <Card
+
+              title="Sobre Nosotros"
+              description=" ¿Quieres sentirte mejor, tener mas energia y cuida tu salud sin salir de casa ? ¡Estas en el lugar correcto! Activate en casa encontraras rutinas simples, efectivas y adaptadas para cualquier persona, sin importar la edad o condicion fisica."
+              image={cuerpoImg}
+              sx={{
+                flexBasis: {
+                  xs: '100%',
+                  sm: fontSize > 18 ? '100%' : '80%',
+                  md: fontSize > 20 ? '100%' : '90%',
+                },
+                maxWidth: {
+                  xs: '100%',
+                  sm: fontSize > 18 ? '100%' : '80%',
+                  md: fontSize > 20 ? '100%' : '90%',
+                },
+                flexGrow: 1,
+              }}
+            />
+
+            {/*Carrusel de imagenes*/}
+            <Box sx={{ width: '90%', mt: 4 }}>
+              <Slider {...sliderSettings}>
+                {[cuerpoImg, cuerpo2Img, cuerpo3Img, funcionImg].map((img, index) => (
+                  <Box key={index}>
+                    <img
+                      src={img}
+                      alt={'Imagen ${index + 1}'}
+                      style={{
+                        width: '100%',
+                        height: '400%',
+                        objectFit: 'cover',
+                        borderRadius: '16px',
+                      }}
                     />
-                    </Box>
-              ))}
-            </Slider>
-           </Box> 
+                  </Box>
+                ))}
+              </Slider>
+            </Box>
           </Box>
 
 
-         
-          
-               <Box
-            id="beneficios"
-          sx={{
-           mt: 8,
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            gap: fontSize > 18 ? 5 : 3, 
-            
-          }}
-        >
-           <Card
-            title="Beneficios"
-            description="Es un sistema accesible que facilite la recuperación, conservación y fortalecimiento de movilidad, fuerza y flexibilidad en adultos mayores, personas en rehabilitación física y población interesada en prevenir riesgos de salud."
-            image={ejercicioImg}
-            sx={{
-              flexBasis: {
-                xs: '100%',
-                sm: fontSize > 18 ? '100%' : '80%',
-                md: fontSize > 20 ? '100%' : '90%',
-              },
-              maxWidth: {
-                xs: '100%',
-                sm: fontSize > 18 ? '100%' : '80%',
-                md: fontSize > 20 ? '100%' : '90%',
-              },
-              flexGrow: 1,
-            }}
-          />
-          </Box>
 
-             <Box
-            id="contacto"
-          sx={{
-           mt: 8,
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            gap: fontSize > 18 ? 5 : 3, 
-            
-          }}
-        >
-         
 
-          <Card
-            title="contacto"
-            description=" La importancia de la actividad física en la prevención  de enfermedades crónicas y en la mejora de la calidad de vida en adultos mayores. Según la Organización Mundial de la Salud (OMS), el envejecimiento activo se basa en la optimización de las oportunidades de salud, participación y seguridad. Proyectos tecnológicos similares, como aplicaciones de fisioterapia o plataformas de ejercicio, suelen carecer de una orientación especializada hacia personas mayores o en rehabilitación, por lo que el presente sistema busca cubrir esa brecha mediante un enfoque inclusivo, accesible y sustentado en inteligencia artificial."
-            image={onuImg}
-            sx={{
-              flexBasis: {
-                xs: '100%',
-                sm: fontSize > 18 ? '100%' : '80%',
-                md: fontSize > 20 ? '100%' : '90%',
-              },
-              maxWidth: {
-                xs: '100%',
-                sm: fontSize > 18 ? '100%' : '80%',
-                md: fontSize > 20 ? '100%' : '90%',
-              },
-              flexGrow: 1,
-            }}
-          />
-        </Box> 
-          
           <Box
-          sx={{
-            textAlign: 'center',
-            py: 6,
-            px: 2,
-            backgroundColor: 'background.paper',
-            borderRadius: 2,
-            boxShadow: (theme) => `0 8px 32px ${theme.palette.primary.main}20`,
-            transition: 'transform 0.2s ease',
-            '&:hover': { transform: 'translateY(-3px)' },
-          }}
-        >
-          <Typography
-            variant="h2"
-            component="h1"
-            gutterBottom
+            id="beneficios"
             sx={{
-              fontSize: { xs: `${fontSize * 2}px`, md: `${fontSize * 2.5}px` },
-              fontWeight: 'bold',
+              mt: 8,
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              gap: fontSize > 18 ? 5 : 3,
+
             }}
           >
-            Bienvenido :)
-          </Typography>
+            <Card
+              title="Beneficios"
+              description="Es un sistema accesible que facilite la recuperación, conservación y fortalecimiento de movilidad, fuerza y flexibilidad en adultos mayores, personas en rehabilitación física y población interesada en prevenir riesgos de salud."
+              image={ejercicioImg}
+              sx={{
+                flexBasis: {
+                  xs: '100%',
+                  sm: fontSize > 18 ? '100%' : '80%',
+                  md: fontSize > 20 ? '100%' : '90%',
+                },
+                maxWidth: {
+                  xs: '100%',
+                  sm: fontSize > 18 ? '100%' : '80%',
+                  md: fontSize > 20 ? '100%' : '90%',
+                },
+                flexGrow: 1,
+              }}
+            />
+          </Box>
 
-          <Typography
-            variant="h5"
-            component="h2"
-            gutterBottom
-            color="text.secondary"
+          <Box
+            id="contacto"
             sx={{
-              mb: 4,
-              fontSize: `${fontSize * 1.2}px`,
+              mt: 8,
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              gap: fontSize > 18 ? 5 : 3,
+
             }}
           >
-            Adaptado para tus necesidades
-          </Typography>
 
-          <Input
-            label="Correo Electrónico"
-            labelSize="small"
-            placeholder="Introduce tu correo"
-            fullWidth
-            sx={{ maxWidth: 400, mx: 'auto', mb: 3 }}
-          />
 
-          <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'center' }}>
-            <Button
-              variant={isLoggedIn ? 'secondary' : 'primary'}
-              onClick={toggleLogin}
-              size="small"
+            <Card
+              title="contacto"
+              description=" La importancia de la actividad física en la prevención  de enfermedades crónicas y en la mejora de la calidad de vida en adultos mayores. Según la Organización Mundial de la Salud (OMS), el envejecimiento activo se basa en la optimización de las oportunidades de salud, participación y seguridad. Proyectos tecnológicos similares, como aplicaciones de fisioterapia o plataformas de ejercicio, suelen carecer de una orientación especializada hacia personas mayores o en rehabilitación, por lo que el presente sistema busca cubrir esa brecha mediante un enfoque inclusivo, accesible y sustentado en inteligencia artificial."
+              image={onuImg}
+              sx={{
+                flexBasis: {
+                  xs: '100%',
+                  sm: fontSize > 18 ? '100%' : '80%',
+                  md: fontSize > 20 ? '100%' : '90%',
+                },
+                maxWidth: {
+                  xs: '100%',
+                  sm: fontSize > 18 ? '100%' : '80%',
+                  md: fontSize > 20 ? '100%' : '90%',
+                },
+                flexGrow: 1,
+              }}
+            />
+          </Box>
+
+          <Box
+            sx={{
+              textAlign: 'center',
+              py: 6,
+              px: 2,
+              backgroundColor: 'background.paper',
+              borderRadius: 2,
+              boxShadow: (theme) => `0 8px 32px ${theme.palette.primary.main}20`,
+              transition: 'transform 0.2s ease',
+              '&:hover': { transform: 'translateY(-3px)' },
+            }}
+          >
+            <Typography
+              variant="h2"
+              component="h1"
+              gutterBottom
+              sx={{
+                fontSize: { xs: `${fontSize * 2}px`, md: `${fontSize * 2.5}px` },
+                fontWeight: 'bold',
+              }}
             >
-              {isLoggedIn ? 'Cerrar Sesión' : 'Iniciar Sesión'} (Demo)
-            </Button>
+              Bienvenido :)
+            </Typography>
 
-            <Button variant="primary" size="small">
-              Explorar
-            </Button>
+            <Typography
+              variant="h5"
+              component="h2"
+              gutterBottom
+              color="text.secondary"
+              sx={{
+                mb: 4,
+                fontSize: `${fontSize * 1.2}px`,
+              }}
+            >
+              Adaptado para tus necesidades
+            </Typography>
+
+            <Input
+              label="Correo Electrónico"
+              labelSize="small"
+              placeholder="Introduce tu correo"
+              fullWidth
+              sx={{ maxWidth: 400, mx: 'auto', mb: 3 }}
+            />
+
+            <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'center' }}>
+              <Button
+                variant={isLoggedIn ? 'secondary' : 'primary'}
+                onClick={toggleLogin}
+                size="small"
+              >
+                {isLoggedIn ? 'Cerrar Sesión' : 'Iniciar Sesión'} (Demo)
+              </Button>
+
+              <Button variant="primary" size="small">
+                Explorar
+              </Button>
+            </Box>
           </Box>
         </Box>
-        </Box>
-      
-      
+
+
       </Container>
       <Footer />
     </Box>
-    
+
   );
 }
