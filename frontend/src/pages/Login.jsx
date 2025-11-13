@@ -33,29 +33,46 @@ export default function Login() {
         correo,
         contrasena: password,
       });
-
-      const data = response.data;
+      
+      /*
+      Estructura respuesta api backend
+        {
+          "access_token": "",
+          "token_type": "bearer",
+          "expires_in": 1800,
+          "refresh_token": null
+        }
+      */
+      const data = response.data || response;
+      console.log('📦 Respuesta del login:', data);
+      console.log('🔑 Token recibido:', data.access_token?.substring(0, 50) + '...');
 
       // Validar respuesta correcta
-      if (data?.access_token && data?.user) {
+      if (data?.access_token) {
         login(data);
         setSnackbar({
           open: true,
-          message: `¡Bienvenido ${data.user.nombre}!`,
+          message: `¡Inicio de sesión exitoso!`,
           severity: 'success',
         });
+        // Navegar al dashboard
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 500);
       } else {
+        console.error('❌ No se recibió access_token en la respuesta');
         setSnackbar({
           open: true,
-          message: 'Credenciales inválidas',
+          message: 'Error al iniciar sesión. Verifica tus credenciales.',
           severity: 'error',
         });
       }
     } catch (error) {
-      console.error('Error en el login:', error);
+      console.error('❌ Error en el login:', error);
+      console.error('❌ Error response:', error.response?.data);
       setSnackbar({
         open: true,
-        message: 'Error al iniciar sesión. Verifica tus credenciales.',
+        message: error.response?.data?.detail || 'Error al iniciar sesión. Verifica tus credenciales.',
         severity: 'error',
       });
     }
