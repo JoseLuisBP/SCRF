@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Box, Container, Typography, Snackbar, Alert } from '@mui/material';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import Header from '../components/layout/Header';
@@ -7,45 +10,57 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import authAPI from '../api/auth';
 
+// Esquema de validación
+const loginSchema = yup.object({
+  correo: yup
+    .string()
+    .email('Debe ser un correo electrónico válido')
+    .required('El correo es obligatorio'),
+  password: yup
+    .string()
+    .required('La contraseña es obligatoria'),
+}).required();
+
 export default function Login() {
   const { login, isLoggedIn } = useAuth();
   const navigate = useNavigate();
-
-  const [correo, setCorreo] = useState('');
-  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
     severity: 'info',
   });
 
-  // 🚀 Si ya está logueado, redirigir automáticamente
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(loginSchema),
+    defaultValues: {
+      correo: '',
+      password: '',
+    },
+  });
+
+  // Si ya está logueado, redirigir automáticamente
   useEffect(() => {
     if (isLoggedIn) {
       navigate('/dashboard');
     }
   }, [isLoggedIn, navigate]);
 
-  const handleLogin = async () => {
+  const onSubmit = async (formData) => {
+    setIsLoading(true);
     try {
       // Llamada real a la API
       const response = await authAPI.login({
-        correo,
-        contrasena: password,
+        correo: formData.correo,
+        contrasena: formData.password,
       });
-      
-      /*
-      Estructura respuesta api backend
-        {
-          "access_token": "",
-          "token_type": "bearer",
-          "expires_in": 1800,
-          "refresh_token": null
-        }
-      */
+
       const data = response.data || response;
       console.log('📦 Respuesta del login:', data);
-      console.log('🔑 Token recibido:', data.access_token?.substring(0, 50) + '...');
 
       // Validar respuesta correcta
       if (data?.access_token) {
@@ -69,12 +84,13 @@ export default function Login() {
       }
     } catch (error) {
       console.error('❌ Error en el login:', error);
-      console.error('❌ Error response:', error.response?.data);
       setSnackbar({
         open: true,
         message: error.response?.data?.detail || 'Error al iniciar sesión. Verifica tus credenciales.',
         severity: 'error',
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -91,6 +107,8 @@ export default function Login() {
 
       <Container maxWidth="sm" sx={{ mt: 12, mb: 4 }}>
         <Box
+          component="form"
+          onSubmit={handleSubmit(onSubmit)}
           sx={{
             textAlign: 'center',
             py: 6,
@@ -118,9 +136,10 @@ export default function Login() {
             label="Correo Electrónico"
             labelSize="small"
             placeholder="Introduce tu correo"
-            value={correo}
-            onChange={(e) => setCorreo(e.target.value)}
             fullWidth
+            error={!!errors.correo}
+            helperText={errors.correo?.message}
+            {...register('correo')}
             sx={{ maxWidth: 400, mx: 'auto', mb: 3 }}
           />
 
@@ -129,9 +148,11 @@ export default function Login() {
             labelSize="small"
             placeholder="Introduce tu contraseña"
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            showPasswordToggle={true}
             fullWidth
+            error={!!errors.password}
+            helperText={errors.password?.message}
+            {...register('password')}
             sx={{ maxWidth: 400, mx: 'auto', mb: 4 }}
           />
 
@@ -139,10 +160,11 @@ export default function Login() {
             variant="primary"
             size="small"
             fullWidth
+            type="submit"
+            disabled={isLoading}
             sx={{ maxWidth: 400, mx: 'auto' }}
-            onClick={handleLogin}
           >
-            Iniciar Sesión
+            {isLoading ? 'Iniciando...' : 'Iniciar Sesión'}
           </Button>
         </Box>
       </Container>

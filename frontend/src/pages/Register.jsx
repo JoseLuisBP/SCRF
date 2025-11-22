@@ -12,84 +12,118 @@ import {
   Button as MuiButton,
   Snackbar,
   Alert,
+  FormHelperText,
 } from '@mui/material';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import Header from '../components/layout/Header';
 import { authAPI } from '../api';
 
-export default function Register() {
-  // Estados para los campos del formulario
-  const [nombre, setNombre] = useState('');
-  const [correo, setCorreo] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [age, setAge] = useState('');
-  const [peso, setPeso] = useState('');
-  const [estatura, setEstatura] = useState('');
-  const [nivelFisico, setNivelFisico] = useState('');
-  const [tiempoDisponible, setTiempoDisponible] = useState('');
+// Esquema de validación
+const registerSchema = yup.object({
+  nombre: yup.string().required('El nombre es obligatorio'),
+  correo: yup
+    .string()
+    .email('Debe ser un correo electrónico válido')
+    .required('El correo es obligatorio'),
+  password: yup
+    .string()
+    .min(6, 'La contraseña debe tener al menos 6 caracteres')
+    .required('La contraseña es obligatoria'),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref('password'), null], 'Las contraseñas no coinciden')
+    .required('Debes confirmar tu contraseña'),
+  age: yup
+    .number()
+    .transform((value) => (isNaN(value) ? undefined : value))
+    .min(0, 'La edad no puede ser negativa')
+    .max(80, 'La edad no puede ser mayor a 80')
+    .required('La edad es obligatoria'),
+  peso: yup
+    .number()
+    .transform((value) => (isNaN(value) ? undefined : value))
+    .positive('Ingresa un valor valido')
+    .nullable(),
+  estatura: yup
+    .number()
+    .transform((value) => (isNaN(value) ? undefined : value))
+    .positive('Ingresa un valor valido')
+    .nullable(),
+  nivelFisico: yup.string().nullable(),
+  tiempoDisponible: yup
+    .number()
+    .transform((value) => (isNaN(value) ? undefined : value))
+    .min(0, 'Ingresa un valor valido')
+    .nullable(),
+  acceptedTerms: yup
+    .boolean()
+    .oneOf([true], 'Debes aceptar los términos y condiciones'),
+}).required();
 
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
+export default function Register() {
   const [openTerms, setOpenTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-  const handleAgeChange = (e) => {
-    let value = e.target.value.replace(/\D/g, '');
-    const numberValue = Number(value);
-    if (numberValue > 120) value = '120';
-    setAge(value);
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+    watch,
+  } = useForm({
+    resolver: yupResolver(registerSchema),
+    defaultValues: {
+      nombre: '',
+      correo: '',
+      password: '',
+      confirmPassword: '',
+      age: '',
+      peso: '',
+      estatura: '',
+      nivelFisico: '',
+      tiempoDisponible: '',
+      acceptedTerms: false,
+    },
+  });
 
-  const handleTermsChange = (e) => {
-    setAcceptedTerms(e.target.checked);
-  };
+  const acceptedTerms = watch('acceptedTerms');
 
-  const handleOpenTerms = () => setOpenTerms(true);
+  const handleOpenTerms = (e) => {
+    e.preventDefault();
+    setOpenTerms(true);
+  };
   const handleCloseTerms = () => setOpenTerms(false);
 
-  // Envío de datos al backend
-  const handleRegister = async () => {
-    if (!acceptedTerms) {
-      setSnackbar({ open: true, message: 'Debes aceptar los términos y condiciones.', severity: 'error' });
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setSnackbar({ open: true, message: 'Las contraseñas no coinciden.', severity: 'error' });
-      return;
-    }
-
+  const onSubmit = async (data) => {
+    setIsLoading(true);
     try {
       const userData = {
-        nombre,
-        correo,
-        contrasena: password,
-        edad: parseInt(age),
-        peso: parseFloat(peso) || null,
-        estatura: parseFloat(estatura) || null,
-        nivel_fisico: nivelFisico || null,
-        tiempo_disponible: parseInt(tiempoDisponible) || 0,
+        nombre: data.nombre,
+        correo: data.correo,
+        contrasena: data.password,
+        edad: parseInt(data.age),
+        peso: data.peso ? parseFloat(data.peso) : null,
+        estatura: data.estatura ? parseFloat(data.estatura) : null,
+        nivel_fisico: data.nivelFisico || null,
+        tiempo_disponible: data.tiempoDisponible ? parseInt(data.tiempoDisponible) : 0,
       };
 
       await authAPI.register(userData);
 
       setSnackbar({ open: true, message: 'Usuario registrado correctamente.', severity: 'success' });
-
-      setNombre('');
-      setCorreo('');
-      setPassword('');
-      setConfirmPassword('');
-      setAge('');
-      setPeso('');
-      setEstatura('');
-      setNivelFisico('');
-      setTiempoDisponible('');
-      setAcceptedTerms(false);
+      reset();
     } catch (error) {
       console.error(error);
       const errorMessage = error.response?.data?.detail || 'Error al registrar usuario.';
       setSnackbar({ open: true, message: errorMessage, severity: 'error' });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -107,6 +141,8 @@ export default function Register() {
 
       <Container maxWidth="sm" sx={{ mt: 12, mb: 4 }}>
         <Box
+          component="form"
+          onSubmit={handleSubmit(onSubmit)}
           sx={{
             textAlign: 'center',
             py: 6,
@@ -128,40 +164,152 @@ export default function Register() {
           </Typography>
 
           {/* Campos de entrada */}
-          <Input label="Nombre completo" labelSize="small" placeholder="Introduce tu nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} fullWidth sx={{ maxWidth: 400, mx: 'auto', mb: 2 }} />
-
-          <Input label="Correo electrónico" labelSize="small" placeholder="Introduce tu correo" value={correo} onChange={(e) => setCorreo(e.target.value)} fullWidth sx={{ maxWidth: 400, mx: 'auto', mb: 2 }} />
-
-          <Input label="Contraseña" labelSize="small" placeholder="Introduce tu contraseña" type="password" value={password} onChange={(e) => setPassword(e.target.value)} fullWidth sx={{ maxWidth: 400, mx: 'auto', mb: 2 }} />
-
-          <Input label="Confirmar contraseña" labelSize="small" placeholder="Confirma tu contraseña" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} fullWidth sx={{ maxWidth: 400, mx: 'auto', mb: 2 }} />
-
-          <Input label="Edad" labelSize="small" placeholder="Introduce tu edad" type="number" value={age} onChange={handleAgeChange} fullWidth sx={{ maxWidth: 400, mx: 'auto', mb: 2 }} inputProps={{ min: 0, max: 120 }} />
-
-          <Input label="Peso (kg)" labelSize="small" placeholder="Introduce tu peso" type="number" value={peso} onChange={(e) => setPeso(e.target.value)} fullWidth sx={{ maxWidth: 400, mx: 'auto', mb: 2 }} />
-
-          <Input label="Estatura (cm)" labelSize="small" placeholder="Introduce tu estatura" type="number" value={estatura} onChange={(e) => setEstatura(e.target.value)} fullWidth sx={{ maxWidth: 400, mx: 'auto', mb: 2 }} />
-
-          <Input label="Nivel físico" labelSize="small" placeholder="Ej. Principiante, Intermedio, Avanzado" value={nivelFisico} onChange={(e) => setNivelFisico(e.target.value)} fullWidth sx={{ maxWidth: 400, mx: 'auto', mb: 2 }} />
-
-          <Input label="Tiempo disponible (minutos)" labelSize="small" placeholder="Ej. 30" type="number" value={tiempoDisponible} onChange={(e) => setTiempoDisponible(e.target.value)} fullWidth sx={{ maxWidth: 400, mx: 'auto', mb: 3 }} />
-
-          {/* Checkbox de términos */}
-          <FormControlLabel
-            control={<Checkbox checked={acceptedTerms} onChange={handleTermsChange} color="primary" />}
-            label={
-              <Typography variant="body2" color="text.secondary">
-                He leído y acepto los{' '}
-                <a href="#" onClick={handleOpenTerms} style={{ color: '#6BAA75', textDecoration: 'none' }}>
-                  términos y condiciones
-                </a>
-              </Typography>
-            }
-            sx={{ mb: 4 }}
+          <Input
+            label="Nombre completo"
+            labelSize="small"
+            placeholder="Introduce tu nombre"
+            fullWidth
+            error={!!errors.nombre}
+            helperText={errors.nombre?.message}
+            {...register('nombre')}
+            sx={{ maxWidth: 400, mx: 'auto', mb: 2 }}
           />
 
-          <Button variant="primary" size="small" fullWidth sx={{ maxWidth: 400, mx: 'auto' }} disabled={!acceptedTerms} onClick={handleRegister}>
-            Registrarse
+          <Input
+            label="Correo electrónico"
+            labelSize="small"
+            placeholder="Introduce tu correo"
+            fullWidth
+            error={!!errors.correo}
+            helperText={errors.correo?.message}
+            {...register('correo')}
+            sx={{ maxWidth: 400, mx: 'auto', mb: 2 }}
+          />
+
+          <Input
+            label="Contraseña"
+            labelSize="small"
+            placeholder="Introduce tu contraseña"
+            type="password"
+            showPasswordToggle={true}
+            fullWidth
+            error={!!errors.password}
+            helperText={errors.password?.message}
+            {...register('password')}
+            sx={{ maxWidth: 400, mx: 'auto', mb: 2 }}
+          />
+
+          <Input
+            label="Confirmar contraseña"
+            labelSize="small"
+            placeholder="Confirma tu contraseña"
+            type="password"
+            showPasswordToggle={true}
+            fullWidth
+            error={!!errors.confirmPassword}
+            helperText={errors.confirmPassword?.message}
+            {...register('confirmPassword')}
+            sx={{ maxWidth: 400, mx: 'auto', mb: 2 }}
+          />
+
+          <Input
+            label="Edad"
+            labelSize="small"
+            placeholder="Introduce tu edad"
+            type="number"
+            fullWidth
+            error={!!errors.age}
+            helperText={errors.age?.message}
+            {...register('age')}
+            sx={{ maxWidth: 400, mx: 'auto', mb: 2 }}
+            inputProps={{ min: 0, max: 120 }}
+          />
+
+          <Input
+            label="Peso (kg)"
+            labelSize="small"
+            placeholder="Introduce tu peso"
+            type="number"
+            fullWidth
+            error={!!errors.peso}
+            helperText={errors.peso?.message}
+            {...register('peso')}
+            sx={{ maxWidth: 400, mx: 'auto', mb: 2 }}
+          />
+
+          <Input
+            label="Estatura (cm)"
+            labelSize="small"
+            placeholder="Introduce tu estatura"
+            type="number"
+            fullWidth
+            error={!!errors.estatura}
+            helperText={errors.estatura?.message}
+            {...register('estatura')}
+            sx={{ maxWidth: 400, mx: 'auto', mb: 2 }}
+          />
+
+          <Input
+            label="Nivel físico"
+            labelSize="small"
+            select={true}
+            options={[
+              { value: 'principiante', label: 'Principiante' },
+              { value: 'intermedio', label: 'Intermedio' },
+              { value: 'avanzado', label: 'Avanzado' },
+            ]}
+            fullWidth
+            error={!!errors.nivelFisico}
+            helperText={errors.nivelFisico?.message}
+            {...register('nivelFisico')}
+            sx={{ maxWidth: 400, mx: 'auto', mb: 2 }}
+          />
+
+          <Input
+            label="Tiempo disponible (minutos)"
+            labelSize="small"
+            placeholder="Ej. 30"
+            type="number"
+            fullWidth
+            error={!!errors.tiempoDisponible}
+            helperText={errors.tiempoDisponible?.message}
+            {...register('tiempoDisponible')}
+            sx={{ maxWidth: 400, mx: 'auto', mb: 3 }}
+          />
+
+          {/* Checkbox de términos */}
+          <Box sx={{ maxWidth: 400, mx: 'auto', mb: 4, textAlign: 'left' }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={acceptedTerms}
+                  onChange={(e) => setValue('acceptedTerms', e.target.checked, { shouldValidate: true })}
+                  color="primary"
+                />
+              }
+              label={
+                <Typography variant="body2" color="text.secondary">
+                  He leído y acepto los{' '}
+                  <a href="#" onClick={handleOpenTerms} style={{ color: '#6BAA75', textDecoration: 'none' }}>
+                    términos y condiciones
+                  </a>
+                </Typography>
+              }
+            />
+            {errors.acceptedTerms && (
+              <FormHelperText error>{errors.acceptedTerms.message}</FormHelperText>
+            )}
+          </Box>
+
+          <Button
+            variant="primary"
+            size="small"
+            fullWidth
+            type="submit"
+            disabled={isLoading}
+            sx={{ maxWidth: 400, mx: 'auto' }}
+          >
+            {isLoading ? 'Registrando...' : 'Registrarse'}
           </Button>
         </Box>
       </Container>
@@ -189,7 +337,7 @@ export default function Register() {
             5. El usuario reconoce que toda actividad física conlleva un riesgo de lesión.
           </Typography>
           <Typography variant="body2" component="p" sx={{ mb: 2 }}>
-            Se recomienda que cualquier entrenamiento se realice bajo la supervisión de un profesional o persona capacitada que pueda asistir en caso de requerir ayuda. 
+            Se recomienda que cualquier entrenamiento se realice bajo la supervisión de un profesional o persona capacitada que pueda asistir en caso de requerir ayuda.
           </Typography>
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'center' }}>
