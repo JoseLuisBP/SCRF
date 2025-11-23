@@ -43,3 +43,5 @@ python-dotenv==1.1.1
 email-validator==2.3.0
 # Cliente HTTP para hacer requests a otros servicios
 httpx==0.28.1
+# Logger JSON
+python-json-logger==4.0.0

@@ -2,46 +2,56 @@
 import logging
 import sys
 from pathlib import Path
+from pythonjsonlogger import jsonlogger
 from app.core.config import settings
 
-# Crear directorio de logs si no existe
+# Crear directorio de logs
 log_dir = Path("logs")
 log_dir.mkdir(exist_ok=True)
 
-
 def setup_logging():
-    """Configurar el sistema de logging"""
-    
-    # Formato de los logs
-    log_format = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        datefmt="%d-%m-%Y %H:%M:%S"
-    )
+    """Configuración de logging para producción"""
     
     # Logger raíz
     root_logger = logging.getLogger()
-    root_logger.setLevel(logging.DEBUG if settings.DEBUG else logging.INFO)
+    level = logging.DEBUG if settings.DEBUG else logging.INFO
+    root_logger.setLevel(level)
     
-    # Handler para consola
+    # Handler de consola con formato legible
     console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel(logging.DEBUG if settings.DEBUG else logging.INFO)
-    console_handler.setFormatter(log_format)
+    console_handler.setLevel(level)
+    console_formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S"
+    )
+    console_handler.setFormatter(console_formatter)
     root_logger.addHandler(console_handler)
     
-    # Handler para archivo
-    file_handler = logging.FileHandler(log_dir / "app.log")
-    file_handler.setLevel(logging.INFO)
-    file_handler.setFormatter(log_format)
-    root_logger.addHandler(file_handler)
+    # Handler de archivo rotativo
+    from logging.handlers import RotatingFileHandler
     
-    # Handler para errores
-    error_handler = logging.FileHandler(log_dir / "error.log")
+    # Handler general
+    app_handler = RotatingFileHandler(
+        log_dir / "app.log",
+        maxBytes=10*1024*1024,  # 10MB
+        backupCount=5,
+        encoding='utf-8'
+    )
+    app_handler.setLevel(logging.INFO)
+    app_handler.setFormatter(console_formatter)
+    root_logger.addHandler(app_handler)
+    
+    # Handler de errores
+    error_handler = RotatingFileHandler(
+        log_dir / "error.log",
+        maxBytes=10*1024*1024,
+        backupCount=5,
+        encoding='utf-8'
+    )
     error_handler.setLevel(logging.ERROR)
-    error_handler.setFormatter(log_format)
+    error_handler.setFormatter(console_formatter)
     root_logger.addHandler(error_handler)
     
     return root_logger
 
-
-# Instancia del logger
 logger = setup_logging()
