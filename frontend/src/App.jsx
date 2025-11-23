@@ -1,5 +1,5 @@
 import { ThemeProvider, CssBaseline } from '@mui/material';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { AccessibilityProvider } from './context/AccessibilityContext';
 
