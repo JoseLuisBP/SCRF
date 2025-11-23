@@ -15,6 +15,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  ListItemButton,
   Switch,
   Tooltip,
   useTheme,
@@ -92,15 +93,13 @@ export default function Header({ showSearchBar = false }) {
     <Box sx={{ width: 250 }} role="presentation">
       <List>
         {navigationItems.map((item) => (
-          <ListItem
-            button
-            key={item.text}
-            onClick={() =>
-              isLoggedIn ? navigate(item.path) : handleScrollToSection(item.path)
-            }
-          >
-            <ListItemText primary={item.text} />
-            <ChevronRightIcon />
+          <ListItem key={item.text} disablePadding>
+            <ListItemButton
+              onClick={() => isLoggedIn ? navigate(item.path) : handleScrollToSection(item.path)}
+            >
+              <ListItemText primary={item.text} />
+              <ChevronRightIcon />
+	          </ListItemButton>
           </ListItem>
         ))}
       </List>
@@ -122,7 +121,8 @@ export default function Header({ showSearchBar = false }) {
           to={isLoggedIn ? '/dashboard' : '/'}
           sx={{ textDecoration: 'none', color: 'inherit', flexGrow: 0, mr: 2 }}
         >
-          LOGO
+          {/*Logo provisional de la web*/}
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="icon icon-tabler icons-tabler-filled icon-tabler-seedling"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 3a7 7 0 0 1 6.95 6.155a6.97 6.97 0 0 1 5.05 -2.155h3a1 1 0 0 1 1 1v1a7 7 0 0 1 -7 7h-2v4a1 1 0 0 1 -2 0v-7h-2a7 7 0 0 1 -7 -7v-2a1 1 0 0 1 1 -1z" /></svg>
         </Typography>
 
         {showSearchBar && (
@@ -131,7 +131,11 @@ export default function Header({ showSearchBar = false }) {
               placeholder="Buscar ejercicios..."
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
-              onKeyPress={handleSearch}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSearch(e);
+                }
+              }}
               aria-label="Buscar ejercicios"
               sx={{
                 color: 'inherit',
