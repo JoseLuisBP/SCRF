@@ -4,9 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.core.config import settings
 from app.core.logging import logger
-from app.api.v1 import auth, users
-from app.api.v1 import exercises
+from app.api.v1 import auth, users, exercises
 from app.db.postgresql import postgresql
+from app.middleware import setup_cors, setup_error_handlers
 
 
 @asynccontextmanager
@@ -29,70 +29,62 @@ async def lifespan(application: FastAPI):
     await postgresql.close()
     logger.info("Cerrando la aplicación y conexiones PostgreSQL...")
 
-app = FastAPI(
-    lifespan=lifespan,
-    title=settings.PROJECT_NAME,
-    version=settings.VERSION,
-    description="API backend de la aplicación",
-    docs_url="/docs",
-    redoc_url="/redoc",
-)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.BACKEND_CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-app.include_router(
-    auth.router,
-    prefix=f"{settings.API_V1_PREFIX}/auth",
-    tags=["Authentication"]
-)
-
-app.include_router(
-    users.router,
-    prefix=f"{settings.API_V1_PREFIX}/users",
-    tags=["Users"]
-)
-
-app.include_router(
-    exercises.router, 
-    prefix="/api/v1"
-)
-
-@app.get("/")
-def root():
-    """Ruta raíz"""
-    return {
-        "message": "Cuidado y Rehabilitación API Backend",
-        "version": settings.VERSION,
-        "status": "running",
-        "docs": "/docs",
-    }
-
-@app.get("/health")
-def health_check():
-    """Health check endpoints"""
-    return {
-        "status": "healthy",
-        "version": settings.VERSION,
-        "environment": settings.ENVIRONMENT
-    }
-
-@app.exception_handler(Exception)
-async def global_exception_handler(_request, exc):
-    """Manejador global de excepciones"""
-    logger.error(f"Error inesperado: {exc}")
-    return JSONResponse(
-        status_code=500,
-        content={
-            "detail": "Error interno del servidor",
-            "message": str(exc) if settings.DEBUG else "Ha ocurrido un error inesperado"
-        }
+def create_app() -> FastAPI:
+    """Crea y configura la aplicación FastAPI"""
+    application = FastAPI(
+        lifespan=lifespan,
+        title=settings.PROJECT_NAME,
+        version=settings.VERSION,
+        description="API backend de la aplicación",
+        docs_url="/docs",
+        redoc_url="/redoc",
     )
+
+    # Configurar Middleware
+    setup_cors(application)
+    setup_error_handlers(application)
+
+    # Incluir routers
+    application.include_router(
+        auth.router,
+        prefix=f"{settings.API_V1_PREFIX}/auth",
+        tags=["Authentication"]
+    )
+
+    application.include_router(
+        users.router,
+        prefix=f"{settings.API_V1_PREFIX}/users",
+        tags=["Users"]
+    )
+
+    application.include_router(
+        exercises.router, 
+        prefix="/api/v1"
+    )
+
+    @application.get("/")
+    def root():
+        """Ruta raíz"""
+        return {
+            "message": "Cuidado y Rehabilitación API Backend",
+            "version": settings.VERSION,
+            "status": "running",
+            "docs": "/docs",
+        }
+
+    @application.get("/health")
+    def health_check():
+        """Health check endpoints"""
+        return {
+            "status": "healthy",
+            "version": settings.VERSION,
+            "environment": settings.ENVIRONMENT
+        }
+
+    return application
+
+app = create_app()
 
 
 if __name__ == "__main__":
