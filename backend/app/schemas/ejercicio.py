@@ -1,15 +1,14 @@
 from pydantic import BaseModel
 from typing import Optional
 
-class EjercicioResponse(BaseModel):
+class EjercicioOut(BaseModel):
     id_ejercicio: int
     nombre_ejercicio: str
     descripcion: str
-    repeticiones: Optional[int] = None
-    tiempo: Optional[int] = None
+    repeticiones: Optional[int]
+    tiempo: Optional[int]
     categoria: str
-    advertencias: Optional[str] = None
-    activo: bool
+    advertencias: Optional[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
