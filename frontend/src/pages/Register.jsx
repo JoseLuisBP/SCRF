@@ -1,4 +1,6 @@
+//Hook de estado de React
 import { useState } from 'react';
+// Componentes de Material UI
 import {
   Box,
   Container,
@@ -14,15 +16,20 @@ import {
   Alert,
   FormHelperText,
 } from '@mui/material';
+// React Hook Form para manejo del formulario
 import { useForm } from 'react-hook-form';
+// Integración de Yup con React Hook Form
 import { yupResolver } from '@hookform/resolvers/yup';
+// Librería Yup para validaciones
 import * as yup from 'yup';
+// Componentes personalizados
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import Header from '../components/layout/Header';
 import { authAPI } from '../api';
 
 // Esquema de validación
+// Define las reglas que deben cumplir los campos del registro
 const registerSchema = yup.object({
   nombre: yup.string().required('El nombre es obligatorio'),
   correo: yup
@@ -64,11 +71,13 @@ const registerSchema = yup.object({
     .oneOf([true], 'Debes aceptar los términos y condiciones'),
 }).required();
 
+//Componentes registro como: terminos, mensaje emergente
 export default function Register() {
   const [openTerms, setOpenTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
+  // Configuración del formulario
   const {
     register,
     handleSubmit,
@@ -92,17 +101,22 @@ export default function Register() {
     },
   });
 
+    // Observa si los términos están aceptados
   const acceptedTerms = watch('acceptedTerms');
 
+    // Abre el modal de términos
   const handleOpenTerms = (e) => {
     e.preventDefault();
     setOpenTerms(true);
   };
+  // Cierra el modal de términos
   const handleCloseTerms = () => setOpenTerms(false);
 
+  //Funcion al enviar formulario 
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
+       // Datos enviados a la API
       const userData = {
         nombre: data.nombre,
         correo: data.correo,
@@ -113,9 +127,9 @@ export default function Register() {
         nivel_fisico: data.nivelFisico || null,
         tiempo_disponible: data.tiempoDisponible ? parseInt(data.tiempoDisponible) : 0,
       };
-
+// Llamada a la API
       await authAPI.register(userData);
-
+// Mensaje de éxito
       setSnackbar({ open: true, message: 'Usuario registrado correctamente.', severity: 'success' });
       reset();
     } catch (error) {
@@ -126,7 +140,7 @@ export default function Register() {
       setIsLoading(false);
     }
   };
-
+//Interfaz
   return (
     <Box
       sx={{
