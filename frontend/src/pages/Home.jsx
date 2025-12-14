@@ -1,3 +1,4 @@
+//Importaciones de librerias como: react, material ui, contexto
 import { Box, Container, Typography } from '@mui/material';
 import Header from '../components/layout/Header';
 import Button from '../components/common/Button';
@@ -24,7 +25,7 @@ import beneficioImg from '../assets/images/beneficio.jpg';
 import contactoImg from '../assets/images/contacto.jpg';
 
 import Footer from '../components/layout/Footer';
-
+//componentes home 
 export default function Home() {
   const { isLoggedIn, toggleLogin } = useAuth();
   const { fontSize } = useAccessibility();
@@ -64,6 +65,7 @@ export default function Home() {
             gap: fontSize > 18 ? 5 : 3,
           }}
         >
+          //Contenido carrusel
           <Box
             sx={{
               position: 'relative',
