@@ -1,9 +1,15 @@
+
 import React from "react";
 import { Box, Typography, IconButton } from "@mui/material";
+// Importa los íconos que se usarán en el footer
 import { Facebook, Instagram, Email, Phone, Twitter } from "@mui/icons-material";
 
+// Define el componente Footer como una función.
 function Footer ()  {
   return (
+     // Caja principal que contiene todo el footer.
+    // Se usa Box porque permite aplicar estilos fácilmente con sx.
+    //Como fondo, texto, centrar texto, sombra de texto
     <Box
       sx={{
         backgroundColor: "#1976d2",
@@ -16,10 +22,13 @@ function Footer ()  {
         boxShadow: (theme) => `0 -8px 24px ${theme.palette.primary.main}40`,
       }}
     >
+
+      // Título principal del footer
       <Typography variant="h6" gutterBottom>
         Pagina de rehabilitación
       </Typography>
 
+// Texto secundario (derechos reservados)
       <Typography 
         variant="h4"
         sx={{
