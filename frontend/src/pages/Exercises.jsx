@@ -1,4 +1,6 @@
+//Importaciones 
 import { useState, useEffect } from "react";
+//Componentes de Material UI
 import {
   Box,
   Container,
@@ -12,14 +14,21 @@ import {
   CardContent,
   Chip,
 } from "@mui/material";
+//Componentes de Layout
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
 
+//Componentes exercises
+//Mustra ejercicios y permite mostrarlos por categoria 
 export default function Exercises() {
+ // Categoría seleccionada en el filtro
   const [category, setCategory] = useState("");
+  // Lista completa de ejercicios obtenidos del backend
   const [exercises, setExercises] = useState([]);
+  // Lista filtrada según la categoría
   const [filtered, setFiltered] = useState([]);
 
+  //Obtener ejercicios del backend
   useEffect(() => {
     fetch("http://localhost:8000/api/v1/exercises")
       .then((res) => res.json())
@@ -27,6 +36,7 @@ export default function Exercises() {
       .catch((err) => console.error("Error cargando ejercicios:", err));
   }, []);
 
+  //Filtra ejercicios por categoria seleccionado
   useEffect(() => {
     if (category) {
       setFiltered(exercises.filter((e) => e.categoria === category));
@@ -37,6 +47,7 @@ export default function Exercises() {
 
   const categories = [...new Set(exercises.map((e) => e.categoria))];
 
+  //Componentes 
   return (
     <Box
       sx={{
