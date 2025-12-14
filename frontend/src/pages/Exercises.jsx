@@ -1,6 +1,10 @@
+
 //Importaciones 
 import { useState, useEffect } from "react";
 //Componentes de Material UI
+
+import { useState, useEffect } from 'react';
+
 import {
   Box,
   Container,
@@ -9,6 +13,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+
   Grid,
   Card,
   CardContent,
@@ -24,19 +29,57 @@ export default function Exercises() {
  // Categoría seleccionada en el filtro
   const [category, setCategory] = useState("");
   // Lista completa de ejercicios obtenidos del backend
+
+} //from '@mui/material';
+
+import Header from '../components/layout/Header';
+import Footer from '../components/layout/Footer';
+import ExerciseList from '../components/exercises/ExerciseList';
+
+/**
+ * Vista principal de ejercicios
+ */
+export default function Exercises() {
+  const [category, setCategory] = useState('');
+
   const [exercises, setExercises] = useState([]);
   // Lista filtrada según la categoría
   const [filtered, setFiltered] = useState([]);
+  const [error, setError] = useState(null);
+
 
   //Obtener ejercicios del backend
+
+  /**
+   * Cargar ejercicios desde la API
+   */
+
   useEffect(() => {
-    fetch("http://localhost:8000/api/v1/exercises")
-      .then((res) => res.json())
-      .then((data) => setExercises(data))
-      .catch((err) => console.error("Error cargando ejercicios:", err));
+    const loadExercises = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/v1/exercises');
+
+        if (!response.ok) {
+          throw new Error('No se pudieron cargar los ejercicios');
+        }
+
+        const data = await response.json();
+        setExercises(data);
+      } catch (err) {
+        console.error('Error cargando ejercicios:', err);
+        setError('No se pudieron cargar los ejercicios');
+      }
+    };
+
+    loadExercises();
   }, []);
 
   //Filtra ejercicios por categoria seleccionado
+
+  /**
+   * Filtrar ejercicios por categoría
+   */
+
   useEffect(() => {
     if (category) {
       setFiltered(exercises.filter((e) => e.categoria === category));
@@ -45,17 +88,19 @@ export default function Exercises() {
     }
   }, [category, exercises]);
 
+  /**
+   * Obtener categorías únicas
+   */
   const categories = [...new Set(exercises.map((e) => e.categoria))];
 
   //Componentes 
   return (
     <Box
       sx={{
-        minHeight: "100vh",
+        minHeight: '100vh',
         background: (theme) =>
           `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
-
-        color: "text.primary",
+        color: 'text.primary',
       }}
     >
       <Header />
@@ -65,7 +110,7 @@ export default function Exercises() {
           variant="h4"
           align="center"
           gutterBottom
-          sx={{ fontWeight: "bold", mb: 4 }}
+          sx={{ fontWeight: 'bold', mb: 4 }}
         >
           Ejercicios Disponibles
         </Typography>
@@ -89,91 +134,15 @@ export default function Exercises() {
           </FormControl>
         </Box>
 
-        {/* Grid de tarjetas */}
-        <Grid container spacing={3} justifyContent="center">
-          {filtered.length > 0 ? (
-            filtered.map((ex) => (
-              <Grid
-                item
-                key={ex.id_ejercicio}
-                xs={12}
-                sm={6}
-                md={4}
-                lg={3}
-                sx={{ display: "flex", justifyContent: "center" }}
-              >
-                <Card
-                  sx={{
-                    width: "100%",
-                    maxWidth: 320,
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    height: "100%",
-                    borderRadius: 3,
-                    boxShadow: 4,
-                    backgroundColor: "rgba(255,255,255,0.9)",
-                    p: 2,
-                    transition: "transform 0.2s, box-shadow 0.2s",
-                    "&:hover": {
-                      transform: "translateY(-5px)",
-                      boxShadow: 6,
-                    },
-                  }}
-                >
-                  <CardContent>
-                    <Typography variant="h6" fontWeight="bold" gutterBottom>
-                      {ex.nombre_ejercicio}
-                    </Typography>
-                    <Chip
-                      label={ex.categoria}
-                      color="success"
-                      size="small"
-                      sx={{ mb: 1 }}
-                    />
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      gutterBottom
-                      sx={{ mb: 1 }}
-                    >
-                      {ex.descripcion}
-                    </Typography>
+        {/* Mensaje de error */}
+        {error && (
+          <Typography color="error" align="center" sx={{ mb: 3 }}>
+            {error}
+          </Typography>
+        )}
 
-                    {ex.repeticiones && (
-                      <Typography>
-                        <b>Repeticiones:</b> {ex.repeticiones}
-                      </Typography>
-                    )}
-                    {ex.tiempo && (
-                      <Typography>
-                        <b>Tiempo:</b> {ex.tiempo} seg
-                      </Typography>
-                    )}
-
-                    {ex.advertencias && (
-                      <Typography
-                        variant="body2"
-                        color="error"
-                        sx={{ mt: 1, fontStyle: "italic" }}
-                      >
-                        {ex.advertencias}
-                      </Typography>
-                    )}
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))
-          ) : (
-            <Typography
-              variant="body1"
-              color="text.secondary"
-              sx={{ mt: 4, textAlign: "center", width: "100%" }}
-            >
-              No hay ejercicios en esta categoría.
-            </Typography>
-          )}
-        </Grid>
+        {/* Lista de ejercicios */}
+        <ExerciseList exercises={filtered} />
       </Container>
 
       <Footer />

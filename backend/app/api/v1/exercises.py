@@ -1,25 +1,21 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends
 from sqlalchemy.future import select
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.db.postgresql import postgresql
+from app.db.session import get_session, SessionManager
 from app.models.ejercicio import Ejercicio
-from app.schemas.ejercicio import EjercicioResponse
+from app.schemas.ejercicio import EjercicioOut
+from typing import List
 
-router = APIRouter(prefix="/exercises", tags=["Exercises"])
+router = APIRouter()
 
-@router.get("/", response_model=list[EjercicioResponse])
+@router.get(
+    "/exercises",
+    response_model=List[EjercicioOut]
+)
 async def get_exercises(
-    categoria: str | None = Query(None, description="Filtrar por categoría"),
-    db: AsyncSession = Depends(postgresql.get_session)
+    session_manager: SessionManager = Depends(get_session)
 ):
-    """
-    Obtener todos los ejercicios activos, opcionalmente filtrados por categoría.
-    """
-    query = select(Ejercicio).where(Ejercicio.activo == True)
-
-    if categoria:
-        query = query.where(Ejercicio.categoria.ilike(f"%{categoria}%"))
-
-    result = await db.execute(query)
+    result = await session_manager.pg_session.execute(
+        select(Ejercicio).where(Ejercicio.activo == True)
+    )
     ejercicios = result.scalars().all()
     return ejercicios
