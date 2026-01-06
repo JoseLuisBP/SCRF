@@ -37,17 +37,17 @@ import { useAccessibility } from "../../context/AccessibilityContext";
 
 // El componente recibe la prop showSearchBar para decidir si mostrar o no una barra de búsqueda.
 export default function Header({ showSearchBar = false }) {
- // Hooks de navegación y ubicación de React Router. 
+  // Hooks de navegación y ubicación de React Router. 
   const navigate = useNavigate();
   const location = useLocation();
 
   // Material UI: obtener el tema y detectar si es vista móvil.
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  
+
   // Información del usuario desde el contexto de autenticación.
   const { isLoggedIn, user, logout } = useAuth();
- // Configuraciones de accesibilidad desde el contexto global.
+  // Configuraciones de accesibilidad desde el contexto global.
   const { fontSize, highContrast, seniorMode, increaseFontSize, toggleContrast, toggleSeniorMode } = useAccessibility();
 
   // Controlan visibilidad del menú móvil, del menú de usuario y del menú de accesibilidad.
@@ -58,11 +58,11 @@ export default function Header({ showSearchBar = false }) {
 
   // Abre o cierra el menú lateral móvil.
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
- // Abre el menú del perfil (usuario). 
+  // Abre el menú del perfil (usuario). 
   const handleProfileMenu = (event) => setAnchorEl(event.currentTarget);
   // Abre el menú de opciones de accesibilidad.
   const handleAccessibilityMenu = (event) => setAccessibilityAnchor(event.currentTarget);
-  
+
   // Cierra ambos menús (usuario y accesibilidad).
   const handleClose = () => {
     setAnchorEl(null);
@@ -94,17 +94,17 @@ export default function Header({ showSearchBar = false }) {
   // Cambian según si el usuario está autenticado o no.
   const navigationItems = isLoggedIn
     ? [
-        { text: 'Dashboard', path: '/dashboard' },
-        { text: 'Rutinas', path: '/rutinas' },
-        { text: 'Ejercicios', path: '/Exercises' },
-        { text: 'Progreso', path: '/progreso' },
-      ]
+      { text: 'Dashboard', path: '/dashboard' },
+      { text: 'Rutinas', path: '/rutinas' },
+      { text: 'Ejercicios', path: '/Exercises' },
+      { text: 'Progreso', path: '/progreso' },
+    ]
     : [
-        { text: 'Inicio', path: 'inicio' },
-        { text: 'Sobre nosotros', path: 'sobre-nosotros' },
-        { text: 'Beneficios', path: 'beneficios' },
-        { text: 'Contacto', path: 'contacto' },
-      ];
+      { text: 'Inicio', path: 'inicio' },
+      { text: 'Sobre nosotros', path: 'sobre-nosotros' },
+      { text: 'Beneficios', path: 'beneficios' },
+      { text: 'Contacto', path: 'contacto' },
+    ];
 
   // Contenido del drawer (menu movil lateral)    
   const drawer = (
@@ -117,7 +117,7 @@ export default function Header({ showSearchBar = false }) {
             >
               <ListItemText primary={item.text} />
               <ChevronRightIcon />
-	          </ListItemButton>
+            </ListItemButton>
           </ListItem>
         ))}
       </List>
@@ -128,14 +128,14 @@ export default function Header({ showSearchBar = false }) {
   return (
     <AppBar position="static" role="navigation" aria-label="Barra principal de navegación">
       <Toolbar>
-    //Icono del menu movil     
+        {/*Icono del menu movil*/}
         {isMobile && (
           <IconButton color="inherit" aria-label="abrir menú" edge="start" onClick={handleDrawerToggle}>
             <MenuIcon />
           </IconButton>
         )}
 
-// Logo que redirige segun login
+        {/*Logo que redirige segun login*/}
         <Typography
           variant="h6"
           component={RouterLink}
@@ -143,10 +143,10 @@ export default function Header({ showSearchBar = false }) {
           sx={{ textDecoration: 'none', color: 'inherit', flexGrow: 0, mr: 2 }}
         >
           {/*Logo provisional de la web*/}
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="icon icon-tabler icons-tabler-filled icon-tabler-seedling"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 3a7 7 0 0 1 6.95 6.155a6.97 6.97 0 0 1 5.05 -2.155h3a1 1 0 0 1 1 1v1a7 7 0 0 1 -7 7h-2v4a1 1 0 0 1 -2 0v-7h-2a7 7 0 0 1 -7 -7v-2a1 1 0 0 1 1 -1z" /></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="icon icon-tabler icons-tabler-filled icon-tabler-seedling"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M6 3a7 7 0 0 1 6.95 6.155a6.97 6.97 0 0 1 5.05 -2.155h3a1 1 0 0 1 1 1v1a7 7 0 0 1 -7 7h-2v4a1 1 0 0 1 -2 0v-7h-2a7 7 0 0 1 -7 -7v-2a1 1 0 0 1 1 -1z" /></svg>
         </Typography>
 
-//Barra de busqueda si showSearchBar es true
+        {/*Barra de busqueda si showSearchBar es true*/}
         {showSearchBar && (
           <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
             <InputBase
@@ -172,7 +172,7 @@ export default function Header({ showSearchBar = false }) {
           </Box>
         )}
 
-//Botones de navegacion en escritorio
+        {/*Botones de navegacion en escritorio*/}
         {!isMobile && (
           <Stack direction="row" spacing={2} sx={{ flexGrow: 1, justifyContent: 'center' }}>
             {navigationItems.map((item) => (
@@ -189,7 +189,7 @@ export default function Header({ showSearchBar = false }) {
           </Stack>
         )}
 
-//Iconos y botones de perfil y login
+        {/*Iconos y botones de perfil y login*/}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Tooltip title="Opciones de accesibilidad">
             <IconButton color="inherit" onClick={handleAccessibilityMenu} aria-label="opciones de accesibilidad">

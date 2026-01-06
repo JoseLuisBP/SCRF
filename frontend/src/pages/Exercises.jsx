@@ -1,10 +1,7 @@
-
-//Importaciones 
-import { useState, useEffect } from "react";
-//Componentes de Material UI
-
+// React
 import { useState, useEffect } from 'react';
 
+// Material UI
 import {
   Box,
   Container,
@@ -13,47 +10,37 @@ import {
   InputLabel,
   Select,
   MenuItem,
+} from '@mui/material';
 
-  Grid,
-  Card,
-  CardContent,
-  Chip,
-} from "@mui/material";
-//Componentes de Layout
-import Header from "../components/layout/Header";
-import Footer from "../components/layout/Footer";
-
-//Componentes exercises
-//Mustra ejercicios y permite mostrarlos por categoria 
-export default function Exercises() {
- // Categoría seleccionada en el filtro
-  const [category, setCategory] = useState("");
-  // Lista completa de ejercicios obtenidos del backend
-
-} //from '@mui/material';
-
+// Layout
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+
+// Componentes de ejercicios
 import ExerciseList from '../components/exercises/ExerciseList';
 
 /**
  * Vista principal de ejercicios
+ * - Obtiene ejercicios desde el backend
+ * - Permite filtrar por categoría
+ * - Muestra la lista usando componentes reutilizables
  */
 export default function Exercises() {
+  // Categoría seleccionada
   const [category, setCategory] = useState('');
 
+  // Lista completa de ejercicios
   const [exercises, setExercises] = useState([]);
-  // Lista filtrada según la categoría
+
+  // Lista filtrada
   const [filtered, setFiltered] = useState([]);
+
+  // Manejo de errores
   const [error, setError] = useState(null);
-
-
-  //Obtener ejercicios del backend
 
   /**
    * Cargar ejercicios desde la API
    */
-
   useEffect(() => {
     const loadExercises = async () => {
       try {
@@ -74,12 +61,9 @@ export default function Exercises() {
     loadExercises();
   }, []);
 
-  //Filtra ejercicios por categoria seleccionado
-
   /**
    * Filtrar ejercicios por categoría
    */
-
   useEffect(() => {
     if (category) {
       setFiltered(exercises.filter((e) => e.categoria === category));
@@ -93,14 +77,12 @@ export default function Exercises() {
    */
   const categories = [...new Set(exercises.map((e) => e.categoria))];
 
-  //Componentes 
   return (
     <Box
       sx={{
         minHeight: '100vh',
         background: (theme) =>
           `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
-        color: 'text.primary',
       }}
     >
       <Header />

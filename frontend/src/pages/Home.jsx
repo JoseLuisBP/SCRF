@@ -60,7 +60,7 @@ export default function Home() {
             gap: fontSize > 18 ? 5 : 3,
           }}
         >
-          //Contenido carrusel
+          {/*Contenido carrusel*/}
           <Box
             sx={{
               position: 'relative',
