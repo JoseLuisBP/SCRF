@@ -1,12 +1,20 @@
+// Importamos useState para manejar estados internos como mostrar/ocultar contraseña.
 import { useState } from 'react';
+// Importamos el componente de campo de texto de Material UI.
 import TextField from '@mui/material/TextField';
+// Importamos el botón de ícono que se usa dentro del input.
 import IconButton from '@mui/material/IconButton';
+// Importamos el contenedor para poner íconos al inicio o final del input.
 import InputAdornment from '@mui/material/InputAdornment';
+// Importamos las opciones tipo menú para inputs select.
 import MenuItem from '@mui/material/MenuItem';
+// Íconos para mostrar o esconder contraseña.
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+// Importamos PropTypes para validación de props.
 import PropTypes from 'prop-types';
 
+//Componente input personalizado  
 export default function Input({
   labelSize = 'medium',
   label,
@@ -19,7 +27,7 @@ export default function Input({
   placeholder = '',
   error = false,
   helperText = '',
-  type = 'text',
+  type = 'text',                //Tipo de input: text, password,
   showPasswordToggle = false,
   select = false,
   options = [],

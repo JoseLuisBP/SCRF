@@ -1,4 +1,10 @@
+
+//Importaciones 
+import { useState, useEffect } from "react";
+//Componentes de Material UI
+
 import { useState, useEffect } from 'react';
+
 import {
   Box,
   Container,
@@ -7,7 +13,24 @@ import {
   InputLabel,
   Select,
   MenuItem,
-} from '@mui/material';
+
+  Grid,
+  Card,
+  CardContent,
+  Chip,
+} from "@mui/material";
+//Componentes de Layout
+import Header from "../components/layout/Header";
+import Footer from "../components/layout/Footer";
+
+//Componentes exercises
+//Mustra ejercicios y permite mostrarlos por categoria 
+export default function Exercises() {
+ // Categoría seleccionada en el filtro
+  const [category, setCategory] = useState("");
+  // Lista completa de ejercicios obtenidos del backend
+
+} //from '@mui/material';
 
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
@@ -18,13 +41,19 @@ import ExerciseList from '../components/exercises/ExerciseList';
  */
 export default function Exercises() {
   const [category, setCategory] = useState('');
+
   const [exercises, setExercises] = useState([]);
+  // Lista filtrada según la categoría
   const [filtered, setFiltered] = useState([]);
   const [error, setError] = useState(null);
+
+
+  //Obtener ejercicios del backend
 
   /**
    * Cargar ejercicios desde la API
    */
+
   useEffect(() => {
     const loadExercises = async () => {
       try {
@@ -45,9 +74,12 @@ export default function Exercises() {
     loadExercises();
   }, []);
 
+  //Filtra ejercicios por categoria seleccionado
+
   /**
    * Filtrar ejercicios por categoría
    */
+
   useEffect(() => {
     if (category) {
       setFiltered(exercises.filter((e) => e.categoria === category));
@@ -61,6 +93,7 @@ export default function Exercises() {
    */
   const categories = [...new Set(exercises.map((e) => e.categoria))];
 
+  //Componentes 
   return (
     <Box
       sx={{

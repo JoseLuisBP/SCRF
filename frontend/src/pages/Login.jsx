@@ -1,16 +1,26 @@
+//Hooks principal de react 
 import { useState, useEffect } from 'react';
+//Componentes de material UI
 import { Box, Container, Typography, Snackbar, Alert } from '@mui/material';
+//React Hook Form para manejo de formularios
 import { useForm } from 'react-hook-form';
+// Integración de Yup con React Hook Form
 import { yupResolver } from '@hookform/resolvers/yup';
+// Librería Yup para validaciones
 import * as yup from 'yup';
+// Componentes personalizados
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import Header from '../components/layout/Header';
+// Contexto de autenticación
 import { useAuth } from '../context/AuthContext';
+// Navegación entre rutas
 import { useNavigate } from 'react-router-dom';
+// API de autenticación
 import authAPI from '../api/auth';
 
 // Esquema de validación
+// Define las reglas que deben cumplir los campos del formulario
 const loginSchema = yup.object({
   correo: yup
     .string()
@@ -21,6 +31,7 @@ const loginSchema = yup.object({
     .required('La contraseña es obligatoria'),
 }).required();
 
+//Componentes del login como: contexto de autencidad, hook para redireccionar.
 export default function Login() {
   const { login, isLoggedIn } = useAuth();
   const navigate = useNavigate();
@@ -31,6 +42,7 @@ export default function Login() {
     severity: 'info',
   });
 
+  // Configuración del formulario con React Hook Form
   const {
     register,
     handleSubmit,
@@ -94,6 +106,7 @@ export default function Login() {
     }
   };
 
+  //Interfaz grafica
   return (
     <Box
       sx={{

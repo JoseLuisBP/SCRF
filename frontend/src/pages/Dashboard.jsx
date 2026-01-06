@@ -1,19 +1,25 @@
+//Importaciones 
 import { Box, Typography, Button, CircularProgress, Alert, Card, CardContent, Avatar, Grid } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 import { useEffect, useState } from 'react';
 import { authAPI } from '../api'
 import Header from '../components/layout/Header';
+//Iconos
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import HeightIcon from "@mui/icons-material/Height";
 import ScaleIcon from "@mui/icons-material/Scale";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 
+//Componente Dashboard
 export default function Dashboard() {
+  //Contexto de autenticacion
   const { logout } = useAuth();
+  //Estados
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  //Efecto: Obtener usuario al cargar
   useEffect(() => {
   const fetchUser = async () => {
     try {
@@ -48,6 +54,7 @@ export default function Dashboard() {
   fetchUser();
 }, []);
 
+//Pantalla de carga 
   if (loading) {
     return (
       <Box
@@ -63,6 +70,7 @@ export default function Dashboard() {
     );
   }
 
+  //Pantalla de error
   if (error) {
     return (
       <Box sx={{minHeight: '100vh', p:4}}>
@@ -71,6 +79,7 @@ export default function Dashboard() {
     );
   }
 
+  //Contenido principal
   return (
     <Box
       sx={{
@@ -83,6 +92,7 @@ export default function Dashboard() {
     >
       <Header showSearchBar={true} />
 
+//Tarjeta central 
       <Box sx={{ mt: 8, display: "flex", justifyContent: "center" }}>
         <Card
           sx={{
@@ -111,6 +121,7 @@ export default function Dashboard() {
                 </Typography>
             </Box>
 
+//Datos del usuario: peso, estatura, nivel fisico, edad
 
             <Grid container justifyContent="center" spacing={3} sx={{ mb: 4 }}>
               {user?.peso && (

@@ -1,3 +1,4 @@
+//Importaciones de librerias como: react, material ui, contexto
 import { Box, Container, Typography } from '@mui/material';
 import Header from '../components/layout/Header';
 import Button from '../components/common/Button';
@@ -11,7 +12,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Footer from '../components/layout/Footer';
-
+//componentes home 
 export default function Home() {
   const { isLoggedIn, toggleLogin } = useAuth();
   const { fontSize } = useAccessibility();
@@ -59,6 +60,7 @@ export default function Home() {
             gap: fontSize > 18 ? 5 : 3,
           }}
         >
+          //Contenido carrusel
           <Box
             sx={{
               position: 'relative',
