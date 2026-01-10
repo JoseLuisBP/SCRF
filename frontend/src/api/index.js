@@ -3,4 +3,5 @@ export { default as authAPI } from './auth';
 export { default as exercisesAPI } from './exercises';
 export { default as routinesAPI } from './routines';
 export { default as progressAPI } from './progress';
+export { default as usersAPI } from './users';
 export { default as axiosInstance } from './axios';
