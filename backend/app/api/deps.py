@@ -8,7 +8,7 @@ from app.core.config import settings
 from app.db.session import get_session, SessionManager
 from app.models.user import User
 from app.schemas.token import TokenData
-from app.services.auth_service import AuthService
+from app.services.user_service import UserService
 
 
 # Configuración de OAuth2
@@ -52,7 +52,7 @@ async def get_current_user(
         user_id_int = int(user_id)
         token_data = TokenData(user_id=user_id_int)
 
-        user = await AuthService.get_user_by_id(
+        user = await UserService.get_user_by_id(
             session_manager.pg_session,
             token_data.user_id
         )
@@ -94,31 +94,29 @@ async def get_current_superuser(
     """
     Verifica que el usuario actual sea administrador.
     """
-    if not current_user.rol.nombre_rol == "admin":
+    if not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="El usuario no tiene suficientes privilegios"
         )
     return current_user
 
-# Dependencia para roles específicos
-async def check_user_role(
-    required_role: str,
+# Dependencia para verificar permisos de administrador
+async def require_admin(
     current_user: User = Depends(get_current_user)
-) -> bool:
+) -> User:
     """
-    Verifica si el usuario tiene el rol requerido.
+    Verifica si el usuario tiene permisos de administrador.
     Args:
-        required_role: Rol requerido para acceder al recurso
         current_user: Usuario actual
     Returns:
-        bool: True si el usuario tiene el rol requerido
+        Usuario administrador
     Raises:
-        HTTPException: Si el usuario no tiene el rol requerido
+        HTTPException: Si el usuario no es administrador
     """
-    if required_role not in current_user.roles:
+    if not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Se requiere el rol {required_role}"
+            detail="Se requieren permisos de administrador"
         )
-    return True
+    return current_user

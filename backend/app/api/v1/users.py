@@ -1,12 +1,11 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
 
-from app.core.security import get_password_hash, verify_password
-from app.db.postgresql import postgresql
+from app.db.session import get_session, SessionManager
 from app.models.user import User
 from app.schemas.user import UserResponse, UserUpdate, UserChangePassword
-from app.api.deps import get_current_user, get_current_superuser
+from app.api.deps import get_current_user, require_admin
+from app.services.user_service import UserService
 
 router = APIRouter()
 
@@ -26,10 +25,10 @@ def get_my_profile(current_user: User = Depends(get_current_user)):
 
 
 @router.put("/me", response_model=UserResponse)
-def update_my_profile(
+async def update_my_profile(
     user_update: UserUpdate,
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(postgresql.get_session)
+    session_manager: SessionManager = Depends(get_session)
 ):
     """
     Actualizar perfil del usuario actual
@@ -37,47 +36,35 @@ def update_my_profile(
     Args:
         user_update: Datos a actualizar
         current_user: Usuario autenticado
-        db: Sesión de base de datos
+        session_manager: Gestor de sesiones de base de datos
     
     Returns:
         Usuario actualizado
     
     Raises:
-        HTTPException: Si el email/username ya están en uso
+        HTTPException: Si hay errores de validación
     """
-    # Verificar si el nuevo email ya existe (si se está cambiando)
-    if user_update.correo and user_update.correo != current_user.correo:
-        existing_email = db.query(User).filter(User.correo == user_update.correo).first()
-        if existing_email:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="El correo ya está registrado"
-            )
-        current_user.correo = user_update.correo
+    updated_user = await UserService.update_user(
+        session_manager.pg_session,
+        current_user.id_usuario,
+        user_update,
+        current_user
+    )
     
-    # Actualizar campos opcionales
-    if user_update.nombre is not None:
-        current_user.nombre = user_update.nombre
-    if user_update.edad is not None:
-        current_user.edad = user_update.edad
-    if user_update.peso is not None:
-        current_user.peso = user_update.peso
-    if user_update.estatura is not None:
-        current_user.estatura = user_update.estatura
-    if user_update.nivel_fisico is not None:
-        current_user.nivel_fisico = user_update.nivel_fisico
-
-    db.commit()
-    db.refresh(current_user)
+    if not updated_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
+        )
     
-    return current_user
+    return updated_user
 
 
 @router.post("/me/change-password")
-def change_password(
+async def change_password(
     password_data: UserChangePassword,
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(postgresql.get_session)
+    session_manager: SessionManager = Depends(get_session)
 ):
     """
     Cambiar contraseña del usuario actual
@@ -85,47 +72,61 @@ def change_password(
     Args:
         password_data: Contraseña actual y nueva
         current_user: Usuario autenticado
-        db: Sesión de base de datos
+        session_manager: Gestor de sesiones de base de datos
     
     Returns:
         Mensaje de confirmación
     
     Raises:
-        HTTPException: Si la contraseña actual es incorrecta
+        HTTPException: Si hay errores de validación
     """
-    # Verificar contraseña actual
-    if not verify_password(password_data.contrasena_actual, current_user.contrasena_hash):
+    success = await UserService.change_password(
+        session_manager.pg_session,
+        current_user.id_usuario,
+        password_data,
+        current_user
+    )
+    
+    if success:
+        return {"message": "Contraseña actualizada exitosamente"}
+    else:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="La contraseña actual es incorrecta"
+            detail="Error al cambiar la contraseña"
         )
-    
-    # Actualizar contraseña
-    current_user.contrasena_hash = get_password_hash(password_data.nueva_contrasena)
-    db.commit()
-    
-    return {"message": "Contraseña actualizada exitosamente"}
 
 
 @router.delete("/me")
-def delete_my_account(
+async def delete_my_account(
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(postgresql.get_session)
+    session_manager: SessionManager = Depends(get_session)
 ):
     """
     Eliminar cuenta del usuario actual
     
     Args:
         current_user: Usuario autenticado
-        db: Sesión de base de datos
+        session_manager: Gestor de sesiones de base de datos
     
     Returns:
         Mensaje de confirmación
     """
-    db.delete(current_user)
-    db.commit()
+    # Para que un usuario pueda eliminar su propia cuenta, pasamos current_user como el "admin"
+    # El UserService verificará que no se pueda eliminar la propia cuenta de un admin desde fuera
+    # pero aquí permitimos que el usuario se elimine a sí mismo
+    success = await UserService.delete_user(
+        session_manager.pg_session,
+        current_user.id_usuario,
+        current_user  # El usuario puede eliminarse a sí mismo
+    )
     
-    return {"message": "Cuenta eliminada exitosamente"}
+    if success:
+        return {"message": "Cuenta eliminada exitosamente"}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error al eliminar la cuenta"
+        )
 
 
 # ============================================
@@ -133,11 +134,11 @@ def delete_my_account(
 # ============================================
 
 @router.get("/", response_model=List[UserResponse])
-def get_all_users(
+async def get_all_users(
     skip: int = 0,
     limit: int = 100,
-    current_user: User = Depends(get_current_superuser),
-    db: Session = Depends(postgresql.get_session)
+    current_user: User = Depends(require_admin),
+    session_manager: SessionManager = Depends(get_session)
 ):
     """
     Obtener todos los usuarios (solo admin)
@@ -145,29 +146,33 @@ def get_all_users(
     Args:
         skip: Número de registros a saltar
         limit: Número máximo de registros a retornar
-        current_user: Usuario superadmin
-        db: Sesión de base de datos
+        current_user: Usuario administrador
+        session_manager: Gestor de sesiones de base de datos
     
     Returns:
         Lista de usuarios
     """
-    users = db.query(User).offset(skip).limit(limit).all()
+    users = await UserService.get_all_users(
+        session_manager.pg_session,
+        skip=skip,
+        limit=limit
+    )
     return users
 
 
 @router.get("/{user_id}", response_model=UserResponse)
-def get_user_by_id(
+async def get_user_by_id(
     user_id: int,
-    current_user: User = Depends(get_current_superuser),
-    db: Session = Depends(postgresql.get_session)
+    current_user: User = Depends(require_admin),
+    session_manager: SessionManager = Depends(get_session)
 ):
     """
     Obtener usuario por ID (solo admin)
     
     Args:
         user_id: ID del usuario
-        current_user: Usuario superadmin
-        db: Sesión de base de datos
+        current_user: Usuario administrador
+        session_manager: Gestor de sesiones de base de datos
     
     Returns:
         Usuario encontrado
@@ -175,43 +180,185 @@ def get_user_by_id(
     Raises:
         HTTPException: Si el usuario no existe
     """
-    user = db.query(User).filter(User.id == user_id).first()
+    user = await UserService.get_user_by_id(
+        session_manager.pg_session,
+        user_id
+    )
+    
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Usuario no encontrado"
         )
+    
     return user
 
 
-@router.delete("/{user_id}")
-def delete_user(
+@router.put("/{user_id}", response_model=UserResponse)
+async def update_user(
     user_id: int,
-    current_user: User = Depends(get_current_superuser),
-    db: Session = Depends(postgresql.get_session)
+    user_update: UserUpdate,
+    current_user: User = Depends(require_admin),
+    session_manager: SessionManager = Depends(get_session)
 ):
     """
-    Eliminar usuario por ID (solo admin)
+    Actualizar cualquier usuario por ID (solo admin)
     
     Args:
-        user_id: ID del usuario a eliminar
-        current_user: Usuario superadmin
-        db: Sesión de base de datos
+        user_id: ID del usuario a actualizar
+        user_update: Datos a actualizar
+        current_user: Usuario administrador
+        session_manager: Gestor de sesiones de base de datos
     
     Returns:
-        Mensaje de confirmación
+        Usuario actualizado
     
     Raises:
         HTTPException: Si el usuario no existe
     """
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
+    updated_user = await UserService.update_user(
+        session_manager.pg_session,
+        user_id,
+        user_update,
+        current_user
+    )
+    
+    if not updated_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Usuario no encontrado"
         )
     
-    db.delete(user)
-    db.commit()
+    return updated_user
+
+
+@router.post("/{user_id}/deactivate")
+async def deactivate_user(
+    user_id: int,
+    current_user: User = Depends(require_admin),
+    session_manager: SessionManager = Depends(get_session)
+):
+    """
+    Desactivar cuenta de usuario (solo admin)
     
-    return {"message": "Usuario eliminado exitosamente"}
+    Args:
+        user_id: ID del usuario a desactivar
+        current_user: Usuario administrador
+        session_manager: Gestor de sesiones de base de datos
+    
+    Returns:
+        Mensaje de confirmación
+    """
+    success = await UserService.deactivate_user(
+        session_manager.pg_session,
+        user_id,
+        current_user
+    )
+    
+    if success:
+        return {"message": "Usuario desactivado exitosamente"}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error al desactivar el usuario"
+        )
+
+
+@router.post("/{user_id}/activate")
+async def activate_user(
+    user_id: int,
+    current_user: User = Depends(require_admin),
+    session_manager: SessionManager = Depends(get_session)
+):
+    """
+    Activar cuenta de usuario (solo admin)
+    
+    Args:
+        user_id: ID del usuario a activar
+        current_user: Usuario administrador
+        session_manager: Gestor de sesiones de base de datos
+    
+    Returns:
+        Mensaje de confirmación
+    """
+    success = await UserService.activate_user(
+        session_manager.pg_session,
+        user_id,
+        current_user
+    )
+    
+    if success:
+        return {"message": "Usuario activado exitosamente"}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error al activar el usuario"
+        )
+
+
+@router.post("/{user_id}/toggle-admin")
+async def toggle_admin_status(
+    user_id: int,
+    current_user: User = Depends(require_admin),
+    session_manager: SessionManager = Depends(get_session)
+):
+    """
+    Cambiar estado de administrador de un usuario (solo admin)
+    
+    Args:
+        user_id: ID del usuario
+        current_user: Usuario administrador
+        session_manager: Gestor de sesiones de base de datos
+    
+    Returns:
+        Mensaje de confirmación
+    """
+    success = await UserService.toggle_admin_status(
+        session_manager.pg_session,
+        user_id,
+        current_user
+    )
+    
+    if success:
+        return {"message": "Estado de administrador actualizado exitosamente"}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error al cambiar el estado de administrador"
+        )
+
+
+@router.post("/{user_id}/change-password")
+async def admin_change_password(
+    user_id: int,
+    password_data: UserChangePassword,
+    current_user: User = Depends(require_admin),
+    session_manager: SessionManager = Depends(get_session)
+):
+    """
+    Cambiar contraseña de cualquier usuario (solo admin)
+    
+    Args:
+        user_id: ID del usuario
+        password_data: Nueva contraseña
+        current_user: Usuario administrador
+        session_manager: Gestor de sesiones de base de datos
+    
+    Returns:
+        Mensaje de confirmación
+    """
+    # Para admin, no verificamos la contraseña actual
+    success = await UserService.change_password(
+        session_manager.pg_session,
+        user_id,
+        password_data,
+        current_user
+    )
+    
+    if success:
+        return {"message": "Contraseña cambiada exitosamente"}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error al cambiar la contraseña"
+        )
