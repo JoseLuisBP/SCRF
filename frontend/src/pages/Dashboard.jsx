@@ -4,20 +4,71 @@ import { useAuth } from '../context/AuthContext';
 import { useEffect, useState } from 'react';
 import { authAPI } from '../api'
 import Header from '../components/layout/Header';
+
 //Iconos
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import HeightIcon from "@mui/icons-material/Height";
 import ScaleIcon from "@mui/icons-material/Scale";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 
+// ===== AÑADIDO: jsPDF para generar el PDF =====
+import { jsPDF } from "jspdf";
+import DownloadIcon from "@mui/icons-material/Download";
+
+// ===== AÑADIDO: URL de la imagen a descargar =====
+const IMAGE_URL =
+  "https://wtrekbnyoeenxlzzxnka.supabase.co/storage/v1/object/public/imagenes/ejercicios/onu.jpg";
+
 //Componente Dashboard
 export default function Dashboard() {
   //Contexto de autenticacion
   const { logout } = useAuth();
+
   //Estados
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // AÑADIDO: función para descargar el PDF
+  const handleDownloadPDF = async () => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = IMAGE_URL;
+
+    img.onload = () => {
+      const doc = new jsPDF("p", "mm", "a4");
+
+      // Tamaño de la página A4
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+
+      // Proporción de la imagen
+      const imgWidth = img.width;
+      const imgHeight = img.height;
+      const ratio = imgHeight / imgWidth;
+
+      // Ajustar al ancho de la página
+      const pdfImgWidth = pageWidth;
+      const pdfImgHeight = pdfImgWidth * ratio;
+
+      // Centrar verticalmente si sobra espacio
+      const y = pdfImgHeight < pageHeight
+        ? (pageHeight - pdfImgHeight) / 2
+        : 0;
+
+      doc.addImage(
+        img,
+        "JPEG",
+        0,
+        y,
+        pdfImgWidth,
+        pdfImgHeight
+      );
+
+      doc.save("imagen-dashboard.pdf");
+    };
+  };
+
 
   //Efecto: Obtener usuario al cargar
   useEffect(() => {
@@ -112,7 +163,6 @@ export default function Dashboard() {
                 {user?.nombre?.charAt(0)?.toUpperCase() || "U"}
               </Avatar>
 
-
               <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>
                 Hola, {user?.nombre || user?.correo || "Usuario"}
               </Typography>
@@ -121,8 +171,7 @@ export default function Dashboard() {
               </Typography>
             </Box>
 
-            {/*Datos del usuario: peso, estatura, nivel fisico, edad*/}
-
+            {/*Datos del usuario*/}
             <Grid container justifyContent="center" spacing={3} sx={{ mb: 4 }}>
               {user?.peso && (
                 <Grid item xs={12} sm={6} md={3}>
@@ -133,7 +182,6 @@ export default function Dashboard() {
                   </Card>
                 </Grid>
               )}
-
 
               {user?.estatura && (
                 <Grid item xs={12} sm={6} md={3}>
@@ -165,6 +213,18 @@ export default function Dashboard() {
                 </Grid>
               )}
             </Grid>
+
+            {/* ===== AÑADIDO: Botón Descargar PDF ===== */}
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <Button
+                variant="contained"
+                startIcon={<DownloadIcon />}
+                onClick={handleDownloadPDF}
+              >
+                Descargar
+              </Button>
+            </Box>
+
           </CardContent>
         </Card>
       </Box>
