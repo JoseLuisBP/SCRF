@@ -21,40 +21,40 @@ export default function Dashboard() {
 
   //Efecto: Obtener usuario al cargar
   useEffect(() => {
-  const fetchUser = async () => {
-    try {
-      // Log para verificar el token
-      const token = localStorage.getItem('token');
-      console.log('Token en localStorage:', token ? 'Existe' : 'No existe');
-      console.log('Token length:', token?.length);
-      
-      // Decodificar el token manualmente para ver el payload
-      if (token) {
-        try {
-          const parts = token.split('.');
-          const payload = JSON.parse(atob(parts[1]));
-          console.log('Payload del token:', payload);
-        } catch (e) {
-          console.error('Error al decodificar token:', e);
-        }
-      }
-      
-      console.log('Llamando a getCurrentUser...');
-      const userData = await authAPI.getCurrentUser();
-      console.log('Usuario obtenido:', userData);
-      setUser(userData);
-    } catch (err) {
-      console.error('Error completo:', err);
-      console.error('Error response:', err.response);
-      setError('Error al cargar datos del usuario');
-    } finally {
-      setLoading(false);
-    }
-  };
-  fetchUser();
-}, []);
+    const fetchUser = async () => {
+      try {
+        // Log para verificar el token
+        const token = localStorage.getItem('token');
+        console.log('Token en localStorage:', token ? 'Existe' : 'No existe');
+        console.log('Token length:', token?.length);
 
-//Pantalla de carga 
+        // Decodificar el token manualmente para ver el payload
+        if (token) {
+          try {
+            const parts = token.split('.');
+            const payload = JSON.parse(atob(parts[1]));
+            console.log('Payload del token:', payload);
+          } catch (e) {
+            console.error('Error al decodificar token:', e);
+          }
+        }
+
+        console.log('Llamando a getCurrentUser...');
+        const userData = await authAPI.getCurrentUser();
+        console.log('Usuario obtenido:', userData);
+        setUser(userData);
+      } catch (err) {
+        console.error('Error completo:', err);
+        console.error('Error response:', err.response);
+        setError('Error al cargar datos del usuario');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  //Pantalla de carga 
   if (loading) {
     return (
       <Box
@@ -65,7 +65,7 @@ export default function Dashboard() {
           justifyContent: 'center',
         }}
       >
-        <CircularProgress/>
+        <CircularProgress />
       </Box>
     );
   }
@@ -73,7 +73,7 @@ export default function Dashboard() {
   //Pantalla de error
   if (error) {
     return (
-      <Box sx={{minHeight: '100vh', p:4}}>
+      <Box sx={{ minHeight: '100vh', p: 4 }}>
         <Alert severity='error'>{error}</Alert>
       </Box>
     );
@@ -92,7 +92,7 @@ export default function Dashboard() {
     >
       <Header showSearchBar={true} />
 
-//Tarjeta central 
+      {/*Tarjeta central*/}
       <Box sx={{ mt: 8, display: "flex", justifyContent: "center" }}>
         <Card
           sx={{
@@ -107,21 +107,21 @@ export default function Dashboard() {
           <CardContent justifyContent="center">
             <Box sx={{ textAlign: "center", mb: 4 }}>
               <Avatar
-              sx={{ width: 100, height: 100, mx: "auto", mb: 2, bgcolor: "secondary.main", fontSize: 40 }}
+                sx={{ width: 100, height: 100, mx: "auto", mb: 2, bgcolor: "secondary.main", fontSize: 40 }}
               >
-              {user?.nombre?.charAt(0)?.toUpperCase() || "U"}
+                {user?.nombre?.charAt(0)?.toUpperCase() || "U"}
               </Avatar>
 
 
               <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>
                 Hola, {user?.nombre || user?.correo || "Usuario"}
               </Typography>
-                <Typography variant="h6" sx={{ opacity: 0.9 }}>
-                  Bienvenido a tu panel de progreso
-                </Typography>
+              <Typography variant="h6" sx={{ opacity: 0.9 }}>
+                Bienvenido a tu panel de progreso
+              </Typography>
             </Box>
 
-//Datos del usuario: peso, estatura, nivel fisico, edad
+            {/*Datos del usuario: peso, estatura, nivel fisico, edad*/}
 
             <Grid container justifyContent="center" spacing={3} sx={{ mb: 4 }}>
               {user?.peso && (
