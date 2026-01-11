@@ -55,47 +55,6 @@ const authAPI = {
       throw error;
     }
   },
-
-  // Obtener perfil del usuario
-  getProfile: async () => {
-    const response = await axiosInstance.get('/v1/auth/profile');
-    return response.data;
-  },
-
-  // Actualizar perfil
-  updateProfile: async profileData => {
-    const response = await axiosInstance.put('/v1/auth/profile', profileData);
-    if (response.data?.user) {
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-    }
-    return response.data;
-  },
-
-  // Cambiar contraseña
-  changePassword: async passwordData => {
-    const response = await axiosInstance.put(
-      '/v1/auth/change-password',
-      passwordData
-    );
-    return response.data;
-  },
-
-  // Recuperar contraseña
-  forgotPassword: async email => {
-    const response = await axiosInstance.post('/v1/auth/forgot-password', {
-      email,
-    });
-    return response.data;
-  },
-
-  // Resetear contraseña
-  resetPassword: async (token, newPassword) => {
-    const response = await axiosInstance.post('/v1/auth/reset-password', {
-      token,
-      password: newPassword,
-    });
-    return response.data;
-  },
 };
 
 export default authAPI;

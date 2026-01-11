@@ -2,7 +2,8 @@
 import logging
 import sys
 from pathlib import Path
-from pythonjsonlogger import jsonlogger
+# Handler de archivo rotativo
+from logging.handlers import RotatingFileHandler
 from app.core.config import settings
 
 # Crear directorio de logs
@@ -26,9 +27,6 @@ def setup_logging():
     )
     console_handler.setFormatter(console_formatter)
     root_logger.addHandler(console_handler)
-    
-    # Handler de archivo rotativo
-    from logging.handlers import RotatingFileHandler
     
     # Handler general
     app_handler = RotatingFileHandler(
