@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.core.config import settings
 from app.core.logging import logger
-from app.api.v1 import auth, users, exercises
+from app.api.v1 import auth, users, exercises, progress
 from app.db.postgresql import postgresql
 from app.middleware import setup_cors, setup_error_handlers
 
@@ -60,6 +60,11 @@ def create_app() -> FastAPI:
 
     application.include_router(
         exercises.router, 
+        prefix="/api/v1"
+    )
+
+    application.include_router(
+        progress.router,
         prefix="/api/v1"
     )
 
