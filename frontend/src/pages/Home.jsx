@@ -1,4 +1,4 @@
-//Importaciones de librerias como: react, material ui, contexto
+{/*Importaciones de librerias como: react, material ui, contexto */}
 import { Box, Container, Typography } from '@mui/material';
 import Header from '../components/layout/Header';
 import Button from '../components/common/Button';
@@ -12,7 +12,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Footer from '../components/layout/Footer';
-//componentes home 
+{/*componentes home */}
 export default function Home() {
   const { isLoggedIn, toggleLogin } = useAuth();
   const { fontSize } = useAccessibility();
@@ -25,7 +25,7 @@ export default function Home() {
   const cuerpo2Img = 'https://wtrekbnyoeenxlzzxnka.supabase.co/storage/v1/object/public/imagenes/ejercicios/cuerpo2.jpg';
   const cuerpo3Img = 'https://wtrekbnyoeenxlzzxnka.supabase.co/storage/v1/object/public/imagenes/ejercicios/cuerpo3.jpg';
 
-  //configuracion del carrusel 
+  {/*configuracion del carrusel */}
   const sliderSettings = {
     dots: true,
     infinite: true,
