@@ -1,35 +1,35 @@
-//Importaciones 
+{/* Importaciones */}
 import { Box, Typography, Button, CircularProgress, Alert, Card, CardContent, Avatar, Grid } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 import { useEffect, useState } from 'react';
 import { authAPI } from '../api'
 import Header from '../components/layout/Header';
 
-//Iconos
+{/* Iconos */}
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import HeightIcon from "@mui/icons-material/Height";
 import ScaleIcon from "@mui/icons-material/Scale";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 
-// ===== AÑADIDO: jsPDF para generar el PDF =====
+{/* ===== AÑADIDO: jsPDF para generar el PDF ===== */}
 import { jsPDF } from "jspdf";
 import DownloadIcon from "@mui/icons-material/Download";
 
-// ===== AÑADIDO: URL de la imagen a descargar =====
+{/* ===== AÑADIDO: URL de la imagen a descargar ===== */}
 const IMAGE_URL =
   "https://wtrekbnyoeenxlzzxnka.supabase.co/storage/v1/object/public/imagenes/ejercicios/onu.jpg";
 
-//Componente Dashboard
+{/*Componente Dashboard */}
 export default function Dashboard() {
   //Contexto de autenticacion
   const { logout } = useAuth();
 
-  //Estados
+  {/*Estados */}
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // AÑADIDO: función para descargar el PDF
+  {/* AÑADIDO: función para descargar el PDF */}
   const handleDownloadPDF = async () => {
     const img = new Image();
     img.crossOrigin = "anonymous";
@@ -38,20 +38,20 @@ export default function Dashboard() {
     img.onload = () => {
       const doc = new jsPDF("p", "mm", "a4");
 
-      // Tamaño de la página A4
+      {/* Tamaño de la página A4 */}
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
 
-      // Proporción de la imagen
+      {/* Proporción de la imagen */}
       const imgWidth = img.width;
       const imgHeight = img.height;
       const ratio = imgHeight / imgWidth;
 
-      // Ajustar al ancho de la página
+      {/* Ajustar al ancho de la página */}
       const pdfImgWidth = pageWidth;
       const pdfImgHeight = pdfImgWidth * ratio;
 
-      // Centrar verticalmente si sobra espacio
+      {/* Centrar verticalmente si sobra espacio */}
       const y = pdfImgHeight < pageHeight
         ? (pageHeight - pdfImgHeight) / 2
         : 0;
@@ -70,16 +70,16 @@ export default function Dashboard() {
   };
 
 
-  //Efecto: Obtener usuario al cargar
+  {/*Efecto: Obtener usuario al cargar */}
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        // Log para verificar el token
+        {/* Log para verificar el token */}
         const token = localStorage.getItem('token');
         console.log('Token en localStorage:', token ? 'Existe' : 'No existe');
         console.log('Token length:', token?.length);
 
-        // Decodificar el token manualmente para ver el payload
+        {/* Decodificar el token manualmente para ver el payload */}
         if (token) {
           try {
             const parts = token.split('.');
@@ -105,7 +105,7 @@ export default function Dashboard() {
     fetchUser();
   }, []);
 
-  //Pantalla de carga 
+  {/* Pantalla de carga */}
   if (loading) {
     return (
       <Box
@@ -121,7 +121,7 @@ export default function Dashboard() {
     );
   }
 
-  //Pantalla de error
+  {/* Pantalla de error */}
   if (error) {
     return (
       <Box sx={{ minHeight: '100vh', p: 4 }}>
@@ -130,7 +130,7 @@ export default function Dashboard() {
     );
   }
 
-  //Contenido principal
+  {/* Contenido principal */}
   return (
     <Box
       sx={{
