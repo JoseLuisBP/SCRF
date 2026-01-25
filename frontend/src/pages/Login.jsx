@@ -1,26 +1,26 @@
-//Hooks principal de react 
+{/*Hooks principal de react */}
 import { useState, useEffect } from 'react';
-//Componentes de material UI
+{/* Componentes de material UI */}
 import { Box, Container, Typography, Snackbar, Alert } from '@mui/material';
-//React Hook Form para manejo de formularios
+{/*React Hook Form para manejo de formularios */}
 import { useForm } from 'react-hook-form';
-// Integración de Yup con React Hook Form
+{/* Integración de Yup con React Hook Form */}
 import { yupResolver } from '@hookform/resolvers/yup';
-// Librería Yup para validaciones
+{/* Librería Yup para validaciones */}
 import * as yup from 'yup';
-// Componentes personalizados
+{/* Componentes personalizados */}
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import Header from '../components/layout/Header';
-// Contexto de autenticación
+{/* Contexto de autenticación */ }
 import { useAuth } from '../context/AuthContext';
-// Navegación entre rutas
+{/* Navegación entre rutas */}
 import { useNavigate } from 'react-router-dom';
-// API de autenticación
+{/* API de autenticación */}
 import authAPI from '../api/auth';
 
-// Esquema de validación
-// Define las reglas que deben cumplir los campos del formulario
+{/* Esquema de validación 
+ Define las reglas que deben cumplir los campos del formulario*/}
 const loginSchema = yup.object({
   correo: yup
     .string()
@@ -31,7 +31,7 @@ const loginSchema = yup.object({
     .required('La contraseña es obligatoria'),
 }).required();
 
-//Componentes del login como: contexto de autencidad, hook para redireccionar.
+{/*Componentes del login como: contexto de autencidad, hook para redireccionar. */}
 export default function Login() {
   const { login, isLoggedIn } = useAuth();
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ export default function Login() {
     severity: 'info',
   });
 
-  // Configuración del formulario con React Hook Form
+  {/* Configuración del formulario con React Hook Form */}
   const {
     register,
     handleSubmit,
@@ -55,7 +55,7 @@ export default function Login() {
     },
   });
 
-  // Si ya está logueado, redirigir automáticamente
+  {/* Si ya está logueado, redirigir automáticamente */}
   useEffect(() => {
     if (isLoggedIn) {
       navigate('/dashboard');
@@ -65,7 +65,7 @@ export default function Login() {
   const onSubmit = async (formData) => {
     setIsLoading(true);
     try {
-      // Llamada real a la API
+      {/* Llamada real a la API */}
       const response = await authAPI.login({
         correo: formData.correo,
         contrasena: formData.password,
@@ -74,7 +74,7 @@ export default function Login() {
       const data = response.data || response;
       console.log('📦 Respuesta del login:', data);
 
-      // Validar respuesta correcta
+      {/* Validar respuesta correcta */}
       if (data?.access_token) {
         login(data);
         setSnackbar({
@@ -82,7 +82,7 @@ export default function Login() {
           message: `¡Inicio de sesión exitoso!`,
           severity: 'success',
         });
-        // Navegar al dashboard
+        {/* Navegar al dashboard */}
         setTimeout(() => {
           navigate('/dashboard');
         }, 500);
@@ -106,7 +106,7 @@ export default function Login() {
     }
   };
 
-  //Interfaz grafica
+  {/* Interfaz grafica */}
   return (
     <Box
       sx={{
