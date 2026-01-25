@@ -6,7 +6,26 @@ import { AccessibilityProvider } from './context/AccessibilityContext';
 import theme from './styles/theme';
 import AppRoutes from './routes';
 
+import {
+  createAppTheme,
+  getInitialMode,
+  saveMode,
+} from './styles/theme';
+
+import AppRoutes from './routes';
+
+
+
 function App() {
+
+const [mode, setMode] = useState(getInitialMode());
+ const theme = useMemo(() => createAppTheme(mode), [mode]);
+ const toggleColorMode = () => {
+    const newMode = mode === 'light' ? 'dark' : 'light';
+    setMode(newMode);
+    saveMode(newMode);
+  };
+
   return (
     /* Proveedor de tema para MUI */
     <ThemeProvider theme={theme}>
@@ -19,7 +38,11 @@ function App() {
           {/* Enrutador de la aplicación */}
           <BrowserRouter>
             {/* Rutas de la aplicación */}
-            <AppRoutes />
+            <AppRoutes
+              mode={mode}
+              toggleColorMode={toggleColorMode}
+            />
+            //<AppRoutes />
           </BrowserRouter>
         </AccessibilityProvider>
       </AuthProvider>
