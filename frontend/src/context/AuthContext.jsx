@@ -48,6 +48,7 @@ export function AuthProvider({ children }) {
       token: null
     });
   };
+<<<<<<< HEAD
   {/* Borrar esto cuando Home.jsx este completo*/}
   const toggleLogin = () => {
     if (authState.isLoggedIn) {
@@ -60,12 +61,19 @@ export function AuthProvider({ children }) {
       });
     }
   };
+=======
+
+>>>>>>> 17b74b057ce87a80411c825bdd8487deaa2f86a0
 
   const value = {
     ...authState,
     login,
+<<<<<<< HEAD
     logout,
     toggleLogin  // Borrar esta linea cuando se borre toggleLogin 
+=======
+    logout
+>>>>>>> 17b74b057ce87a80411c825bdd8487deaa2f86a0
   };
 
   return (
