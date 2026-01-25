@@ -48,24 +48,12 @@ export function AuthProvider({ children }) {
       token: null
     });
   };
-  // Borrar esto cuando Home.jsx este completo
-  const toggleLogin = () => {
-    if (authState.isLoggedIn) {
-      logout();
-    } else {
-      login({ 
-        id: 1, 
-        name: 'Usuario de Prueba', 
-        email: 'test@example.com' 
-      });
-    }
-  };
+
 
   const value = {
     ...authState,
     login,
-    logout,
-    toggleLogin // Borrar esta linea cuando se borre toggleLogin
+    logout
   };
 
   return (
