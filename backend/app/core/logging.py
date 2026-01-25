@@ -11,7 +11,7 @@ log_dir = Path("logs")
 log_dir.mkdir(exist_ok=True)
 
 def setup_logging():
-    """Configuración de logging para producción"""
+    """Configuración de logging"""
     
     # Logger raíz
     root_logger = logging.getLogger()
