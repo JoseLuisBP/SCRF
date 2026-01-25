@@ -16,20 +16,20 @@ import {
   Alert,
   FormHelperText,
 } from '@mui/material';
-{/* React Hook Form para manejo del formulario */}
+// React Hook Form para manejo del formulario 
 import { useForm } from 'react-hook-form';
-{/* Integración de Yup con React Hook Form */}
+// Integración de Yup con React Hook Form 
 import { yupResolver } from '@hookform/resolvers/yup';
-{/* Librería Yup para validaciones */}
+// Librería Yup para validaciones 
 import * as yup from 'yup';
-{/* Componentes personalizados */}
+// Componentes personalizados 
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import Header from '../components/layout/Header';
 import { authAPI } from '../api';
 
-{/* Esquema de validación 
-// Define las reglas que deben cumplir los campos del registro */}
+{/* Esquema de validación */}
+{/*Define las reglas que deben cumplir los campos del registro */}
 const registerSchema = yup.object({
   nombre: yup.string().required('El nombre es obligatorio'),
   correo: yup
