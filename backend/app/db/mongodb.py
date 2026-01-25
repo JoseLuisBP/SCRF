@@ -22,7 +22,7 @@ class MongoDBManager:
         try:
             if not self._client:
                 self._client = AsyncIOMotorClient(settings.MONGODB_URL)
-                self._db = self._client[settings.MONGODB_DB_NAME]
+                self._db = self._client[settings.MONGODB_DB]
                 # Verificar conexión
                 await self._client.admin.command('ping')
                 logger.info("Conexión exitosa a MongoDB")
