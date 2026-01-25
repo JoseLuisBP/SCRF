@@ -31,7 +31,7 @@ import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import { jsPDF } from "jspdf";
 import DownloadIcon from "@mui/icons-material/Download";
 
-{/* ===== AÑADIDO: URL de la imagen a descargar ===== */}
+//* ===== AÑADIDO: URL de la imagen a descargar ===== */}
 //AÑADIDO: jsPDF para generar el PDF
 import { jsPDF } from "jspdf";
 import DownloadIcon from "@mui/icons-material/Download";
