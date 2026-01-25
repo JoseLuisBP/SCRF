@@ -3,7 +3,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { AccessibilityProvider } from './context/AccessibilityContext';
 
-import theme from './styles/theme';
+//import theme from './styles/theme';
 import AppRoutes from './routes';
 
 import {
