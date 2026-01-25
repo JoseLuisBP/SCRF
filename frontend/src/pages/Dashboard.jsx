@@ -5,9 +5,9 @@ import { useEffect, useState } from 'react';
 import { authAPI } from '../api'
 import Header from '../components/layout/Header';
 
-<<<<<<< HEAD
+
 {/* Iconos */}
-=======
+
 //Graficas
 import {
   Chart as ChartJS,
@@ -21,19 +21,17 @@ import {
 import { Line } from "react-chartjs-2";
 
 //Iconos
->>>>>>> 17b74b057ce87a80411c825bdd8487deaa2f86a0
+
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import HeightIcon from "@mui/icons-material/Height";
 import ScaleIcon from "@mui/icons-material/Scale";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 
-<<<<<<< HEAD
 {/* ===== AÑADIDO: jsPDF para generar el PDF ===== */}
 import { jsPDF } from "jspdf";
 import DownloadIcon from "@mui/icons-material/Download";
 
 {/* ===== AÑADIDO: URL de la imagen a descargar ===== */}
-=======
 //AÑADIDO: jsPDF para generar el PDF
 import { jsPDF } from "jspdf";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -49,7 +47,7 @@ ChartJS.register(
 
 
 //AÑADIDO: URL de la imagen a descargar
->>>>>>> 17b74b057ce87a80411c825bdd8487deaa2f86a0
+
 const IMAGE_URL =
   "https://wtrekbnyoeenxlzzxnka.supabase.co/storage/v1/object/public/imagenes/ejercicios/onu.jpg";
 
@@ -63,9 +61,9 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-<<<<<<< HEAD
+
   {/* AÑADIDO: función para descargar el PDF */}
-=======
+
   // controla qué gráfica se muestra
   const [activeChart, setActiveChart] = useState("peso");
 
@@ -101,7 +99,7 @@ export default function Dashboard() {
 
 
   //función para descargar el PDF
->>>>>>> 17b74b057ce87a80411c825bdd8487deaa2f86a0
+
   const handleDownloadPDF = async () => {
     const img = new Image();
     img.crossOrigin = "anonymous";
@@ -141,14 +139,12 @@ export default function Dashboard() {
     };
   };
 
-
-<<<<<<< HEAD
   {/*Efecto: Obtener usuario al cargar */}
-=======
+
 
 
   //Efecto: Obtener usuario al cargar
->>>>>>> 17b74b057ce87a80411c825bdd8487deaa2f86a0
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
