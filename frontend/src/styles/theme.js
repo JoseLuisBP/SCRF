@@ -185,6 +185,19 @@ export const getDesignTokens = mode => ({
     },
   },
 });
+//Comandos de modo claro a oscuro 
+export const getInitialMode = () => {
+  const savedMode = localStorage.getItem('themeMode');
+  return savedMode ? savedMode : 'light';
+};
+
+export const saveMode = (mode) => {
+  localStorage.setItem('themeMode', mode);
+};
+export const createAppTheme = (mode) =>
+  createTheme(getDesignTokens(mode));
+
+
 
 const theme = createTheme(getDesignTokens('light'));
 export default theme;
