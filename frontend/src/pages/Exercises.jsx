@@ -1,7 +1,7 @@
-// React
+{/* React */}
 import { useState, useEffect } from 'react';
 
-// Material UI
+{/* Material UI */}
 import {
   Box,
   Container,
@@ -12,11 +12,11 @@ import {
   MenuItem,
 } from '@mui/material';
 
-// Layout
+{/* Layout */}
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 
-// Componentes de ejercicios
+{/* Componentes de ejercicios */}
 import ExerciseList from '../components/exercises/ExerciseList';
 
 /**
@@ -26,16 +26,16 @@ import ExerciseList from '../components/exercises/ExerciseList';
  * - Muestra la lista usando componentes reutilizables
  */
 export default function Exercises() {
-  // Categoría seleccionada
+  {/* Categoría seleccionada */}
   const [category, setCategory] = useState('');
 
-  // Lista completa de ejercicios
+  {/*Lista completa de ejercicios */}
   const [exercises, setExercises] = useState([]);
 
-  // Lista filtrada
+  {/* Lista filtrada */}
   const [filtered, setFiltered] = useState([]);
 
-  // Manejo de errores
+  {/* Manejo de errores */}
   const [error, setError] = useState(null);
 
   /**
