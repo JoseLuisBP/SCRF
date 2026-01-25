@@ -3,11 +3,11 @@ import { useState, useEffect } from 'react';
 {/* Componentes de material UI */}
 import { Box, Container, Typography, Snackbar, Alert } from '@mui/material';
 {/*React Hook Form para manejo de formularios */}
-import { useForm } from 'react-hook-form';
+//import { useForm } from 'react-hook-form';
 {/* Integración de Yup con React Hook Form */}
-import { yupResolver } from '@hookform/resolvers/yup';
+//import { yupResolver } from '@hookform/resolvers/yup';
 {/* Librería Yup para validaciones */}
-import * as yup from 'yup';
+//import * as yup from 'yup';
 {/* Componentes personalizados */}
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
