@@ -1,15 +1,16 @@
-// Importa React y los componentes de MUI necesarios.
+
+{/* Importa React y los componentes de MUI necesarios.*/}
 import React from "react";
 import { Card as MuiCard, CardContent, Typography, Box } from "@mui/material";
-// Importa el contexto de accesibilidad, para obtener el tamaño de fuente dinámico.
+{/* Importa el contexto de accesibilidad, para obtener el tamaño de fuente dinámico.*/}
 import { useAccessibility } from "../../context/AccessibilityContext";
 
-// Componente Card que recibe título, descripción, imagen y estilos extra (sx)
+{/* Componente Card que recibe título, descripción, imagen y estilos extra (sx)*/}
 function Card({ title, description, image, sx = {} }) {
-  // Obtiene el tamaño de fuente global definido en el contexto de accesibilidad.
+  {/* Obtiene el tamaño de fuente global definido en el contexto de accesibilidad.*/}
   const { fontSize } = useAccessibility(); 
 
-  // Mapa que asocia nombres de tamaños con valores reales en "rem"
+  {/* Mapa que asocia nombres de tamaños con valores reales en "rem"*/}
   const fontSizeMap = {
     small: "0.9rem",
     medium: "1rem",
@@ -17,8 +18,8 @@ function Card({ title, description, image, sx = {} }) {
     xlarge: "1.4rem",
   };
 
-   // Determina el tamaño de fuente que usará la tarjeta.
-  // Si no encuentra el tamaño, usa 1rem por defecto.
+   {/* Determina el tamaño de fuente que usará la tarjeta.*/}
+  {/* Si no encuentra el tamaño, usa 1rem por defecto.*/}
   const appliedFontSize = fontSizeMap[fontSize] || "1rem";
 
   return (
