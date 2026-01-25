@@ -5,17 +5,51 @@ import { useEffect, useState } from 'react';
 import { authAPI } from '../api'
 import Header from '../components/layout/Header';
 
+<<<<<<< HEAD
 {/* Iconos */}
+=======
+//Graficas
+import {
+  Chart as ChartJS,
+  LineElement,
+  PointElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+
+//Iconos
+>>>>>>> 17b74b057ce87a80411c825bdd8487deaa2f86a0
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import HeightIcon from "@mui/icons-material/Height";
 import ScaleIcon from "@mui/icons-material/Scale";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 
+<<<<<<< HEAD
 {/* ===== AÑADIDO: jsPDF para generar el PDF ===== */}
 import { jsPDF } from "jspdf";
 import DownloadIcon from "@mui/icons-material/Download";
 
 {/* ===== AÑADIDO: URL de la imagen a descargar ===== */}
+=======
+//AÑADIDO: jsPDF para generar el PDF
+import { jsPDF } from "jspdf";
+import DownloadIcon from "@mui/icons-material/Download";
+
+ChartJS.register(
+  LineElement,
+  PointElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend
+);
+
+
+//AÑADIDO: URL de la imagen a descargar
+>>>>>>> 17b74b057ce87a80411c825bdd8487deaa2f86a0
 const IMAGE_URL =
   "https://wtrekbnyoeenxlzzxnka.supabase.co/storage/v1/object/public/imagenes/ejercicios/onu.jpg";
 
@@ -29,7 +63,45 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+<<<<<<< HEAD
   {/* AÑADIDO: función para descargar el PDF */}
+=======
+  // controla qué gráfica se muestra
+  const [activeChart, setActiveChart] = useState("peso");
+
+  // datos de ejemplo para cada tipo de gráfica
+
+  const chartDataMap = {
+    peso: {
+      label: "Peso (kg)",
+      data: [80, 78, 76, user?.peso || 75],
+    },
+    repeticiones: {
+      label: "Repeticiones",
+      data: [10, 12, 15, 18],
+    },
+    tiempo: {
+      label: "Tiempo (min)",
+      data: [20, 25, 30, 35],
+    },
+  };
+
+  // data final que usa la gráfica
+  const progressData = {
+    labels: ["Semana 1", "Semana 2", "Semana 3", "Semana 4"],
+    datasets: [
+      {
+        label: chartDataMap[activeChart].label,
+        data: chartDataMap[activeChart].data,
+        borderWidth: 2,
+        tension: 0.4,
+      },
+    ],
+  };
+
+
+  //función para descargar el PDF
+>>>>>>> 17b74b057ce87a80411c825bdd8487deaa2f86a0
   const handleDownloadPDF = async () => {
     const img = new Image();
     img.crossOrigin = "anonymous";
@@ -70,7 +142,13 @@ export default function Dashboard() {
   };
 
 
+<<<<<<< HEAD
   {/*Efecto: Obtener usuario al cargar */}
+=======
+
+
+  //Efecto: Obtener usuario al cargar
+>>>>>>> 17b74b057ce87a80411c825bdd8487deaa2f86a0
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -214,7 +292,7 @@ export default function Dashboard() {
               )}
             </Grid>
 
-            {/* ===== AÑADIDO: Botón Descargar PDF ===== */}
+            {/*AÑADIDO: Botón Descargar PDF 
             <Box sx={{ display: "flex", justifyContent: "center" }}>
               <Button
                 variant="contained"
@@ -223,7 +301,41 @@ export default function Dashboard() {
               >
                 Descargar
               </Button>
-            </Box>
+            </Box>*/}
+
+            {/* Gráfica de progreso */}
+            <Card sx={{ mt: 4, p: 3, borderRadius: 3 }}>
+              <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
+                Progreso de peso
+              </Typography>
+              {/* AÑADIDO: botones para cambiar gráfica */}
+              <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mb: 3 }}>
+                <Button
+                  variant={activeChart === "peso" ? "contained" : "outlined"}
+                  onClick={() => setActiveChart("peso")}
+                >
+                  Peso
+                </Button>
+
+                <Button
+                  variant={activeChart === "repeticiones" ? "contained" : "outlined"}
+                  onClick={() => setActiveChart("repeticiones")}
+                >
+                  Repeticiones
+                </Button>
+
+                <Button
+                  variant={activeChart === "tiempo" ? "contained" : "outlined"}
+                  onClick={() => setActiveChart("tiempo")}
+                >
+                  Tiempo
+                </Button>
+              </Box>
+
+              <Line data={progressData} />
+            </Card>
+
+
 
           </CardContent>
         </Card>
