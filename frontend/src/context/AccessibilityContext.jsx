@@ -1,11 +1,11 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-//Creacion del contexto
+{/*Creacion del contexto */}
 const AccessibilityContext = createContext();
-//Es clave para su localstorage
-//Guarda las preferencias del usuario 
+{/*Es clave para su localstorage */}
+{/*Guarda las preferencias del usuario */}
 const STORAGE_KEY = 'accessibility_preferences';
 
-//Preferencias por defecto 
+{/*Preferencias por defecto */}
 const defaultPreferences = {
   fontSize: 'medium',     
   highContrast: false,      //modo alto contraste
@@ -15,25 +15,25 @@ const defaultPreferences = {
 
 export function AccessibilityProvider({ children }) {
  
-  //Carga Localstorage si existe 
+  {/*Carga Localstorage si existe */}
   const [preferences, setPreferences] = useState(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? JSON.parse(stored) : defaultPreferences;
   });
 
-    //Efectos: guarda y aplica cambio visuales
+    {/*Efectos: guarda y aplica cambio visuales */}
   useEffect(() => {
-    //Guardar en Localstorage
+    {/*Guardar en Localstorage */}
     localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
     
-    // Aplicar preferencias al documento
+    {/* Aplicar preferencias al documento */}
     document.documentElement.style.fontSize = getFontSizeValue(preferences.fontSize);
-    //Activar o desactivar clase CSS
+    {/*Activar o desactivar clase CSS */}
     document.body.classList.toggle('high-contrast', preferences.highContrast);
     document.body.classList.toggle('senior-mode', preferences.seniorMode);
   }, [preferences]);
 
-  //Cambiar tamaño de fuente
+  {/*Cambiar tamaño de fuente */}
   const getFontSizeValue = (size) => {
     const sizes = {
       small: '14px',
@@ -44,7 +44,7 @@ export function AccessibilityProvider({ children }) {
     return sizes[size] || sizes.medium;
   };
 
-  //Aumentar el tamaño de fuente
+  {/*Aumentar el tamaño de fuente */}
   const increaseFontSize = () => {
     const sizes = ['small', 'medium', 'large', 'extra-large'];
     const currentIndex = sizes.indexOf(preferences.fontSize);
@@ -56,14 +56,14 @@ export function AccessibilityProvider({ children }) {
     }));
   };
 
-  //Activa/desactiva contraste 
+  {/*Activa/desactiva contraste */}
   const toggleContrast = () => {
     setPreferences(prev => ({
       ...prev,
       highContrast: !prev.highContrast
     }));
   };
-//Modo adulto mayor
+{/* Modo adulto mayor */}
   const toggleSeniorMode = () => {
     setPreferences(prev => ({
       ...prev,
@@ -73,7 +73,7 @@ export function AccessibilityProvider({ children }) {
     }));
   };
 
-  //Comparte el contexto
+  {/*Comparte el contexto */}
   const value = {
     ...preferences,
     increaseFontSize,
