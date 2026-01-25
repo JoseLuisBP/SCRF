@@ -12,9 +12,9 @@ import PersonIcon from '@mui/icons-material/Person';
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import LockIcon from '@mui/icons-material/Lock';
 
-// --- Esquemas de Validación ---
+{/* --- Esquemas de Validación --- */}
 
-// Esquema para Información Personal y Física
+{/* Esquema para Información Personal y Física */}
 const profileSchema = yup.object({
     nombre: yup.string().required('El nombre es obligatorio'),
     correo: yup.string().email('Correo inválido').required('El correo es obligatorio'),
@@ -29,7 +29,7 @@ const profileSchema = yup.object({
         .positive('Debe ser mayor a 0')
         .nullable()
         .transform((value, originalValue) => (String(originalValue).trim() === '' ? null : value)),
-    // Cambio importante: unificamos a 'estatura' para consistencia con Dashboard y Backend
+    // Cambio importante: unificamos a 'estatura' para consistencia con Dashboard y Backend 
     estatura: yup.number()
         .typeError('La estatura debe ser un número')
         .positive('Debe ser mayor a 0')
@@ -37,7 +37,7 @@ const profileSchema = yup.object({
         .transform((value, originalValue) => (String(originalValue).trim() === '' ? null : value)),
 }).required();
 
-// Esquema para Cambio de Contraseña
+{/* Esquema para Cambio de Contraseña */}
 const passwordSchema = yup.object({
     currentPassword: yup.string().required('La contraseña actual es obligatoria'),
     newPassword: yup
@@ -57,7 +57,7 @@ export default function Profile() {
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
-    // --- Hooks del Formulario de Perfil ---
+    {/* --- Hooks del Formulario de Perfil --- */}
     const {
         register: registerProfile,
         handleSubmit: handleSubmitProfile,
@@ -74,7 +74,7 @@ export default function Profile() {
         }
     });
 
-    // --- Hooks del Formulario de Contraseña ---
+    {/* --- Hooks del Formulario de Contraseña --- */}
     const {
         register: registerPassword,
         handleSubmit: handleSubmitPassword,
@@ -84,11 +84,11 @@ export default function Profile() {
         resolver: yupResolver(passwordSchema),
     });
 
-    // --- Cargar datos del usuario ---
+    {/* --- Cargar datos del usuario --- */}
     useEffect(() => {
         if (user) {
-            // Mapeamos los datos del usuario al formulario
-            // Nota: Nos aseguramos de usar 'estatura' consistentemente
+            {/* Mapeamos los datos del usuario al formulario */}
+            {/* Nota: Nos aseguramos de usar 'estatura' consistentemente */}
             resetProfile({
                 nombre: user.nombre || '',
                 correo: user.correo || '',
@@ -99,7 +99,7 @@ export default function Profile() {
         }
     }, [user, resetProfile]);
 
-    // Limpiar mensajes después de unos segundos
+    {/* Limpiar mensajes después de unos segundos */}
     useEffect(() => {
         if (successMessage || errorMessage) {
             const timer = setTimeout(() => {
@@ -111,9 +111,9 @@ export default function Profile() {
     }, [successMessage, errorMessage]);
 
 
-    // --- Handlers ---
+    {/* --- Handlers --- */}
 
-    // Actualizar Perfil
+    {/* Actualizar Perfil */}
     const onSubmitProfile = async (formData) => {
         setIsLoading(true);
         setErrorMessage('');
@@ -122,7 +122,7 @@ export default function Profile() {
             console.log('📝 Enviando datos de perfil:', formData);
             const response = await usersAPI.updateProfile(formData);
 
-            // Actualizar contexto
+            {/* Actualizar contexto */}
             if (response.data) {
                 updateUser(response.data);
             } else if (response.user) {
