@@ -195,6 +195,14 @@ export default function Header({ showSearchBar = false }) {
 
         {/*Iconos y botones de perfil y login*/}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
+
+          {/*Modo claro y oscuro */}
+          <Tooltip title="Cambio modo claro / oscuro ">
+          <IconButton color="inherit" onClick={toggleTheme}>
+          {mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
+          </IconButton>
+          </Tooltip>
+
           <Tooltip title="Opciones de accesibilidad">
             <IconButton color="inherit" onClick={handleAccessibilityMenu} aria-label="opciones de accesibilidad">
               <AccessibilityIcon />
