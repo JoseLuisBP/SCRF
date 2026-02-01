@@ -14,11 +14,12 @@ class UserBase(BaseModel):
 
 # Schema para creación de Usuario
 class UserCreate(UserBase):
-    contrasena: str = Field(..., min_length=4, max_length=50, description="Contraseña del usuario")
+    contrasena: str = Field(..., min_length=8, max_length=50, description="Contraseña del usuario")
+    confirmado: bool = Field(default=False, description="Indica si el usuario aceptó los términos")
 
 # Schema para actualización de Usuario
 class UserUpdate(UserBase):
-    contrasena: Optional[str] = Field(None, min_length=4, max_length=50, description="Contraseña del usuario")
+    contrasena: Optional[str] = Field(None, min_length=8, max_length=50, description="Contraseña del usuario")
 
 # Schema para cambio de contraseña
 class UserChangePassword(BaseModel):

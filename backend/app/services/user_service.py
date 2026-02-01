@@ -114,7 +114,8 @@ class UserService:
             nivel_fisico=user_data.nivel_fisico,
             tiempo_disponible=user_data.tiempo_disponible,
             is_active=True,
-            is_admin=False
+            confirmado=user_data.confirmado, # Confirmación de términos y condiciones
+            id_rol=1  # Default Role: 1=User  2=Trainer  3=Admin
         )
 
         session.add(new_user)
