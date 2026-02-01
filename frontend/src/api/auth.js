@@ -16,10 +16,10 @@ const authAPI = {
     const response = await axiosInstance.post('/v1/auth/login', credentials);
     const { access_token } = response.data;
     if (access_token) {
-      console.log('✅ Token guardado en localStorage:', access_token.substring(0, 50) + '...');
+      console.log('Token guardado en localStorage:', access_token.substring(0, 50) + '...');
       localStorage.setItem('token', access_token);
     } else {
-      console.error('❌ No se recibió access_token del backend');
+      console.error('No se recibió access_token del backend');
     }
     return response.data;
   },

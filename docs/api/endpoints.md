@@ -1,7 +1,7 @@
 # Documentación de la API
 
 ## Información General
-- Base URL: `http://localhost:5000/api`
+- Base URL: `http://localhost:8000/api/v1`
 - Versión actual: `v1`
 - Formato: JSON
 
@@ -9,143 +9,136 @@
 La API utiliza autenticación JWT (JSON Web Tokens).
 
 ### Headers Requeridos
+Para endpoints protegidos:
 ```
 Authorization: Bearer <token>
 ```
 
 ## Endpoints
 
-### Autenticación
+### Autenticación (`/auth`)
 
-#### POST /api/v1/auth/login
-Login de usuario.
+#### POST /auth/register
+Registrar un nuevo usuario y obtener token.
 ```json
+// Request
 {
-  "email": "string",
-  "password": "string"
+  "nombre": "Juan Perez",
+  "correo": "juan@example.com",
+  "contrasena": "securePa$$word123",
+  "edad": 25,
+  "peso": 75.5,
+  "estatura": 1.75,
+  "nivel_fisico": "Intermedio",
+  "tiempo_disponible": 60
+}
+
+// Response (201 Created)
+{
+  "access_token": "eyJhbGciOiJI...",
+  "token_type": "bearer",
+  "expires_in": 1800
 }
 ```
 
-#### POST /api/v1/auth/register
-Registro de nuevo usuario.
+#### POST /auth/login
+Iniciar sesión.
 ```json
+// Request
 {
-  "email": "string",
-  "password": "string",
-  "name": "string"
+  "correo": "juan@example.com",
+  "contrasena": "securePa$$word123"
+}
+
+// Response (200 OK)
+{
+  "access_token": "eyJhbGciOiJI...",
+  "token_type": "bearer",
+  "expires_in": 1800
 }
 ```
 
-### Usuarios
+#### GET /auth/verify
+Verificar validez del token actual. Retorna los datos del usuario.
 
-#### GET /api/v1/users/me
-Obtener perfil del usuario actual.
+#### GET /auth/me
+Alias para obtener información del usuario actual.
 
-#### PUT /api/v1/users/me
+#### POST /auth/logout
+Cierre de sesión simbólico (el cliente debe descartar el token).
+
+### Usuarios (`/users`)
+
+#### GET /users/me
+Obtener perfil completo del usuario autenticado.
+
+#### PUT /users/me
 Actualizar perfil del usuario.
 ```json
+// Request (campos opcionales)
 {
-  "name": "string",
-  "email": "string"
+  "nombre": "Juan P.",
+  "peso": 74.0,
+  "nivel_fisico": "Avanzado"
 }
 ```
 
-### Ejercicios
+#### DELETE /users/me
+Eliminar cuenta del usuario actual.
 
-#### GET /api/v1/exercises
-Listar ejercicios.
-
-#### POST /api/v1/exercises
-Crear nuevo ejercicio.
+#### POST /users/me/change-password
+Cambiar contraseña.
 ```json
+// Request
 {
-  "name": "string",
-  "description": "string",
-  "type": "string",
-  "difficulty": "string"
+  "contrasena_actual": "oldPass",
+  "nueva_contrasena": "newPass"
 }
 ```
 
-#### GET /api/v1/exercises/{id}
-Obtener detalles de un ejercicio.
+### Gestión de Usuarios (Requiere Rol Admin)
 
-#### PUT /api/v1/exercises/{id}
-Actualizar ejercicio.
+#### GET /users/
+Listar todos los usuarios (paginado).
+- Query params: `skip` (default: 0), `limit` (default: 100)
 
-#### DELETE /api/v1/exercises/{id}
-Eliminar ejercicio.
+#### GET /users/{user_id}
+Obtener detalle de un usuario específico.
 
-### Rutinas
+#### PUT /users/{user_id}
+Actualizar un usuario específico.
 
-#### GET /api/v1/routines
-Listar rutinas.
+#### POST /users/{user_id}/activate
+Activar un usuario suspendido.
 
-#### POST /api/v1/routines
-Crear nueva rutina.
-```json
-{
-  "name": "string",
-  "description": "string",
-  "exercises": [
-    {
-      "exercise_id": "string",
-      "sets": "number",
-      "reps": "number"
-    }
-  ]
-}
-```
+#### POST /users/{user_id}/deactivate
+Suspender un usuario.
 
-#### GET /api/v1/routines/{id}
-Obtener detalles de una rutina.
+#### POST /users/{user_id}/toggle-admin
+Otorgar o revocar permisos de administrador.
 
-#### PUT /api/v1/routines/{id}
-Actualizar rutina.
+#### POST /users/{user_id}/change-password
+Cambiar contraseña de un usuario (no requiere contraseña anterior).
 
-#### DELETE /api/v1/routines/{id}
-Eliminar rutina.
+### Ejercicios (`/exercises`)
 
-### Progreso
+#### GET /exercises
+Obtener lista de ejercicios activos.
 
-#### GET /api/v1/progress
-Obtener historial de progreso.
+### Progreso (`/progress`)
 
-#### POST /api/v1/progress
-Registrar nuevo progreso.
-```json
-{
-  "routine_id": "string",
-  "exercise_id": "string",
-  "sets_completed": "number",
-  "reps_completed": "number",
-  "weight": "number"
-}
-```
+#### GET /progress/{id_usuario}
+Obtener historial de progreso de un usuario.
 
-## Códigos de Estado
+## Códigos de Estado Comunes
 
 - 200: OK
 - 201: Created
-- 400: Bad Request
-- 401: Unauthorized
-- 403: Forbidden
+- 400: Bad Request (Datos inválidos)
+- 401: Unauthorized (Token faltante o inválido)
+- 403: Forbidden (Permisos insuficientes)
 - 404: Not Found
 - 500: Internal Server Error
 
 ## Rate Limiting
-
-- 100 requests por minuto por IP
-- 1000 requests por hora por usuario
-
-## Errores
-
-Formato de respuesta de error:
-```json
-{
-  "error": {
-    "code": "string",
-    "message": "string",
-    "details": {}
-  }
-}
-```
+- Configurado vía middleware (ver documentación de infraestructura).
