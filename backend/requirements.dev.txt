@@ -4,21 +4,21 @@
 # Framework para ejecutar tests
 pytest==8.4.2
 # Soporte para tests asíncronos
-pytest-asyncio==1.2.0
+pytest-asyncio==0.23.8
 # Cobertura de código
-pytest-cov==7.0.0
+pytest-cov==6.0.0
 httpx==0.28.1
 
 # Linter y formateador de código
-black==25.9.0
+black==24.10.0
 # Análisis estático de código
-flake8==7.3.0
+flake8==7.1.1
 # Ordena imports automáticamente
-isort==7.0.0
+isort==5.13.2
 # Verifica tipos en el código
-mypy==1.18.2
+mypy==1.13.0
 
 # Consola interactiva
-ipython==9.6.0
+ipython==8.29.0
 # Depurador interactivo
 ipdb==0.13.13
