@@ -1,6 +1,6 @@
-{/* Hook de estado de React */ }
+//Hook de estado de React
 import { useState } from 'react';
-{/* Componentes de Material UI */ }
+//Componentes de Material UI
 import {
   Box,
   Container,
@@ -28,8 +28,8 @@ import Button from '../components/common/Button';
 import Header from '../components/layout/Header';
 import { authAPI } from '../api';
 
-{/* Esquema de validación */ }
-{/*Define las reglas que deben cumplir los campos del registro */ }
+/* Esquema de validación */ 
+/*Define las reglas que deben cumplir los campos del registro */ 
 const registerSchema = yup.object({
   nombre: yup.string().required('El nombre es obligatorio'),
   correo: yup
@@ -71,13 +71,13 @@ const registerSchema = yup.object({
     .oneOf([true], 'Debes aceptar los términos y condiciones'),
 }).required();
 
-{/*Componentes registro como: terminos, mensaje emergente */ }
+//Componentes registro como: terminos, mensaje emergente
 export default function Register() {
   const [openTerms, setOpenTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-  {/* Configuración del formulario */ }
+  //Configuración del formulario
   const {
     register,
     handleSubmit,
@@ -101,22 +101,22 @@ export default function Register() {
     },
   });
 
-  {/* Observa si los términos están aceptados */ }
+  //Observa si los términos están aceptados
   const acceptedTerms = watch('acceptedTerms');
 
-  {/* Abre el modal de términos */ }
+  //Abre el modal de términos
   const handleOpenTerms = (e) => {
     e.preventDefault();
     setOpenTerms(true);
   };
-  {/* Cierra el modal de términos */ }
+  //Cierra el modal de términos
   const handleCloseTerms = () => setOpenTerms(false);
 
-  {/* Funcion al enviar formulario */ }
+  //Funcion al enviar formulario
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      {/* Datos enviados a la API */ }
+      //Datos enviados a la API
       const userData = {
         nombre: data.nombre,
         correo: data.correo,
@@ -128,20 +128,20 @@ export default function Register() {
         tiempo_disponible: data.tiempoDisponible ? parseInt(data.tiempoDisponible) : 0,
         confirmado: data.acceptedTerms,
       };
-      {/* Llamada a la API */ }
+      //Llamada a la API
       await authAPI.register(userData);
-      {/* Mensaje de éxito */ }
+      //Mensaje de éxito
       setSnackbar({ open: true, message: 'Usuario registrado correctamente.', severity: 'success' });
       reset();
     } catch (error) {
       console.error(error);
-      const errorMessage = error.response?.data?.detail || 'Error al registrar usuario.';
+      const errorMessage = error.response?.data?.detail || error?.message || 'Error al registrar usuario.';
       setSnackbar({ open: true, message: errorMessage, severity: 'error' });
     } finally {
       setIsLoading(false);
     }
   };
-  {/* Interfaz */ }
+  //Interfaz
   return (
     <Box
       sx={{

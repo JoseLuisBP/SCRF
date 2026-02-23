@@ -1,4 +1,4 @@
-{/*Importaciones de librerias como: react, material ui, contexto */}
+//Importaciones de librerias como: react, material ui, contexto
 import { Box, Container, Typography } from '@mui/material';
 import Header from '../components/layout/Header';
 import Button from '../components/common/Button';
@@ -7,12 +7,12 @@ import Card from '../components/layout/Card';
 import { useAuth } from '../context/AuthContext';
 import { useAccessibility } from '../context/AccessibilityContext';
 
-{/*Librerias de Carrusel */ }
+//Librerias de Carrusel
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Footer from '../components/layout/Footer';
-{/*componentes home */}
+//componentes home
 export default function Home() {
   const { isLoggedIn, toggleLogin } = useAuth();
   const { fontSize } = useAccessibility();
@@ -25,7 +25,7 @@ export default function Home() {
   const cuerpo2Img = 'https://wtrekbnyoeenxlzzxnka.supabase.co/storage/v1/object/public/imagenes/ejercicios/cuerpo2.jpg';
   const cuerpo3Img = 'https://wtrekbnyoeenxlzzxnka.supabase.co/storage/v1/object/public/imagenes/ejercicios/cuerpo3.jpg';
 
-  {/*configuracion del carrusel */}
+  //configuracion del carrusel
   const sliderSettings = {
     dots: true,
     infinite: true,
@@ -192,13 +192,13 @@ export default function Home() {
           >
             <Card
               title="Beneficios"
-              description=" ¿Buscas mejorar tu salud física sin salir de casa? Nuestra página web te ofrece una solución completa con ejercicios diseñados especialmente para la rehabilitación y el bienestar. Aquí tienes lo que te espera:
+              description=' ¿Buscas mejorar tu salud física sin salir de casa? Nuestra página web te ofrece una solución completa con ejercicios diseñados especialmente para la rehabilitación y el bienestar. Aquí tienes lo que te espera:
             • 	 Comodidad total: Realiza rutinas adaptadas desde tu hogar, sin necesidad de equipo especializado.
             • 	 Ejercicios guiados por expertos: Videos y planes creados por profesionales en fisioterapia y entrenamiento funcional.
             • 	 Rehabilitación progresiva: Programas pensados para recuperar movilidad, fuerza y confianza paso a paso.
             • 	 A tu ritmo: Accede a las sesiones cuando quieras, sin presiones ni horarios fijos.
             • 	 Seguimiento personalizado: Herramientas para monitorear tu avance y ajustar tus rutinas según tus necesidades.
-            • 	 Bienestar integral: Mejora tu calidad de vida, reduce el dolor y fortalece tu cuerpo con seguridad. "
+            • 	 Bienestar integral: Mejora tu calidad de vida, reduce el dolor y fortalece tu cuerpo con seguridad. '
               image={beneficioImg}
               sx={{
                 flexBasis: {

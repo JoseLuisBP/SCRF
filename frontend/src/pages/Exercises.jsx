@@ -1,7 +1,7 @@
-{/* React */}
+//React
 import { useState, useEffect } from 'react';
 
-{/* Material UI */}
+//Material UI
 import {
   Box,
   Container,
@@ -72,9 +72,7 @@ export default function Exercises() {
     }
   }, [category, exercises]);
 
-  /**
-   * Obtener categorías únicas
-   */
+  /*Obtener categorías únicas*/
   const categories = [...new Set(exercises.map((e) => e.categoria))];
 
   return (

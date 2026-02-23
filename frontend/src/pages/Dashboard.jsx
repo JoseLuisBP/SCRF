@@ -1,78 +1,44 @@
-{/* Importaciones */}
+//Importaciones
 import { Box, Typography, Button, CircularProgress, Alert, Card, CardContent, Avatar, Grid } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 import { useEffect, useState } from 'react';
-import { authAPI } from '../api'
+import { authAPI } from '../api';
 import Header from '../components/layout/Header';
 
-
-{/* Iconos */}
-
 //Graficas
-import {
-  Chart as ChartJS,
-  LineElement,
-  PointElement,
-  CategoryScale,
-  LinearScale,
-  Tooltip,
-  Legend
-} from "chart.js";
+import "chart.js/auto";
 import { Line } from "react-chartjs-2";
 
 //Iconos
-
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import HeightIcon from "@mui/icons-material/Height";
 import ScaleIcon from "@mui/icons-material/Scale";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 
-{/* ===== AÑADIDO: jsPDF para generar el PDF ===== */}
-import { jsPDF } from "jspdf";
-import DownloadIcon from "@mui/icons-material/Download";
-
-//* ===== AÑADIDO: URL de la imagen a descargar ===== */}
 //AÑADIDO: jsPDF para generar el PDF
-//import { jsPDF } from "jspdf";
-//import DownloadIcon from "@mui/icons-material/Download";
-
-ChartJS.register(
-  LineElement,
-  PointElement,
-  CategoryScale,
-  LinearScale,
-  Tooltip,
-  Legend
-);
-
+import { jsPDF } from "jspdf";
+// import DownloadIcon from "@mui/icons-material/Download";
 
 //AÑADIDO: URL de la imagen a descargar
-
 const IMAGE_URL =
   "https://wtrekbnyoeenxlzzxnka.supabase.co/storage/v1/object/public/imagenes/ejercicios/onu.jpg";
 
-{/*Componente Dashboard */}
+//Componente Dashboard
 export default function Dashboard() {
-  //Contexto de autenticacion
+
   const { logout } = useAuth();
 
-  {/*Estados */}
+  //Estados
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-
-  {/* AÑADIDO: función para descargar el PDF */}
-
-  // controla qué gráfica se muestra
   const [activeChart, setActiveChart] = useState("peso");
 
-  // datos de ejemplo para cada tipo de gráfica
-
+  //Datos de ejemplo para cada gráfica
   const chartDataMap = {
     peso: {
       label: "Peso (kg)",
-      data: [80, 78, 76, user?.peso || 75],
+      data: [80, 78, 76, user?.peso ?? 75],
     },
     repeticiones: {
       label: "Repeticiones",
@@ -84,7 +50,6 @@ export default function Dashboard() {
     },
   };
 
-  // data final que usa la gráfica
   const progressData = {
     labels: ["Semana 1", "Semana 2", "Semana 3", "Semana 4"],
     datasets: [
@@ -97,10 +62,8 @@ export default function Dashboard() {
     ],
   };
 
-
-  //función para descargar el PDF
-
-  const handleDownloadPDF = async () => {
+  //Función para descargar PDF
+  const handleDownloadPDF = () => {
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.src = IMAGE_URL;
@@ -108,52 +71,30 @@ export default function Dashboard() {
     img.onload = () => {
       const doc = new jsPDF("p", "mm", "a4");
 
-      {/* Tamaño de la página A4 */}
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
 
-      {/* Proporción de la imagen */}
-      const imgWidth = img.width;
-      const imgHeight = img.height;
-      const ratio = imgHeight / imgWidth;
-
-      {/* Ajustar al ancho de la página */}
+      const ratio = img.height / img.width;
       const pdfImgWidth = pageWidth;
       const pdfImgHeight = pdfImgWidth * ratio;
 
-      {/* Centrar verticalmente si sobra espacio */}
-      const y = pdfImgHeight < pageHeight
-        ? (pageHeight - pdfImgHeight) / 2
-        : 0;
+      const y =
+        pdfImgHeight < pageHeight
+          ? (pageHeight - pdfImgHeight) / 2
+          : 0;
 
-      doc.addImage(
-        img,
-        "JPEG",
-        0,
-        y,
-        pdfImgWidth,
-        pdfImgHeight
-      );
-
+      doc.addImage(img, "JPEG", 0, y, pdfImgWidth, pdfImgHeight);
       doc.save("imagen-dashboard.pdf");
     };
   };
 
-  {/*Efecto: Obtener usuario al cargar */}
-
-
-
-  //Efecto: Obtener usuario al cargar
-
+  //Efecto: Obtener usuario
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        {/* Log para verificar el token */}
         const token = localStorage.getItem('token');
         console.log('Token en localStorage:', token ? 'Existe' : 'No existe');
-        console.log('Token length:', token?.length);
 
-        {/* Decodificar el token manualmente para ver el payload */}
         if (token) {
           try {
             const parts = token.split('.');
@@ -164,38 +105,30 @@ export default function Dashboard() {
           }
         }
 
-        console.log('Llamando a getCurrentUser...');
         const userData = await authAPI.getCurrentUser();
-        console.log('Usuario obtenido:', userData);
         setUser(userData);
+
       } catch (err) {
-        console.error('Error completo:', err);
-        console.error('Error response:', err.response);
+        console.error(err);
         setError('Error al cargar datos del usuario');
       } finally {
         setLoading(false);
       }
     };
+
     fetchUser();
   }, []);
 
-  {/* Pantalla de carga */}
+  //Pantalla de carga
   if (loading) {
     return (
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <CircularProgress />
       </Box>
     );
   }
 
-  {/* Pantalla de error */}
+  //Pantalla de error
   if (error) {
     return (
       <Box sx={{ minHeight: '100vh', p: 4 }}>
@@ -204,7 +137,7 @@ export default function Dashboard() {
     );
   }
 
-  {/* Contenido principal */}
+  //Contenido principal
   return (
     <Box
       sx={{
@@ -217,7 +150,6 @@ export default function Dashboard() {
     >
       <Header showSearchBar={true} />
 
-      {/*Tarjeta central*/}
       <Box sx={{ mt: 8, display: "flex", justifyContent: "center" }}>
         <Card
           sx={{
@@ -229,7 +161,7 @@ export default function Dashboard() {
             backgroundColor: "#d4e9f8ff",
           }}
         >
-          <CardContent justifyContent="center">
+          <CardContent>
             <Box sx={{ textAlign: "center", mb: 4 }}>
               <Avatar
                 sx={{ width: 100, height: 100, mx: "auto", mb: 2, bgcolor: "secondary.main", fontSize: 40 }}
@@ -240,12 +172,12 @@ export default function Dashboard() {
               <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>
                 Hola, {user?.nombre || user?.correo || "Usuario"}
               </Typography>
+
               <Typography variant="h6" sx={{ opacity: 0.9 }}>
                 Bienvenido a tu panel de progreso
               </Typography>
             </Box>
 
-            {/*Datos del usuario*/}
             <Grid container justifyContent="center" spacing={3} sx={{ mb: 4 }}>
               {user?.peso && (
                 <Grid item xs={12} sm={6} md={3}>
@@ -288,23 +220,11 @@ export default function Dashboard() {
               )}
             </Grid>
 
-            {/*AÑADIDO: Botón Descargar PDF 
-            <Box sx={{ display: "flex", justifyContent: "center" }}>
-              <Button
-                variant="contained"
-                startIcon={<DownloadIcon />}
-                onClick={handleDownloadPDF}
-              >
-                Descargar
-              </Button>
-            </Box>*/}
-
-            {/* Gráfica de progreso */}
             <Card sx={{ mt: 4, p: 3, borderRadius: 3 }}>
               <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
-                Progreso de peso
+                Progreso
               </Typography>
-              {/* AÑADIDO: botones para cambiar gráfica */}
+
               <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mb: 3 }}>
                 <Button
                   variant={activeChart === "peso" ? "contained" : "outlined"}
@@ -330,8 +250,6 @@ export default function Dashboard() {
 
               <Line data={progressData} />
             </Card>
-
-
 
           </CardContent>
         </Card>

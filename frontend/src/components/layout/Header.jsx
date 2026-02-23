@@ -1,4 +1,4 @@
-{/*Se importan varios componentes de Material UI que serán utilizados en la interfaz del Header, los hooks básicos de React y los componentes de navegación de React Router.*/}
+//Se importan varios componentes de Material UI que serán utilizados en la interfaz del Header, los hooks básicos de React y los componentes de navegación de React Router
 import { useState } from 'react';
 import { useNavigate, Link as RouterLink, useLocation } from 'react-router-dom';
 import {
@@ -31,55 +31,56 @@ import {
   AccountCircle,
   AccessibilityNew as AccessibilityIcon,
   ChevronRight as ChevronRightIcon,
-  LightMode as LightModeIcon
+  LightMode as LightModeIcon,
+  DarkMode as DarkModeIcon
 } from '@mui/icons-material';
 import { useAuth } from "../../context/AuthContext";
 import { useAccessibility } from "../../context/AccessibilityContext";
 import { useThemeMode } from '../../context/ThemeContext';
 
-{/* El componente recibe la prop showSearchBar para decidir si mostrar o no una barra de búsqueda.*/}
+//El componente recibe la prop showSearchBar para decidir si mostrar o no una barra de búsqueda.
 export default function Header({ showSearchBar = false }) {
-  {/* Hooks de navegación y ubicación de React Router. */}
+  //Hooks de navegación y ubicación de React Router.
   const navigate = useNavigate();
   const location = useLocation();
 
-  {/*Material UI: obtener el tema y detectar si es vista móvil.*/}
+  //Material UI: obtener el tema y detectar si es vista móvil.
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  {/* Información del usuario desde el contexto de autenticación.*/}
+  //Información del usuario desde el contexto de autenticación.
   const { isLoggedIn, user, logout } = useAuth();
-  {/* Configuraciones de accesibilidad desde el contexto global.*/}
+  //Configuraciones de accesibilidad desde el contexto global.
   const { fontSize, highContrast, seniorMode, increaseFontSize, toggleContrast, toggleSeniorMode } = useAccessibility();
 
-  const { mode, toggleTheme } = useAuth();
+  const { mode, toggleTheme } = useThemeMode();
 
-  {/* Controlan visibilidad del menú móvil, del menú de usuario y del menú de accesibilidad.*/}
+  //Controlan visibilidad del menú móvil, del menú de usuario y del menú de accesibilidad.
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [accessibilityAnchor, setAccessibilityAnchor] = useState(null);
   const [searchValue, setSearchValue] = useState('');
 
-  {/* Abre o cierra el menú lateral móvil.*/}
+  //Abre o cierra el menú lateral móvil.
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
-  {/* Abre el menú del perfil (usuario). */}
+  //Abre el menú del perfil (usuario).
   const handleProfileMenu = (event) => setAnchorEl(event.currentTarget);
-  {/* Abre el menú de opciones de accesibilidad.*/}
+  //Abre el menú de opciones de accesibilidad.
   const handleAccessibilityMenu = (event) => setAccessibilityAnchor(event.currentTarget);
 
-  {/* Cierra ambos menús (usuario y accesibilidad).*/}
+  //Cierra ambos menús (usuario y accesibilidad).
   const handleClose = () => {
     setAnchorEl(null);
     setAccessibilityAnchor(null);
   };
 
-  {/* Maneja la búsqueda cuando presionan Enter.*/}
+  //Maneja la búsqueda cuando presionan Enter.
   const handleSearch = (e) => {
     if (e.key === 'Enter') console.log('Buscando:', searchValue);
   };
 
-  {/* Scroll suave a secciones del Home*/}
-  {/* Si estás en otra página, navega al Home y luego hace scroll.*/}
+  //Scroll suave a secciones del Home
+  //Si estás en otra página, navega al Home y luego hace scroll.
   const handleScrollToSection = (sectionId) => {
     if (location.pathname !== "/") {
       navigate("/");
@@ -94,8 +95,8 @@ export default function Header({ showSearchBar = false }) {
     setMobileOpen(false);
   };
 
-  {/*  Menú de navegación */}
-  {/* Cambian según si el usuario está autenticado o no. */}
+  //Menú de navegación
+  //Cambian según si el usuario está autenticado o no.
   const navigationItems = isLoggedIn
     ? [
       { text: 'Dashboard', path: '/dashboard' },
@@ -110,7 +111,7 @@ export default function Header({ showSearchBar = false }) {
       { text: 'Contacto', path: 'contacto' },
     ];
 
-  {/* Contenido del drawer (menu movil lateral) */}
+  //Contenido del drawer (menu movil lateral)
   const drawer = (
     <Box sx={{ width: 250 }} role="presentation">
       <List>
@@ -128,7 +129,7 @@ export default function Header({ showSearchBar = false }) {
     </Box>
   );
 
-  {/*return principal del componente */}
+  //return principal del componente
   return (
     <AppBar position="static" role="navigation" aria-label="Barra principal de navegación">
       <Toolbar>

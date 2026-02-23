@@ -1,26 +1,33 @@
-{/*Hooks principal de react */}
+// Hooks principal de react
 import { useState, useEffect } from 'react';
-{/* Componentes de material UI */}
+
+// Componentes de material UI
 import { Box, Container, Typography, Snackbar, Alert } from '@mui/material';
-{/*React Hook Form para manejo de formularios */}
+
+// React Hook Form para manejo de formularios
 import { useForm } from 'react-hook-form';
-{/* Integración de Yup con React Hook Form */}
+
+// Integración de Yup con React Hook Form
 import { yupResolver } from '@hookform/resolvers/yup';
-{/* Librería Yup para validaciones */}
+
+// Librería Yup para validaciones
 import * as yup from 'yup';
-{/* Componentes personalizados */}
+
+// Componentes personalizados
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import Header from '../components/layout/Header';
-{/* Contexto de autenticación */ }
+
+// Contexto de autenticación
 import { useAuth } from '../context/AuthContext';
-{/* Navegación entre rutas */}
+
+// Navegación entre rutas
 import { useNavigate } from 'react-router-dom';
-{/* API de autenticación */}
+
+// API de autenticación
 import authAPI from '../api/auth';
 
-{/* Esquema de validación 
- Define las reglas que deben cumplir los campos del formulario*/}
+/* Esquema de validación */
 const loginSchema = yup.object({
   correo: yup
     .string()
@@ -31,10 +38,11 @@ const loginSchema = yup.object({
     .required('La contraseña es obligatoria'),
 }).required();
 
-{/*Componentes del login como: contexto de autencidad, hook para redireccionar. */}
 export default function Login() {
+
   const { login, isLoggedIn } = useAuth();
   const navigate = useNavigate();
+
   const [isLoading, setIsLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -42,7 +50,7 @@ export default function Login() {
     severity: 'info',
   });
 
-  {/* Configuración del formulario con React Hook Form */}
+  // Configuración del formulario
   const {
     register,
     handleSubmit,
@@ -55,7 +63,7 @@ export default function Login() {
     },
   });
 
-  {/* Si ya está logueado, redirigir automáticamente */}
+  // Si ya está logueado redirigir
   useEffect(() => {
     if (isLoggedIn) {
       navigate('/dashboard');
@@ -65,7 +73,7 @@ export default function Login() {
   const onSubmit = async (formData) => {
     setIsLoading(true);
     try {
-      {/* Llamada real a la API */}
+
       const response = await authAPI.login({
         correo: formData.correo,
         contrasena: formData.password,
@@ -74,7 +82,6 @@ export default function Login() {
       const data = response.data || response;
       console.log('📦 Respuesta del login:', data);
 
-      {/* Validar respuesta correcta */}
       if (data?.access_token) {
         login(data);
         setSnackbar({
@@ -82,23 +89,25 @@ export default function Login() {
           message: `¡Inicio de sesión exitoso!`,
           severity: 'success',
         });
-        {/* Navegar al dashboard */}
+
         setTimeout(() => {
           navigate('/dashboard');
         }, 500);
+
       } else {
-        console.error('❌ No se recibió access_token en la respuesta');
         setSnackbar({
           open: true,
           message: 'Error al iniciar sesión. Verifica tus credenciales.',
           severity: 'error',
         });
       }
+
     } catch (error) {
-      console.error('❌ Error en el login:', error);
       setSnackbar({
         open: true,
-        message: error.response?.data?.detail || 'Error al iniciar sesión. Verifica tus credenciales.',
+        message:
+          error.response?.data?.detail ||
+          'Error al iniciar sesión. Verifica tus credenciales.',
         severity: 'error',
       });
     } finally {
@@ -106,7 +115,6 @@ export default function Login() {
     }
   };
 
-  {/* Interfaz grafica */}
   return (
     <Box
       sx={{
@@ -185,9 +193,13 @@ export default function Login() {
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
-        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+        onClose={() =>
+          setSnackbar((prev) => ({ ...prev, open: false }))
+        }
       >
-        <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
+        <Alert severity={snackbar.severity}>
+          {snackbar.message}
+        </Alert>
       </Snackbar>
     </Box>
   );

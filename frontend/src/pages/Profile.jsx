@@ -12,9 +12,9 @@ import PersonIcon from '@mui/icons-material/Person';
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import LockIcon from '@mui/icons-material/Lock';
 
-{/* --- Esquemas de Validación --- */}
+//  Esquemas de Validación 
 
-{/* Esquema para Información Personal y Física */}
+// Esquema para Información Personal y Física
 const profileSchema = yup.object({
     nombre: yup.string().required('El nombre es obligatorio'),
     correo: yup.string().email('Correo inválido').required('El correo es obligatorio'),
@@ -29,7 +29,6 @@ const profileSchema = yup.object({
         .positive('Debe ser mayor a 0')
         .nullable()
         .transform((value, originalValue) => (String(originalValue).trim() === '' ? null : value)),
-    // Cambio importante: unificamos a 'estatura' para consistencia con Dashboard y Backend 
     estatura: yup.number()
         .typeError('La estatura debe ser un número')
         .positive('Debe ser mayor a 0')
@@ -37,7 +36,7 @@ const profileSchema = yup.object({
         .transform((value, originalValue) => (String(originalValue).trim() === '' ? null : value)),
 }).required();
 
-{/* Esquema para Cambio de Contraseña */}
+// Esquema para Cambio de Contraseña
 const passwordSchema = yup.object({
     currentPassword: yup.string().required('La contraseña actual es obligatoria'),
     newPassword: yup
@@ -50,14 +49,14 @@ const passwordSchema = yup.object({
         .required('Debe confirmar la nueva contraseña'),
 }).required();
 
-
 export default function Profile() {
+
     const { user, updateUser } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
-    {/* --- Hooks del Formulario de Perfil --- */}
+    //  Hooks del Formulario de Perfil 
     const {
         register: registerProfile,
         handleSubmit: handleSubmitProfile,
@@ -74,7 +73,7 @@ export default function Profile() {
         }
     });
 
-    {/* --- Hooks del Formulario de Contraseña --- */}
+    //  Hooks del Formulario de Contraseña 
     const {
         register: registerPassword,
         handleSubmit: handleSubmitPassword,
@@ -84,22 +83,20 @@ export default function Profile() {
         resolver: yupResolver(passwordSchema),
     });
 
-    {/* --- Cargar datos del usuario --- */}
+    //  Cargar datos del usuario 
     useEffect(() => {
         if (user) {
-            {/* Mapeamos los datos del usuario al formulario */}
-            {/* Nota: Nos aseguramos de usar 'estatura' consistentemente */}
             resetProfile({
                 nombre: user.nombre || '',
                 correo: user.correo || '',
                 edad: user.edad || '',
                 peso: user.peso || '',
-                estatura: user.estatura || user.altura || '', // Fallback por si acaso viene como altura
+                estatura: user.estatura || user.altura || '',
             });
         }
     }, [user, resetProfile]);
 
-    {/* Limpiar mensajes después de unos segundos */}
+    // Limpiar mensajes después de unos segundos
     useEffect(() => {
         if (successMessage || errorMessage) {
             const timer = setTimeout(() => {
@@ -110,40 +107,31 @@ export default function Profile() {
         }
     }, [successMessage, errorMessage]);
 
-
-    {/* --- Handlers --- */}
-
-    {/* Actualizar Perfil */}
     const onSubmitProfile = async (formData) => {
         setIsLoading(true);
         setErrorMessage('');
         setSuccessMessage('');
         try {
-            console.log('📝 Enviando datos de perfil:', formData);
             const response = await usersAPI.updateProfile(formData);
 
-            {/* Actualizar contexto */}
             if (response.data) {
                 updateUser(response.data);
             } else if (response.user) {
                 updateUser(response.user);
             } else {
-                // Fallback si la respuesta es directa
                 updateUser(response);
             }
 
             setSuccessMessage('¡Perfil actualizado con éxito!');
-            // Resetear para que isDirty vuelva a false con los nuevos valores
             resetProfile(formData);
+
         } catch (error) {
-            console.error('Error al actualizar perfil:', error);
             setErrorMessage('Error al actualizar el perfil. Intente nuevamente.');
         } finally {
             setIsLoading(false);
         }
     };
 
-    // Cambiar Contraseña
     const onSubmitPassword = async (formData) => {
         setIsLoading(true);
         setErrorMessage('');
@@ -153,8 +141,10 @@ export default function Profile() {
             resetPassword();
             setSuccessMessage('¡Contraseña cambiada correctamente!');
         } catch (error) {
-            console.error('Error al cambiar contraseña:', error);
-            setErrorMessage(error.response?.data?.detail || 'Error al cambiar la contraseña. Verifique su contraseña actual.');
+            setErrorMessage(
+                error.response?.data?.detail ||
+                'Error al cambiar la contraseña. Verifique su contraseña actual.'
+            );
         } finally {
             setIsLoading(false);
         }
@@ -192,7 +182,7 @@ export default function Profile() {
                 >
                     <Grid container spacing={4}>
 
-                        {/* --- Columna Izquierda: Avatar y Resumen --- */}
+                        {/*  Columna Izquierda: Avatar y Resumen  */}
                         <Grid item xs={12} md={4} sx={{ textAlign: 'center', borderRight: { md: '1px solid rgba(0,0,0,0.1)' } }}>
                             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'center' }}>
                                 <Avatar
@@ -222,10 +212,10 @@ export default function Profile() {
                             </Box>
                         </Grid>
 
-                        {/* --- Columna Derecha: Formularios --- */}
+                        {/*  Columna Derecha: Formularios  */}
                         <Grid item xs={12} md={8}>
 
-                            {/* --- Categoría 1: Información Personal --- */}
+                            {/*  Categoría 1: Información Personal  */}
                             <Box component="section" sx={{ mb: 5 }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                                     <PersonIcon color="primary" sx={{ mr: 1, fontSize: 30 }} />
@@ -263,7 +253,7 @@ export default function Profile() {
                                             />
                                         </Grid>
 
-                                        {/* --- Categoría 2: Información Física / Médica --- */}
+                                        {/*  Categoría 2: Información Física / Médica  */}
                                         <Grid item xs={12}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, mb: 1 }}>
                                                 <MedicalServicesIcon color="primary" sx={{ mr: 1, fontSize: 30 }} />
@@ -311,7 +301,7 @@ export default function Profile() {
 
                             <Divider sx={{ my: 4 }} />
 
-                            {/* --- Categoría 3: Preferencias y Seguridad --- */}
+                            {/*  Categoría 3: Preferencias y Seguridad  */}
                             <Box component="section">
                                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                                     <LockIcon color="primary" sx={{ mr: 1, fontSize: 30 }} />
