@@ -12,9 +12,9 @@ import PersonIcon from '@mui/icons-material/Person';
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import LockIcon from '@mui/icons-material/Lock';
 
-//  Esquemas de Validación 
+{/* --- Esquemas de Validación --- */ }
 
-// Esquema para Información Personal y Física
+{/* Esquema para Información Personal y Física */ }
 const profileSchema = yup.object({
     nombre: yup.string().required('El nombre es obligatorio'),
     correo: yup.string().email('Correo inválido').required('El correo es obligatorio'),
@@ -34,9 +34,23 @@ const profileSchema = yup.object({
         .positive('Debe ser mayor a 0')
         .nullable()
         .transform((value, originalValue) => (String(originalValue).trim() === '' ? null : value)),
+    nivel_fisico: yup.string()
+        .nullable()
+        .oneOf(['sedentario', 'ligero', 'moderado', 'intenso'], 'Seleccione un nivel válido'),
+    tiempo_disponible: yup.number()
+        .typeError('El tiempo debe ser un número')
+        .positive('Debe ser mayor a 0')
+        .integer('Debe ser un número entero')
+        .nullable()
+        .transform((value, originalValue) => (String(originalValue).trim() === '' ? null : value)),
+    perfil_medico: yup.object({
+        condiciones_fisicas: yup.string().nullable().max(1000, 'Texto muy extenso'),
+        lesiones: yup.string().nullable().max(1000, 'Texto muy extenso'),
+        limitaciones: yup.string().nullable().max(1000, 'Texto muy extenso'),
+    }),
 }).required();
 
-// Esquema para Cambio de Contraseña
+{/* Esquema para Cambio de Contraseña */ }
 const passwordSchema = yup.object({
     currentPassword: yup.string().required('La contraseña actual es obligatoria'),
     newPassword: yup
@@ -56,7 +70,7 @@ export default function Profile() {
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
-    //  Hooks del Formulario de Perfil 
+    {/* --- Hooks del Formulario de Perfil --- */ }
     const {
         register: registerProfile,
         handleSubmit: handleSubmitProfile,
@@ -70,10 +84,17 @@ export default function Profile() {
             edad: null,
             peso: null,
             estatura: null,
+            nivel_fisico: 'sedentario',
+            tiempo_disponible: null,
+            perfil_medico: {
+                condiciones_fisicas: '',
+                lesiones: '',
+                limitaciones: '',
+            }
         }
     });
 
-    //  Hooks del Formulario de Contraseña 
+    {/* --- Hooks del Formulario de Contraseña --- */ }
     const {
         register: registerPassword,
         handleSubmit: handleSubmitPassword,
@@ -83,20 +104,29 @@ export default function Profile() {
         resolver: yupResolver(passwordSchema),
     });
 
-    //  Cargar datos del usuario 
+    {/* --- Cargar datos del usuario --- */ }
     useEffect(() => {
         if (user) {
+            {/* Mapeamos los datos del usuario al formulario */ }
+            {/* Nota: Nos aseguramos de usar 'estatura' consistentemente */ }
             resetProfile({
                 nombre: user.nombre || '',
                 correo: user.correo || '',
                 edad: user.edad || '',
                 peso: user.peso || '',
-                estatura: user.estatura || user.altura || '',
+                estatura: user.estatura || user.altura || '', // Fallback por si acaso viene como altura
+                nivel_fisico: user.nivel_fisico || 'sedentario',
+                tiempo_disponible: user.tiempo_disponible || '',
+                perfil_medico: {
+                    condiciones_fisicas: user.perfil_medico?.condiciones_fisicas || '',
+                    lesiones: user.perfil_medico?.lesiones || '',
+                    limitaciones: user.perfil_medico?.limitaciones || '',
+                }
             });
         }
     }, [user, resetProfile]);
 
-    // Limpiar mensajes después de unos segundos
+    {/* Limpiar mensajes después de unos segundos */ }
     useEffect(() => {
         if (successMessage || errorMessage) {
             const timer = setTimeout(() => {
@@ -107,13 +137,19 @@ export default function Profile() {
         }
     }, [successMessage, errorMessage]);
 
+
+    {/* --- Handlers --- */ }
+
+    {/* Actualizar Perfil */ }
     const onSubmitProfile = async (formData) => {
         setIsLoading(true);
         setErrorMessage('');
         setSuccessMessage('');
         try {
+            console.log('Enviando datos de perfil:', formData);
             const response = await usersAPI.updateProfile(formData);
 
+            {/* Actualizar contexto */ }
             if (response.data) {
                 updateUser(response.data);
             } else if (response.user) {
@@ -281,7 +317,78 @@ export default function Profile() {
                                                 {...registerProfile('estatura')}
                                                 error={profileErrors.estatura?.message}
                                                 fullWidth
-                                                helperText="Ingrese su estatura en centímetros"
+                                            />
+                                        </Grid>
+
+                                        <Grid item xs={12} sm={6}>
+                                            <Input
+                                                select
+                                                label="Nivel Físico"
+                                                {...registerProfile('nivel_fisico')}
+                                                error={!!profileErrors.nivel_fisico}
+                                                helperText={profileErrors.nivel_fisico?.message}
+                                                fullWidth
+                                                options={[
+                                                    { value: 'sedentario', label: 'Sedentario (Poco o nada de ejercicio)' },
+                                                    { value: 'ligero', label: 'Ligero (1-3 días/sem)' },
+                                                    { value: 'moderado', label: 'Moderado (3-5 días/sem)' },
+                                                    { value: 'intenso', label: 'Intenso (6-7 días/sem)' },
+                                                ]}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <Input
+                                                label="Tiempo Disponible (min/día)"
+                                                type="number"
+                                                {...registerProfile('tiempo_disponible')}
+                                                error={profileErrors.tiempo_disponible?.message}
+                                                fullWidth
+                                            />
+                                        </Grid>
+
+                                        <Grid item xs={12}>
+                                            <Typography variant="subtitle1" color="primary" sx={{ mt: 2, mb: 1 }}>
+                                                Condiciones Físicas
+                                            </Typography>
+                                            <Input
+                                                label="Condiciones (Ej: Asma, Hipertensión)"
+                                                multiline
+                                                rows={2}
+                                                {...registerProfile('perfil_medico.condiciones_fisicas')}
+                                                error={!!profileErrors.perfil_medico?.condiciones_fisicas}
+                                                helperText={profileErrors.perfil_medico?.condiciones_fisicas?.message || "Información encriptada para su seguridad."}
+                                                fullWidth
+                                                placeholder="Describa sus condiciones físicas..."
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <Typography variant="subtitle1" color="primary" sx={{ mt: 2, mb: 1 }}>
+                                                Lesiones
+                                            </Typography>
+                                            <Input
+                                                label="Lesiones (Ej: Esguince tobillo derecho)"
+                                                multiline
+                                                rows={2}
+                                                {...registerProfile('perfil_medico.lesiones')}
+                                                error={!!profileErrors.perfil_medico?.lesiones}
+                                                helperText={profileErrors.perfil_medico?.lesiones?.message || "Información encriptada para su seguridad."}
+                                                fullWidth
+                                                placeholder="Describa sus lesiones actuales o pasadas..."
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <Typography variant="subtitle1" color="primary" sx={{ mt: 2, mb: 1 }}>
+                                                Limitaciones
+                                            </Typography>
+                                            <Input
+                                                label="Limitaciones (Ej: No levantar mucho peso)"
+                                                multiline
+                                                rows={2}
+                                                {...registerProfile('perfil_medico.limitaciones')}
+                                                error={!!profileErrors.perfil_medico?.limitaciones}
+                                                helperText={profileErrors.perfil_medico?.limitaciones?.message || "Información encriptada para su seguridad."}
+                                                fullWidth
+                                                placeholder="Describa sus limitaciones físicas..."
                                             />
                                         </Grid>
 

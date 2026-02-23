@@ -1,5 +1,5 @@
 // Importamos useState para manejar estados internos como mostrar/ocultar contraseña.
-import { useState } from 'react';
+import { useState, forwardRef } from 'react';
 // Importamos el componente de campo de texto de Material UI.
 import TextField from '@mui/material/TextField';
 // Importamos el botón de ícono que se usa dentro del input.
@@ -15,7 +15,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import PropTypes from 'prop-types';
 
 //Componente input personalizado  
-export default function Input({
+const Input = forwardRef(({
   labelSize = 'medium',
   label,
   value,
@@ -32,7 +32,7 @@ export default function Input({
   select = false,
   options = [],
   ...props
-}) {
+}, ref) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const sizeMap = {
@@ -63,6 +63,7 @@ export default function Input({
       helperText={helperText}
       type={inputType}
       select={select}
+      inputRef={ref} // Reenvía la refencia al elemento de entrada
       {...props}
       slotProps={{
         inputLabel: {
@@ -97,7 +98,9 @@ export default function Input({
       ))}
     </TextField>
   );
-}
+});
+
+export default Input;
 
 Input.propTypes = {
   label: PropTypes.string,

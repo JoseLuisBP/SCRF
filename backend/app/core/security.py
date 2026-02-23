@@ -2,10 +2,41 @@ from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+from cryptography.fernet import Fernet
+import base64
 from app.core.config import settings
 
 # Contexto para hashing de passwords
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def get_encryption_key():
+    """Deriva una key válida para Fernet desde la SECRET_KEY"""
+    # Fernet necesita 32 bytes url-safe base64. 
+    # Usamos settings.SECRET_KEY. Aseguramos 32 bytes padding o truncando.
+    key = settings.SECRET_KEY
+    if len(key) < 32:
+        key = key.ljust(32, '0') # Padding simple
+    else:
+        key = key[:32]
+    return base64.urlsafe_b64encode(key.encode())
+
+cipher_suite = Fernet(get_encryption_key())
+
+def encrypt_value(value: str) -> str:
+    """Encripta un valor string"""
+    if not value:
+        return value
+    return cipher_suite.encrypt(value.encode()).decode()
+
+def decrypt_value(value: str) -> Optional[str]:
+    """Desencripta un valor string"""
+    if not value:
+        return value
+    try:
+        return cipher_suite.decrypt(value.encode()).decode()
+    except Exception:
+        # Si falla (ej. dato no encriptado previamente), retornamos el valor original o None
+        return value
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:

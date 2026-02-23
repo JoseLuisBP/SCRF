@@ -4,8 +4,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
 
-from app.core.security import get_password_hash, verify_password
+from app.core.security import get_password_hash, verify_password, encrypt_value
 from app.models.user import User
+from app.models.medical_profile import MedicalProfile
 from app.schemas.user import UserCreate, UserUpdate, UserChangePassword, UserResponse
 
 
@@ -113,6 +114,9 @@ class UserService:
             estatura=user_data.estatura,
             nivel_fisico=user_data.nivel_fisico,
             tiempo_disponible=user_data.tiempo_disponible,
+            nivel_fisico=user_data.nivel_fisico,
+            tiempo_disponible=user_data.tiempo_disponible,
+            # informacion_medica se maneja en update_user o create separado
             is_active=True,
             confirmado=user_data.confirmado, # Confirmación de términos y condiciones
             id_rol=1  # Default Role: 1=User  2=Trainer  3=Admin
@@ -180,13 +184,57 @@ class UserService:
         if 'contrasena' in update_data:
             update_data['contrasena_hash'] = get_password_hash(update_data.pop('contrasena'))
 
+        if 'contrasena' in update_data:
+            update_data['contrasena_hash'] = get_password_hash(update_data.pop('contrasena'))
+
+        # Gestionar Perfil Médico
+        medical_profile_data = None
+        if 'perfil_medico' in update_data:
+            medical_profile_data = update_data.pop('perfil_medico')
+
         try:
-            await session.execute(
-                update(User)
-                .where(User.id_usuario == user_id)
-                .values(**update_data)
-            )
+            # Actualizar datos de usuario base
+            if update_data:
+                await session.execute(
+                    update(User)
+                    .where(User.id_usuario == user_id)
+                    .values(**update_data)
+                )
+
+            # Actualizar o Crear Perfil Médico
+            if medical_profile_data:
+                # Buscar perfil existente (aunque la relación en User lo traería, aquí aseguramos query)
+                stmt = select(MedicalProfile).where(MedicalProfile.id_usuario == user_id)
+                result = await session.execute(stmt)
+                existing_profile = result.scalar_one_or_none()
+
+                # Preparar datos encriptados
+                mp_values = {}
+                if medical_profile_data.condiciones_fisicas is not None:
+                    mp_values['condiciones_fisicas'] = encrypt_value(medical_profile_data.condiciones_fisicas)
+                if medical_profile_data.lesiones is not None:
+                    mp_values['lesiones'] = encrypt_value(medical_profile_data.lesiones)
+                if medical_profile_data.limitaciones is not None:
+                    mp_values['limitaciones'] = encrypt_value(medical_profile_data.limitaciones)
+                
+                if existing_profile:
+                    # Actualizar
+                    if mp_values:
+                        await session.execute(
+                            update(MedicalProfile)
+                            .where(MedicalProfile.id_perfil_medico == existing_profile.id_perfil_medico)
+                            .values(**mp_values)
+                        )
+                else:
+                    # Crear nuevo
+                    new_profile = MedicalProfile(
+                        id_usuario=user_id,
+                        **mp_values
+                    )
+                    session.add(new_profile)
+
             await session.commit()
+
 
             # Recargar el usuario actualizado
             updated_user = await UserService.get_user_by_id(session, user_id)

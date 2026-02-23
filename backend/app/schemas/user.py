@@ -1,6 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
-from typing import Optional
-from datetime import date
+from app.schemas.medical_profile import MedicalProfileResponse, MedicalProfileUpdate
 
 # Schema base para Usuario
 class UserBase(BaseModel):
@@ -20,6 +18,7 @@ class UserCreate(UserBase):
 # Schema para actualización de Usuario
 class UserUpdate(UserBase):
     contrasena: Optional[str] = Field(None, min_length=8, max_length=50, description="Contraseña del usuario")
+    perfil_medico: Optional[MedicalProfileUpdate] = Field(None, description="Datos del perfil médico")
 
 # Schema para cambio de contraseña
 class UserChangePassword(BaseModel):
@@ -34,6 +33,7 @@ class UserResponse(UserBase):
     is_active: bool = Field(..., description="Indica si la cuenta del usuario está activa")
     is_admin: bool = Field(default=False, description="Indica si el usuario tiene privilegios administrativos")
     id_rol: Optional[int] = Field(None, description="ID del rol asignado al usuario")
+    perfil_medico: Optional[MedicalProfileResponse] = Field(None, description="Perfil médico del usuario")
 
     model_config = ConfigDict(from_attributes=True)
 

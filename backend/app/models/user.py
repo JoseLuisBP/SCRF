@@ -18,6 +18,7 @@ class User(Base):
     estatura = Column(Float, nullable=True)
     nivel_fisico = Column(String(100), nullable=True)
     tiempo_disponible = Column(Integer, nullable=True)
+    # informacion_medica movida a tabla separada 'MedicalProfile'
 
     # Estado y permisos
     fecha_registro = Column(Date, server_default=text("CURRENT_DATE"))
@@ -27,6 +28,8 @@ class User(Base):
 
     # Relaciones
     rol = relationship("Rol", back_populates="usuarios", lazy="joined")
+    # Relación 1 a 1 con Perfil Médico
+    perfil_medico = relationship("MedicalProfile", back_populates="usuario", uselist=False, lazy="joined", cascade="all, delete-orphan")
 
     @property
     def is_admin(self) -> bool:
