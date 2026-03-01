@@ -1,5 +1,7 @@
 # Para construir la API
 fastapi==0.119.0
+# Ejecución asíncrona de tareas bloqueantes (bcrypt) en hilos separados
+anyio>=4.0.0
 # Servidor ASGI que ejecuta FastAPI
 uvicorn[standard]==0.37.0
 # Valida y convierte datos, JSON -> objetos Python

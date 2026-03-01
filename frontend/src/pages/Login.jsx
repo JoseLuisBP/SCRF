@@ -1,8 +1,12 @@
 // Hooks principal de react
 import { useState, useEffect } from 'react';
 
-// Componentes de material UI
-import { Box, Container, Typography, Snackbar, Alert } from '@mui/material';
+// Componentes de Material UI — Direct imports para reducir costo de compilación
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 // React Hook Form para manejo de formularios
 import { useForm } from 'react-hook-form';
@@ -51,12 +55,15 @@ export default function Login() {
   });
 
   // Configuración del formulario
+  // mode: 'onBlur' — valida solo al salir del campo, no en cada pulsación de tecla.
+  // Evita que el procesador procese validaciones con cada keystroke.
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(loginSchema),
+    mode: 'onBlur',
     defaultValues: {
       correo: '',
       password: '',
@@ -120,8 +127,9 @@ export default function Login() {
       sx={{
         minHeight: '100vh',
         minWidth: '100vw',
-        background: (theme) =>
-          `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
+        // background: (theme) =>
+        //   `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
+        backgroundColor: 'primary.light', // Optimizado: color sólido sin gradient (menos carga GPU/CPU)
       }}
     >
       <Header showSearchBar={false} />
@@ -136,9 +144,11 @@ export default function Login() {
             px: 2,
             backgroundColor: 'background.paper',
             borderRadius: 2,
-            boxShadow: (theme) => `0 8px 32px ${theme.palette.primary.main}20`,
-            transition: 'transform 0.2s ease',
-            '&:hover': { transform: 'translateY(-3px)' },
+            // boxShadow: (theme) => `0 8px 32px ${theme.palette.primary.main}20`,
+            boxShadow: 1, // Optimizado: sombra estática simple
+            // transition: 'transform 0.2s ease',
+            transition: 'none', // Optimizado: sin animación de movimiento
+            // '&:hover': { transform: 'translateY(-3px)' },
           }}
         >
           <Typography
@@ -182,7 +192,7 @@ export default function Login() {
             size="small"
             fullWidth
             type="submit"
-            disabled={isLoading}
+            isLoading={isLoading}
             sx={{ maxWidth: 400, mx: 'auto' }}
           >
             {isLoading ? 'Iniciando...' : 'Iniciar Sesión'}

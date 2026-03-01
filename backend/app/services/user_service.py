@@ -108,7 +108,7 @@ class UserService:
         new_user = User(
             correo=user_data.correo,
             nombre=user_data.nombre,
-            contrasena_hash=get_password_hash(user_data.contrasena),
+            contrasena_hash=await get_password_hash(user_data.contrasena),
             edad=user_data.edad,
             peso=user_data.peso,
             estatura=user_data.estatura,
@@ -182,10 +182,10 @@ class UserService:
 
         # Si se está actualizando la contraseña, hashearla
         if 'contrasena' in update_data:
-            update_data['contrasena_hash'] = get_password_hash(update_data.pop('contrasena'))
+            update_data['contrasena_hash'] = await get_password_hash(update_data.pop('contrasena'))
 
         if 'contrasena' in update_data:
-            update_data['contrasena_hash'] = get_password_hash(update_data.pop('contrasena'))
+            update_data['contrasena_hash'] = await get_password_hash(update_data.pop('contrasena'))
 
         # Gestionar Perfil Médico
         medical_profile_data = None
@@ -285,7 +285,7 @@ class UserService:
 
         # Verificar contraseña actual (si no es admin cambiando la de otro)
         if current_user and current_user.id_usuario == user_id:
-            if not verify_password(password_data.contrasena_actual, user.contrasena_hash):
+            if not await verify_password(password_data.contrasena_actual, user.contrasena_hash):
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="La contraseña actual es incorrecta"
@@ -296,7 +296,7 @@ class UserService:
             await session.execute(
                 update(User)
                 .where(User.id_usuario == user_id)
-                .values(contrasena_hash=get_password_hash(password_data.nueva_contrasena))
+                .values(contrasena_hash=await get_password_hash(password_data.nueva_contrasena))
             )
             await session.commit()
             return True

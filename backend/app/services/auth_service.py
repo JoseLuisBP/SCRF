@@ -41,7 +41,7 @@ class AuthService:
 
         if not user:
             return None
-        if not verify_password(contrasena, user.contrasena_hash):
+        if not await verify_password(contrasena, user.contrasena_hash):
             return None
         if not user.is_active:
             return None

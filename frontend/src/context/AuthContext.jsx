@@ -9,11 +9,11 @@ export function AuthProvider({ children }) {
     token: null
   });
 
+  // Verificar token al cargar.
+  // No requiere cleanup: se ejecuta una sola vez y no deja procesos activos.
   useEffect(() => {
-    {/* Verificar token al cargar */}
     const token = localStorage.getItem('token');
     if (token) {
-      {/* Validar aquí el token con el backend*/}
       setAuthState(prev => ({
         ...prev,
         isLoggedIn: true,
@@ -30,8 +30,8 @@ export function AuthProvider({ children }) {
       return;
     }
 
-    {/* El token ya fue guardado en authAPI.login() */}
-    {/* Solo actualizamos el estado */}
+    // El token ya fue guardado en authAPI.login()
+    // Solo actualizamos el estado
     setAuthState({
       isLoggedIn: true,
       user: userData,
@@ -49,28 +49,10 @@ export function AuthProvider({ children }) {
     });
   };
 
-  {/* Borrar esto cuando Home.jsx este completo*/}
-  const toggleLogin = () => {
-    if (authState.isLoggedIn) {
-      logout();
-    } else {
-      login({ 
-        id: 1, 
-        name: 'Usuario de Prueba', 
-        email: 'test@example.com' 
-      });
-    }
-  };
-
-
-
   const value = {
     ...authState,
     login,
     logout,
-    toggleLogin  // Borrar esta linea cuando se borre toggleLogin
-   
-
   };
 
   return (

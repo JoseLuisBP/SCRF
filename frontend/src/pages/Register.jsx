@@ -1,35 +1,35 @@
 //Hook de estado de React
 import { useState } from 'react';
-//Componentes de Material UI
-import {
-  Box,
-  Container,
-  Typography,
-  FormControlLabel,
-  Checkbox,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button as MuiButton,
-  Snackbar,
-  Alert,
-  FormHelperText,
-} from '@mui/material';
-// React Hook Form para manejo del formulario 
+
+// Componentes de Material UI — Direct imports para reducir costo de compilación
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import MuiButton from '@mui/material/Button';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import FormHelperText from '@mui/material/FormHelperText';
+
+// React Hook Form para manejo del formulario
 import { useForm } from 'react-hook-form';
-// Integración de Yup con React Hook Form 
+// Integración de Yup con React Hook Form
 import { yupResolver } from '@hookform/resolvers/yup';
-// Librería Yup para validaciones 
+// Librería Yup para validaciones
 import * as yup from 'yup';
-// Componentes personalizados 
+// Componentes personalizados
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import Header from '../components/layout/Header';
 import { authAPI } from '../api';
 
-/* Esquema de validación */ 
-/*Define las reglas que deben cumplir los campos del registro */ 
+/* Esquema de validación */
+/* Define las reglas que deben cumplir los campos del registro */
 const registerSchema = yup.object({
   nombre: yup.string().required('El nombre es obligatorio'),
   correo: yup
@@ -71,13 +71,15 @@ const registerSchema = yup.object({
     .oneOf([true], 'Debes aceptar los términos y condiciones'),
 }).required();
 
-//Componentes registro como: terminos, mensaje emergente
+// Componentes registro como: términos, mensaje emergente
 export default function Register() {
   const [openTerms, setOpenTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-  //Configuración del formulario
+  // Configuración del formulario
+  // mode: 'onBlur' — valida solo al salir del campo, no en cada pulsación de tecla.
+  // Evita que el procesador procese validaciones con cada pulsación de tecla.
   const {
     register,
     handleSubmit,
@@ -87,6 +89,7 @@ export default function Register() {
     watch,
   } = useForm({
     resolver: yupResolver(registerSchema),
+    mode: 'onBlur',
     defaultValues: {
       nombre: '',
       correo: '',
@@ -101,22 +104,22 @@ export default function Register() {
     },
   });
 
-  //Observa si los términos están aceptados
+  // Observa si los términos están aceptados
   const acceptedTerms = watch('acceptedTerms');
 
-  //Abre el modal de términos
+  // Abre el modal de términos
   const handleOpenTerms = (e) => {
     e.preventDefault();
     setOpenTerms(true);
   };
-  //Cierra el modal de términos
+  // Cierra el modal de términos
   const handleCloseTerms = () => setOpenTerms(false);
 
-  //Funcion al enviar formulario
+  // Función al enviar formulario
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      //Datos enviados a la API
+      // Datos enviados a la API
       const userData = {
         nombre: data.nombre,
         correo: data.correo,
@@ -128,9 +131,9 @@ export default function Register() {
         tiempo_disponible: data.tiempoDisponible ? parseInt(data.tiempoDisponible) : 0,
         confirmado: data.acceptedTerms,
       };
-      //Llamada a la API
+      // Llamada a la API
       await authAPI.register(userData);
-      //Mensaje de éxito
+      // Mensaje de éxito
       setSnackbar({ open: true, message: 'Usuario registrado correctamente.', severity: 'success' });
       reset();
     } catch (error) {
@@ -141,14 +144,16 @@ export default function Register() {
       setIsLoading(false);
     }
   };
-  //Interfaz
+
+  // Interfaz
   return (
     <Box
       sx={{
         minHeight: '100vh',
         minWidth: '100vw',
-        background: (theme) =>
-          `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
+        // background: (theme) =>
+        //   `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
+        backgroundColor: 'primary.light', // Optimizado: color sólido sin gradient (menos carga GPU/CPU)
         color: 'text.primary',
       }}
     >
@@ -164,9 +169,11 @@ export default function Register() {
             px: 2,
             backgroundColor: 'background.paper',
             borderRadius: 2,
-            boxShadow: (theme) => `0 8px 32px ${theme.palette.primary.main}20`,
-            transition: 'transform 0.2s ease',
-            '&:hover': { transform: 'translateY(-3px)' },
+            // boxShadow: (theme) => `0 8px 32px ${theme.palette.primary.main}20`,
+            boxShadow: 1, // Optimizado: sombra estática simple
+            // transition: 'transform 0.2s ease',
+            transition: 'none', // Optimizado: sin animación de movimiento
+            // '&:hover': { transform: 'translateY(-3px)' },
           }}
         >
           <Typography
@@ -321,7 +328,7 @@ export default function Register() {
             size="small"
             fullWidth
             type="submit"
-            disabled={isLoading}
+            isLoading={isLoading}
             sx={{ maxWidth: 400, mx: 'auto' }}
           >
             {isLoading ? 'Registrando...' : 'Registrarse'}
@@ -329,7 +336,7 @@ export default function Register() {
         </Box>
       </Container>
 
-      {/* Modal de términos y condiciones (SIN CAMBIOS) */}
+      {/* Modal de términos y condiciones */}
       <Dialog open={openTerms} onClose={handleCloseTerms} maxWidth="sm" fullWidth>
         <DialogTitle>Términos y Condiciones</DialogTitle>
         <DialogContent dividers>

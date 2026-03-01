@@ -4,6 +4,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from cryptography.fernet import Fernet
 import base64
+import anyio
 from app.core.config import settings
 
 # Contexto para hashing de passwords
@@ -39,14 +40,22 @@ def decrypt_value(value: str) -> Optional[str]:
         return value
 
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verificar si una contraseña coincide con el hash"""
-    return pwd_context.verify(plain_password, hashed_password)
+async def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verificar si una contraseña coincide con el hash.
+    Ejecuta bcrypt en un hilo separado para no bloquear el event loop.
+    """
+    return await anyio.to_thread.run_sync(
+        lambda: pwd_context.verify(plain_password, hashed_password)
+    )
 
 
-def get_password_hash(password: str) -> str:
-    """Hashear una contraseña"""
-    return pwd_context.hash(password)
+async def get_password_hash(password: str) -> str:
+    """Hashear una contraseña.
+    Ejecuta bcrypt en un hilo separado para no bloquear el event loop.
+    """
+    return await anyio.to_thread.run_sync(
+        lambda: pwd_context.hash(password)
+    )
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
