@@ -1,4 +1,3 @@
-import { get } from "react-hook-form";
 import axiosInstance from "./axios";
 
 const usersAPI = {
@@ -31,19 +30,34 @@ const usersAPI = {
         const response = await axiosInstance.delete('/v1/users/me');
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        localStorage.removeItem('id_rol');
         return response.data;
     },
 
     //
-    // Administración de usuarios (solo para admins)
+    // Administración de usuarios (solo para admins, id_rol=3)
     //
-    // Obtener lista de usuarios
-    getUsers: async () => {
-        const response = await axiosInstance.get('/v1/users');
-        return response.data;
-    }
 
-    // Faltan más funciones relacionadas con usuarios pueden añadirse aquí
-}
+    // Obtener lista completa de usuarios
+    getAdminUsers: async (skip = 0, limit = 100) => {
+        const response = await axiosInstance.get('/v1/admin/users', {
+            params: { skip, limit }
+        });
+        return response.data;
+    },
+
+    // Crear nuevo administrador (requiere id_rol=3 en el token)
+    createAdmin: async (adminData) => {
+        const response = await axiosInstance.post('/v1/admin/create-admin', adminData);
+        return response.data;
+    },
+
+    // Obtener lista de usuarios (endpoint antiguo, solo admin)
+    // Mantenido por retrocompatibilidad — usar getAdminUsers() en nuevo código
+    // getUsers: async () => {
+    //     const response = await axiosInstance.get('/v1/users');
+    //     return response.data;
+    // }
+};
 
 export default usersAPI;
