@@ -1,56 +1,102 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import authAPI from '../api/auth';
 
 const AuthContext = createContext();
+
+// ID del rol Administrador según la tabla roles de PostgreSQL
+const ADMIN_ROL_ID = 3;
 
 export function AuthProvider({ children }) {
   const [authState, setAuthState] = useState({
     isLoggedIn: false,
     user: null,
-    token: null
+    token: null,
+    // id_rol del usuario autenticado (null = no autenticado o rol desconocido)
+    id_rol: null,
   });
 
-  // Verificar token al cargar.
-  // No requiere cleanup: se ejecuta una sola vez y no deja procesos activos.
+  // Al arrancar, restauramos la sesión si existe un token guardado.
+  // Se llama a /auth/verify para obtener el perfil completo (incluyendo id_rol)
+  // y garantizar que el token sigue siendo válido.
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) {
+    if (!token) return;
+
+    // Intentar restaurar id_rol desde localStorage (evita flash de UI sin rol)
+    const storedRol = localStorage.getItem('id_rol');
+    if (storedRol) {
       setAuthState(prev => ({
         ...prev,
         isLoggedIn: true,
-        token
+        token,
+        id_rol: parseInt(storedRol, 10),
       }));
+    } else {
+      setAuthState(prev => ({ ...prev, isLoggedIn: true, token }));
     }
+
+    // Verificar token con el backend y refrescar perfil + id_rol real
+    authAPI.verifyToken()
+      .then(userData => {
+        setAuthState(prev => ({
+          ...prev,
+          isLoggedIn: true,
+          user: userData,
+          id_rol: userData?.id_rol ?? null,
+        }));
+        if (userData?.id_rol != null) {
+          localStorage.setItem('id_rol', String(userData.id_rol));
+        }
+      })
+      .catch(() => {
+        // Token inválido o expirado — limpiar sesión
+        localStorage.removeItem('token');
+        localStorage.removeItem('id_rol');
+        localStorage.removeItem('user');
+        setAuthState({ isLoggedIn: false, user: null, token: null, id_rol: null });
+      });
   }, []);
 
   const login = (loginData) => {
-    const { access_token, ...userData } = loginData;
+    const { access_token, id_rol, ...userData } = loginData;
 
     if (!access_token) {
       console.error('No se recibió access_token en loginData');
       return;
     }
 
-    // El token ya fue guardado en authAPI.login()
-    // Solo actualizamos el estado
+    // id_rol ahora viene directamente en la respuesta del servidor (Token schema).
+    // Se persiste en localStorage para restaurarlo en recargas sin re-verificar.
+    if (id_rol != null) {
+      localStorage.setItem('id_rol', String(id_rol));
+    }
+
     setAuthState({
       isLoggedIn: true,
       user: userData,
-      token: access_token
+      token: access_token,
+      id_rol: id_rol ?? null,
     });
   };
 
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('id_rol');
     setAuthState({
       isLoggedIn: false,
       user: null,
-      token: null
+      token: null,
+      id_rol: null,
     });
   };
 
+  // Helper derivado: true solo si el usuario tiene rol de Administrador
+  const isAdmin = authState.id_rol === ADMIN_ROL_ID;
+
   const value = {
     ...authState,
+    isAdmin,
     login,
     logout,
   };
