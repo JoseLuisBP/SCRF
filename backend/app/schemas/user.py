@@ -10,10 +10,19 @@ class UserBase(BaseModel):
     nivel_fisico: Optional[str] = Field(None, max_length=100, description="Nivel físico del usuario")
     tiempo_disponible: Optional[int] = Field(None, ge=0, description="Tiempo disponible para entrenar en minutos por día")
 
-# Schema para creación de Usuario
+# Schema para creación de Usuario (endpoint público /auth/register)
+# SEGURIDAD: id_rol NO se acepta aquí. El servicio siempre asigna id_rol=1 (Usuario normal).
+# Un usuario no puede escalar sus propios privilegios en el registro.
 class UserCreate(UserBase):
     contrasena: str = Field(..., min_length=8, max_length=50, description="Contraseña del usuario")
     confirmado: bool = Field(default=False, description="Indica si el usuario aceptó los términos")
+
+# Schema exclusivo para crear administradores desde el Panel Admin.
+# Solo disponible en POST /admin/create-admin (requiere id_rol==3 en el token).
+# El campo id_rol es ignorado en el body — el servicio lo fuerza a 3.
+class AdminCreate(UserBase):
+    contrasena: str = Field(..., min_length=8, max_length=50, description="Contraseña del nuevo administrador")
+    confirmado: bool = Field(default=True, description="Los admins se consideran confirmados por defecto")
 
 # Schema para actualización de Usuario
 class UserUpdate(UserBase):

@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.core.config import settings
 from app.core.logging import logger
-from app.api.v1 import auth, users, exercises, progress
+from app.api.v1 import auth, users, exercises, progress, admin
 from app.db.postgresql import postgresql
 from app.db.mongodb import mongodb
 from app.middleware import setup_cors, setup_error_handlers
@@ -92,6 +92,13 @@ def create_app() -> FastAPI:
     application.include_router(
         progress.router,
         prefix="/api/v1"
+    )
+
+    # Router de administración — solo accesible con id_rol=3
+    application.include_router(
+        admin.router,
+        prefix=f"{settings.API_V1_PREFIX}/admin",
+        tags=["Admin"]
     )
 
     @application.get("/")
