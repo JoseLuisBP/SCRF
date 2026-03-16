@@ -1,3 +1,6 @@
+from pydantic import BaseModel, Field, ConfigDict, EmailStr
+from typing import Optional
+from datetime import date
 from app.schemas.medical_profile import MedicalProfileResponse, MedicalProfileUpdate
 
 # Schema base para Usuario
