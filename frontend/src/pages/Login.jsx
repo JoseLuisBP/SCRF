@@ -1,20 +1,19 @@
-// Hooks principal de react
 import { useState, useEffect } from 'react';
 
-// Componentes de Material UI — Direct imports para reducir costo de compilación
+// Componentes de Material UI
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
-// React Hook Form para manejo de formularios
+// React Hook Form
 import { useForm } from 'react-hook-form';
 
-// Integración de Yup con React Hook Form
+// Integración Yup
 import { yupResolver } from '@hookform/resolvers/yup';
 
-// Librería Yup para validaciones
+// Validaciones
 import * as yup from 'yup';
 
 // Componentes personalizados
@@ -22,13 +21,13 @@ import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import Header from '../components/layout/Header';
 
-// Contexto de autenticación
+// Contexto
 import { useAuth } from '../context/AuthContext';
 
-// Navegación entre rutas
+// Navegación
 import { useNavigate } from 'react-router-dom';
 
-// API de autenticación
+// API
 import authAPI from '../api/auth';
 
 /* Esquema de validación */
@@ -54,9 +53,6 @@ export default function Login() {
     severity: 'info',
   });
 
-  // Configuración del formulario
-  // mode: 'onBlur' — valida solo al salir del campo, no en cada pulsación de tecla.
-  // Evita que el procesador procese validaciones con cada keystroke.
   const {
     register,
     handleSubmit,
@@ -70,7 +66,6 @@ export default function Login() {
     },
   });
 
-  // Si ya está logueado redirigir
   useEffect(() => {
     if (isLoggedIn) {
       navigate('/dashboard');
@@ -79,6 +74,7 @@ export default function Login() {
 
   const onSubmit = async (formData) => {
     setIsLoading(true);
+
     try {
 
       const response = await authAPI.login({
@@ -87,13 +83,14 @@ export default function Login() {
       });
 
       const data = response.data || response;
-      console.log('📦 Respuesta del login:', data);
 
       if (data?.access_token) {
+
         login(data);
+
         setSnackbar({
           open: true,
-          message: `¡Inicio de sesión exitoso!`,
+          message: '¡Inicio de sesión exitoso!',
           severity: 'success',
         });
 
@@ -102,14 +99,17 @@ export default function Login() {
         }, 500);
 
       } else {
+
         setSnackbar({
           open: true,
           message: 'Error al iniciar sesión. Verifica tus credenciales.',
           severity: 'error',
         });
+
       }
 
     } catch (error) {
+
       setSnackbar({
         open: true,
         message:
@@ -117,6 +117,7 @@ export default function Login() {
           'Error al iniciar sesión. Verifica tus credenciales.',
         severity: 'error',
       });
+
     } finally {
       setIsLoading(false);
     }
@@ -127,9 +128,14 @@ export default function Login() {
       sx={{
         minHeight: '100vh',
         minWidth: '100vw',
-        // background: (theme) =>
-        //   `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
-        backgroundColor: 'primary.light', // Optimizado: color sólido sin gradient (menos carga GPU/CPU)
+
+        //cambio de fondo segun modo claro u oscuro
+        background: (theme) =>
+          theme.palette.mode === "dark"
+            ? "#000000"
+            : theme.palette.primary.light,
+
+        transition: 'background 0.3s ease'
       }}
     >
       <Header showSearchBar={false} />
@@ -144,13 +150,10 @@ export default function Login() {
             px: 2,
             backgroundColor: 'background.paper',
             borderRadius: 2,
-            // boxShadow: (theme) => `0 8px 32px ${theme.palette.primary.main}20`,
-            boxShadow: 1, // Optimizado: sombra estática simple
-            // transition: 'transform 0.2s ease',
-            transition: 'none', // Optimizado: sin animación de movimiento
-            // '&:hover': { transform: 'translateY(-3px)' },
+            boxShadow: 1
           }}
         >
+
           <Typography
             variant="h2"
             component="h1"
@@ -197,6 +200,7 @@ export default function Login() {
           >
             {isLoading ? 'Iniciando...' : 'Iniciar Sesión'}
           </Button>
+
         </Box>
       </Container>
 
@@ -211,6 +215,7 @@ export default function Login() {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
     </Box>
   );
 }
