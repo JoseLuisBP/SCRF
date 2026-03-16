@@ -1,7 +1,7 @@
 //Hook de estado de React
 import { useState } from 'react';
 
-// Componentes de Material UI — Direct imports para reducir costo de compilación
+// Componentes de Material UI
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
@@ -16,20 +16,20 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import FormHelperText from '@mui/material/FormHelperText';
 
-// React Hook Form para manejo del formulario
+// React Hook Form
 import { useForm } from 'react-hook-form';
-// Integración de Yup con React Hook Form
 import { yupResolver } from '@hookform/resolvers/yup';
-// Librería Yup para validaciones
+
+// Yup
 import * as yup from 'yup';
+
 // Componentes personalizados
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import Header from '../components/layout/Header';
 import { authAPI } from '../api';
 
-/* Esquema de validación */
-/* Define las reglas que deben cumplir los campos del registro */
+/* Validación */
 const registerSchema = yup.object({
   nombre: yup.string().required('El nombre es obligatorio'),
   correo: yup
@@ -71,15 +71,12 @@ const registerSchema = yup.object({
     .oneOf([true], 'Debes aceptar los términos y condiciones'),
 }).required();
 
-// Componentes registro como: términos, mensaje emergente
 export default function Register() {
+
   const [openTerms, setOpenTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-  // Configuración del formulario
-  // mode: 'onBlur' — valida solo al salir del campo, no en cada pulsación de tecla.
-  // Evita que el procesador procese validaciones con cada pulsación de tecla.
   const {
     register,
     handleSubmit,
@@ -104,22 +101,19 @@ export default function Register() {
     },
   });
 
-  // Observa si los términos están aceptados
   const acceptedTerms = watch('acceptedTerms');
 
-  // Abre el modal de términos
   const handleOpenTerms = (e) => {
     e.preventDefault();
     setOpenTerms(true);
   };
-  // Cierra el modal de términos
+
   const handleCloseTerms = () => setOpenTerms(false);
 
-  // Función al enviar formulario
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      // Datos enviados a la API
+
       const userData = {
         nombre: data.nombre,
         correo: data.correo,
@@ -131,35 +125,58 @@ export default function Register() {
         tiempo_disponible: data.tiempoDisponible ? parseInt(data.tiempoDisponible) : 0,
         confirmado: data.acceptedTerms,
       };
-      // Llamada a la API
+
       await authAPI.register(userData);
-      // Mensaje de éxito
-      setSnackbar({ open: true, message: 'Usuario registrado correctamente.', severity: 'success' });
+
+      setSnackbar({
+        open: true,
+        message: 'Usuario registrado correctamente.',
+        severity: 'success'
+      });
+
       reset();
+
     } catch (error) {
-      console.error(error);
-      const errorMessage = error.response?.data?.detail || error?.message || 'Error al registrar usuario.';
-      setSnackbar({ open: true, message: errorMessage, severity: 'error' });
+
+      const errorMessage =
+        error.response?.data?.detail ||
+        error?.message ||
+        'Error al registrar usuario.';
+
+      setSnackbar({
+        open: true,
+        message: errorMessage,
+        severity: 'error'
+      });
+
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Interfaz
   return (
+
     <Box
       sx={{
         minHeight: '100vh',
         minWidth: '100vw',
-        // background: (theme) =>
-        //   `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
-        backgroundColor: 'primary.light', // Optimizado: color sólido sin gradient (menos carga GPU/CPU)
-        color: 'text.primary',
+
+        //cambio de fondo dependiendo modo claro u oscuro
+        background: (theme) =>
+          theme.palette.mode === "dark"
+            ? "#000000"
+            : theme.palette.primary.light,
+
+        transition: "background 0.3s ease",
+
+        color: 'text.primary'
       }}
     >
+
       <Header showSearchBar={false} />
 
       <Container maxWidth="sm" sx={{ mt: 12, mb: 4 }}>
+
         <Box
           component="form"
           onSubmit={handleSubmit(onSubmit)}
@@ -169,26 +186,27 @@ export default function Register() {
             px: 2,
             backgroundColor: 'background.paper',
             borderRadius: 2,
-            // boxShadow: (theme) => `0 8px 32px ${theme.palette.primary.main}20`,
-            boxShadow: 1, // Optimizado: sombra estática simple
-            // transition: 'transform 0.2s ease',
-            transition: 'none', // Optimizado: sin animación de movimiento
-            // '&:hover': { transform: 'translateY(-3px)' },
+            boxShadow: 1,
+            transition: 'none'
           }}
         >
+
           <Typography
             variant="h2"
             component="h1"
             gutterBottom
-            sx={{ fontSize: { xs: '2.5rem', md: '3.75rem' }, fontWeight: 'bold' }}
+            sx={{
+              fontSize: { xs: '2.5rem', md: '3.75rem' },
+              fontWeight: 'bold'
+            }}
           >
             Crear Cuenta
           </Typography>
 
-          {/* Campos de entrada */}
+          {/* Campos */}
+
           <Input
             label="Nombre completo"
-            labelSize="small"
             placeholder="Introduce tu nombre"
             fullWidth
             error={!!errors.nombre}
@@ -199,7 +217,6 @@ export default function Register() {
 
           <Input
             label="Correo electrónico"
-            labelSize="small"
             placeholder="Introduce tu correo"
             fullWidth
             error={!!errors.correo}
@@ -210,10 +227,8 @@ export default function Register() {
 
           <Input
             label="Contraseña"
-            labelSize="small"
-            placeholder="Introduce tu contraseña"
             type="password"
-            showPasswordToggle={true}
+            showPasswordToggle
             fullWidth
             error={!!errors.password}
             helperText={errors.password?.message}
@@ -223,10 +238,8 @@ export default function Register() {
 
           <Input
             label="Confirmar contraseña"
-            labelSize="small"
-            placeholder="Confirma tu contraseña"
             type="password"
-            showPasswordToggle={true}
+            showPasswordToggle
             fullWidth
             error={!!errors.confirmPassword}
             helperText={errors.confirmPassword?.message}
@@ -236,21 +249,16 @@ export default function Register() {
 
           <Input
             label="Edad"
-            labelSize="small"
-            placeholder="Introduce tu edad"
             type="number"
             fullWidth
             error={!!errors.age}
             helperText={errors.age?.message}
             {...register('age')}
             sx={{ maxWidth: 400, mx: 'auto', mb: 2 }}
-            inputProps={{ min: 0, max: 120 }}
           />
 
           <Input
             label="Peso (kg)"
-            labelSize="small"
-            placeholder="Introduce tu peso"
             type="number"
             fullWidth
             error={!!errors.peso}
@@ -261,8 +269,6 @@ export default function Register() {
 
           <Input
             label="Estatura (cm)"
-            labelSize="small"
-            placeholder="Introduce tu estatura"
             type="number"
             fullWidth
             error={!!errors.estatura}
@@ -273,54 +279,56 @@ export default function Register() {
 
           <Input
             label="Nivel físico"
-            labelSize="small"
-            select={true}
+            select
             options={[
               { value: 'principiante', label: 'Principiante' },
               { value: 'intermedio', label: 'Intermedio' },
               { value: 'avanzado', label: 'Avanzado' },
             ]}
             fullWidth
-            error={!!errors.nivelFisico}
-            helperText={errors.nivelFisico?.message}
             {...register('nivelFisico')}
             sx={{ maxWidth: 400, mx: 'auto', mb: 2 }}
           />
 
           <Input
             label="Tiempo disponible (minutos)"
-            labelSize="small"
-            placeholder="Ej. 30"
             type="number"
             fullWidth
-            error={!!errors.tiempoDisponible}
-            helperText={errors.tiempoDisponible?.message}
             {...register('tiempoDisponible')}
             sx={{ maxWidth: 400, mx: 'auto', mb: 3 }}
           />
 
-          {/* Checkbox de términos */}
           <Box sx={{ maxWidth: 400, mx: 'auto', mb: 4, textAlign: 'left' }}>
+
             <FormControlLabel
               control={
                 <Checkbox
                   checked={acceptedTerms}
-                  onChange={(e) => setValue('acceptedTerms', e.target.checked, { shouldValidate: true })}
-                  color="primary"
+                  onChange={(e) =>
+                    setValue('acceptedTerms', e.target.checked, { shouldValidate: true })
+                  }
                 />
               }
               label={
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2">
                   He leído y acepto los{' '}
-                  <a href="#" onClick={handleOpenTerms} style={{ color: '#6BAA75', textDecoration: 'none' }}>
+                  <a
+                    href="#"
+                    onClick={handleOpenTerms}
+                    style={{ color: '#6BAA75', textDecoration: 'none' }}
+                  >
                     términos y condiciones
                   </a>
                 </Typography>
               }
             />
+
             {errors.acceptedTerms && (
-              <FormHelperText error>{errors.acceptedTerms.message}</FormHelperText>
+              <FormHelperText error>
+                {errors.acceptedTerms.message}
+              </FormHelperText>
             )}
+
           </Box>
 
           <Button
@@ -333,14 +341,18 @@ export default function Register() {
           >
             {isLoading ? 'Registrando...' : 'Registrarse'}
           </Button>
+
         </Box>
+
       </Container>
 
-      {/* Modal de términos y condiciones */}
       <Dialog open={openTerms} onClose={handleCloseTerms} maxWidth="sm" fullWidth>
+
         <DialogTitle>Términos y Condiciones</DialogTitle>
+
         <DialogContent dividers>
-          <Typography variant="body2" component="p" sx={{ mb: 2 }}>
+
+         <Typography variant="body2" component="p" sx={{ mb: 2 }}>
             Al registrarte en nuestra plataforma, aceptas los siguientes términos:
           </Typography>
           <Typography variant="body2" component="p" sx={{ mb: 2 }}>
@@ -361,16 +373,26 @@ export default function Register() {
           <Typography variant="body2" component="p" sx={{ mb: 2 }}>
             Se recomienda que cualquier entrenamiento se realice bajo la supervisión de un profesional o persona capacitada que pueda asistir en caso de requerir ayuda.
           </Typography>
+
+
         </DialogContent>
+
         <DialogActions sx={{ justifyContent: 'center' }}>
           <MuiButton onClick={handleCloseTerms}>Cerrar</MuiButton>
         </DialogActions>
+
       </Dialog>
 
-      {/* Snackbar de mensajes */}
-      <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}>
-        <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+      >
+        <Alert severity={snackbar.severity}>
+          {snackbar.message}
+        </Alert>
       </Snackbar>
+
     </Box>
   );
 }
