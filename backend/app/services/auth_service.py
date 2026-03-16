@@ -77,13 +77,15 @@ class AuthService:
             user: Usuario para el cual crear el token
 
         Returns:
-            Token con access_token, tipo y tiempo de expiración
+            Token con access_token, tipo, tiempo de expiración e id_rol
         """
         access_token_expires = timedelta(
             minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
         )
+        # El payload incluye id_rol para que los endpoints de admin puedan
+        # validar el rol sin hacer una consulta extra a la base de datos.
         access_token = create_access_token(
-            data={"sub": str(user.id_usuario)},
+            data={"sub": str(user.id_usuario), "id_rol": user.id_rol},
             expires_delta=access_token_expires
         )
 
@@ -91,6 +93,7 @@ class AuthService:
             access_token=access_token,
             token_type="bearer",
             expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+            id_rol=user.id_rol,       # Devuelto para que el frontend lo persista sin decodificar el JWT
             refresh_token=None
         )
 

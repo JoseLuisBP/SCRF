@@ -10,6 +10,9 @@ from app.models.user import User
 from app.schemas.token import TokenData
 from app.services.user_service import UserService
 
+# Rol de Administrador en la tabla roles (seed.sql)
+ADMIN_ROL_ID = 3
+
 
 # Configuración de OAuth2
 oauth2_scheme = OAuth2PasswordBearer(
@@ -50,7 +53,8 @@ async def get_current_user(
             raise credentials_exception
         
         user_id_int = int(user_id)
-        token_data = TokenData(user_id=user_id_int)
+        id_rol_from_token = payload.get("id_rol")  # Claim de rol añadido en auth_service
+        token_data = TokenData(user_id=user_id_int, id_rol=id_rol_from_token)
 
         user = await UserService.get_user_by_id(
             session_manager.pg_session,
@@ -88,35 +92,75 @@ async def get_current_active_user(
         )
     return current_user
 
-async def get_current_superuser(
-    current_user: User = Depends(get_current_user),
-) -> User:
-    """
-    Verifica que el usuario actual sea administrador.
-    """
-    if not current_user.is_admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="El usuario no tiene suficientes privilegios"
-        )
-    return current_user
+# ---------------------------------------------------------------------------
+# SISTEMA ANTIGUO (comentado — no borrar)
+# Las siguientes dependencias usaban la property is_admin del modelo ORM
+# (que comprueba el nombre del rol en la relación). Se reemplazan por
+# check_admin_role que lee id_rol directamente del payload JWT.
+# ---------------------------------------------------------------------------
+# async def get_current_superuser(
+#     current_user: User = Depends(get_current_user),
+# ) -> User:
+#     """Verifica que el usuario actual sea administrador (método antiguo)."""
+#     if not current_user.is_admin:  # is_admin = property ORM, no columna DB
+#         raise HTTPException(
+#             status_code=status.HTTP_403_FORBIDDEN,
+#             detail="El usuario no tiene suficientes privilegios"
+#         )
+#     return current_user
+#
+# async def require_admin(
+#     current_user: User = Depends(get_current_user)
+# ) -> User:
+#     """Verifica si el usuario tiene permisos de administrador (método antiguo)."""
+#     if not current_user.is_admin:  # is_admin = property ORM, no columna DB
+#         raise HTTPException(
+#             status_code=status.HTTP_403_FORBIDDEN,
+#             detail="Se requieren permisos de administrador"
+#         )
+#     return current_user
+# ---------------------------------------------------------------------------
 
-# Dependencia para verificar permisos de administrador
-async def require_admin(
+# Nueva dependencia basada en id_rol del JWT (sin consulta extra a la DB)
+async def check_admin_role(
+    token: str = Depends(oauth2_scheme),
     current_user: User = Depends(get_current_user)
 ) -> User:
     """
-    Verifica si el usuario tiene permisos de administrador.
+    Verifica que el usuario tenga el rol de Administrador (id_rol == 3).
+
+    Lee el claim 'id_rol' del JWT para evitar una consulta extra a la DB.
+    También valida contra el id_rol real del usuario en DB como segunda capa.
+
     Args:
-        current_user: Usuario actual
+        token: Token JWT del header Authorization
+        current_user: Usuario autenticado obtenido de get_current_user
     Returns:
         Usuario administrador
     Raises:
-        HTTPException: Si el usuario no es administrador
+        HTTPException 403: Si el usuario no tiene rol de administrador
     """
-    if not current_user.is_admin:
+    # Primera capa: leer id_rol del JWT claim (rápido, sin DB)
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        id_rol_token = payload.get("id_rol")
+    except JWTError:
+        id_rol_token = None
+
+    # Segunda capa: comparar con el id_rol real del usuario en DB
+    # Usamos el valor de la DB como fuente de verdad final.
+    if current_user.id_rol != ADMIN_ROL_ID:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Se requieren permisos de administrador"
+            detail="Se requiere rol de Administrador para esta operación"
         )
+    return current_user
+
+
+# Alias mantenido para retrocompatibilidad con endpoints existentes (users.py)
+# que ya usan require_admin. Apuntar al nuevo sistema basado en id_rol.
+async def require_admin(
+    current_user: User = Depends(check_admin_role)
+) -> User:
+    """Alias de check_admin_role para retrocompatibilidad con endpoints existentes."""
     return current_user

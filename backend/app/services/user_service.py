@@ -7,7 +7,10 @@ from fastapi import HTTPException, status
 from app.core.security import get_password_hash, verify_password, encrypt_value
 from app.models.user import User
 from app.models.medical_profile import MedicalProfile
-from app.schemas.user import UserCreate, UserUpdate, UserChangePassword, UserResponse
+from app.schemas.user import UserCreate, UserUpdate, UserChangePassword, UserResponse, AdminCreate
+
+# ID del rol Administrador (mirrors seed.sql: id_rol=3)
+ADMIN_ROL_ID = 3
 
 
 class UserService:
@@ -114,8 +117,6 @@ class UserService:
             estatura=user_data.estatura,
             nivel_fisico=user_data.nivel_fisico,
             tiempo_disponible=user_data.tiempo_disponible,
-            nivel_fisico=user_data.nivel_fisico,
-            tiempo_disponible=user_data.tiempo_disponible,
             # informacion_medica se maneja en update_user o create separado
             is_active=True,
             confirmado=user_data.confirmado, # Confirmación de términos y condiciones
@@ -135,6 +136,64 @@ class UserService:
             ) from e
 
         return new_user
+
+    @staticmethod
+    async def create_admin_user(
+        session: AsyncSession,
+        admin_data: AdminCreate,
+    ) -> User:
+        """
+        Crea un nuevo usuario con rol Administrador (id_rol=3).
+        Solo puede ser llamado desde el endpoint POST /admin/create-admin,
+        el cual requiere check_admin_role.
+
+        Args:
+            session: Sesión de base de datos
+            admin_data: Datos del nuevo administrador
+
+        Returns:
+            Usuario administrador creado
+
+        Raises:
+            HTTPException: Si el email ya está registrado
+        """
+        # Verificar si el email ya existe
+        existing_user = await UserService.get_user_by_email(session, admin_data.correo)
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El email ya está registrado"
+            )
+
+        # id_rol se fuerza a ADMIN_ROL_ID independientemente del input,
+        # garantizando que este método no pueda usarse para crear roles arbitrarios.
+        new_admin = User(
+            correo=admin_data.correo,
+            nombre=admin_data.nombre,
+            contrasena_hash=await get_password_hash(admin_data.contrasena),
+            edad=admin_data.edad,
+            peso=admin_data.peso,
+            estatura=admin_data.estatura,
+            nivel_fisico=admin_data.nivel_fisico,
+            tiempo_disponible=admin_data.tiempo_disponible,
+            is_active=True,
+            confirmado=admin_data.confirmado,
+            id_rol=ADMIN_ROL_ID,  # Siempre 3
+        )
+
+        session.add(new_admin)
+
+        try:
+            await session.commit()
+            await session.refresh(new_admin)
+        except IntegrityError as e:
+            await session.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Error al crear el administrador"
+            ) from e
+
+        return new_admin
 
     @staticmethod
     async def update_user(
@@ -170,6 +229,11 @@ class UserService:
             )
 
         update_data = user_data.model_dump(exclude_unset=True)
+
+        # SEGURIDAD: Si el usuario que actualiza NO es admin, se elimina id_rol
+        # del payload para prevenir escalado de privilegios.
+        if current_user and not current_user.is_admin and "id_rol" in update_data:
+            update_data.pop("id_rol")
 
         # Si se está actualizando el email, verificar que no exista
         if 'correo' in update_data:
@@ -478,6 +542,7 @@ class UserService:
     ) -> bool:
         """
         Cambia el estado de administrador de un usuario.
+        Alterna el id_rol entre ADMIN_ROL_ID (3) y rol normal (1).
 
         Args:
             session: Sesión de base de datos
@@ -511,11 +576,14 @@ class UserService:
                 detail="No puedes cambiar tus propios permisos de administrador"
             )
 
+        # Alternamos id_rol entre ADMIN (3) y Usuario normal (1).
+        nuevo_rol = 1 if user.id_rol == ADMIN_ROL_ID else ADMIN_ROL_ID
+
         try:
             await session.execute(
                 update(User)
                 .where(User.id_usuario == user_id)
-                .values(is_admin=not user.is_admin)
+                .values(id_rol=nuevo_rol)
             )
             await session.commit()
             return True
