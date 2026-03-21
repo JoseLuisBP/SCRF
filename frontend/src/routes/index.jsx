@@ -1,43 +1,54 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { CircularProgress, Box } from '@mui/material';
 import ProtectedRoute from './ProtectedRoute';
 import AdminRoute from './AdminRoute';
 
-//Páginas
-import Home from '../pages/Home';
-import Login from '../pages/Login';
-import Register from '../pages/Register';
-import Dashboard from '../pages/Dashboard';
-//import Routines from '../pages/Routines';
-import Exercises from '../pages/Exercises';
-import AdminPanel from '../pages/AdminPanel';
-//import Profile from '../pages/Profile';
+// Lazy-loading de todas las páginas
+// Cada página se descarga SOLO cuando el usuario navega a esa ruta
+const Home = lazy(() => import('../pages/Home'));
+const Login = lazy(() => import('../pages/Login'));
+const Register = lazy(() => import('../pages/Register'));
+const Dashboard = lazy(() => import('../pages/Dashboard'));
+const Exercises = lazy(() => import('../pages/Exercises'));
+const AdminPanel = lazy(() => import('../pages/AdminPanel'));
+const Profile = lazy(() => import('../pages/Profile'));
+
+// Spinner centrado mientras se carga el chunk de la página
+const PageLoader = () => (
+    <Box
+        sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+        }}
+    >
+        <CircularProgress />
+    </Box>
+);
 
 export default function AppRoutes() {
     return (
-        <Routes>
-            {/* Rutas públicas */}
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+        <Suspense fallback={<PageLoader />}>
+            <Routes>
+                {/* Rutas públicas */}
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
 
+                {/* Rutas protegidas (requieren login) */}
+                <Route element={<ProtectedRoute />}>
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/exercises" element={<Exercises />} />
+                    <Route path="/profile" element={<Profile />} />
 
-            {/* Rutas protegidas (requieren login)*/}
-            <Route element={<ProtectedRoute />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/exercises" element={<Exercises />} />
-                {/*<Route path="/routines" element={<Routines />} />
-                <Route path="/profile" element={<Profile />} />*/}
-
-                {/* Rutas de administración (requieren login + id_rol=3) */}
-                <Route element={<AdminRoute />}>
-                    <Route path="/admin" element={<AdminPanel />} />
+                    {/* Rutas de administración (requieren login + id_rol=3) */}
+                    <Route element={<AdminRoute />}>
+                        <Route path="/admin" element={<AdminPanel />} />
+                    </Route>
                 </Route>
-            </Route>
-
-
-            {/* Ruta 404 
-            <Route path="*" element={<NotFound />} />
-            */}
-        </Routes>
+            </Routes>
+        </Suspense>
     );
 }
