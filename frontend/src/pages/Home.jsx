@@ -1,4 +1,5 @@
-//Importaciones de librerias como: react, material ui, contexto
+// useEffect añadido para carga diferida del CSS de slick-carousel
+import { useEffect } from 'react';
 import { Box, Container, Typography } from '@mui/material';
 import Header from '../components/layout/Header';
 import Button from '../components/common/Button';
@@ -7,14 +8,18 @@ import Card from '../components/layout/Card';
 import { useAuth } from '../context/AuthContext';
 import { useAccessibility } from '../context/AccessibilityContext';
 
-// Librerías de Carrusel
+// Librerias de Carrusel — Slider se importa de forma normal (JS)
 import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-
+// CSS de slick cargado de forma no bloqueante (solo tras el montaje)
 import Footer from '../components/layout/Footer';
 
 export default function Home() {
+  // Carga diferida del CSS de slick para no bloquear el render
+  useEffect(() => {
+    import('slick-carousel/slick/slick.css');
+    import('slick-carousel/slick/slick-theme.css');
+  }, []);
+
   const { isLoggedIn, toggleLogin } = useAuth();
   const { fontSize } = useAccessibility();
 
