@@ -246,8 +246,7 @@ export default function Header({ showSearchBar = false }) {
 
       {/* Menú de usuario */}
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-        <MenuItem onClick={() => { navigate('/perfil'); handleClose(); }}>Ver perfil</MenuItem>
-        <MenuItem onClick={() => { navigate('/configuracion'); handleClose(); }}>Configuración</MenuItem>
+        <MenuItem onClick={() => { navigate('/profile'); handleClose(); }}>Ver perfil</MenuItem>
         <MenuItem onClick={() => { logout(); handleClose(); }}>Cerrar sesión</MenuItem>
       </Menu>
 
