@@ -1,32 +1,18 @@
-import { CssBaseline } from '@mui/material';
+// Se eliminó CssBaseline duplicado.
+// ThemeModeProvider ya renderiza <CssBaseline /> internamente.
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { AccessibilityProvider } from './context/AccessibilityContext';
 import { ThemeModeProvider } from './context/ThemeContext';
-//import theme from './styles/theme';
-//import AppRoutes from './routes';
-
-
 import AppRoutes from './routes';
 
-
-
 function App() {
-
   return (
-    /* Proveedor de tema para MUI */
     <ThemeModeProvider>
-      {/* Restablece los estilos base de MUI */}
-      <CssBaseline />
-      {/* Proveedor de autenticación */}
       <AuthProvider>
-        {/* Proveedor de accesibilidad */}
         <AccessibilityProvider>
-          {/* Enrutador de la aplicación */}
           <BrowserRouter>
-            {/* Rutas de la aplicación */}
-            <AppRoutes/>
-            {/*<AppRoutes />*/}
+            <AppRoutes />
           </BrowserRouter>
         </AccessibilityProvider>
       </AuthProvider>
