@@ -19,8 +19,8 @@ Aplicación web integral para la gestión de rehabilitación física, que conect
 
 1. **Clonar el repositorio**:
    ```bash
-   git clone <repo-url>
-   cd Modular
+   git clone https://github.com/JoseLuisBP/SCRF.git
+   cd SCRF
    ```
 
 2. **Configurar variables de entorno**:
