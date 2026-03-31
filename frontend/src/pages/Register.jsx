@@ -281,9 +281,10 @@ export default function Register() {
             label="Nivel físico"
             select
             options={[
-              { value: 'principiante', label: 'Principiante' },
-              { value: 'intermedio', label: 'Intermedio' },
-              { value: 'avanzado', label: 'Avanzado' },
+              { value: 'sedentario', label: 'Sedentario (Poco o nada de ejercicio)' },
+              { value: 'ligero', label: 'Ligero (1-3 días/sem)' },
+              { value: 'moderado', label: 'Moderado (3-5 días/sem)' },
+              { value: 'intenso', label: 'Intenso (6-7 días/sem)' },
             ]}
             fullWidth
             {...register('nivelFisico')}

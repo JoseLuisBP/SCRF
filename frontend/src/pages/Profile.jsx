@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Box, Container, Typography, Avatar, Paper, Grid, Divider, Alert, CircularProgress } from '@mui/material';
-import { useForm } from 'react-hook-form';
+import {
+    Box, Container, Typography, Avatar, Paper, Grid, Divider, Alert, CircularProgress,
+    Tabs, Tab, Autocomplete, TextField, Chip
+} from '@mui/material';
+import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import Input from '../components/common/Input';
@@ -11,10 +14,12 @@ import { usersAPI } from '../api';
 import PersonIcon from '@mui/icons-material/Person';
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import LockIcon from '@mui/icons-material/Lock';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
-{/* --- Esquemas de Validación --- */ }
+// --- Esquemas de Validación ---
 
-{/* Esquema para Información Personal y Física */ }
+// Esquema para Información Personal y Física
 const profileSchema = yup.object({
     nombre: yup.string().required('El nombre es obligatorio'),
     correo: yup.string().email('Correo inválido').required('El correo es obligatorio'),
@@ -43,14 +48,15 @@ const profileSchema = yup.object({
         .integer('Debe ser un número entero')
         .nullable()
         .transform((value, originalValue) => (String(originalValue).trim() === '' ? null : value)),
+    objetivo_principal: yup.string().nullable(),
     perfil_medico: yup.object({
-        condiciones_fisicas: yup.string().nullable().max(1000, 'Texto muy extenso'),
-        lesiones: yup.string().nullable().max(1000, 'Texto muy extenso'),
-        limitaciones: yup.string().nullable().max(1000, 'Texto muy extenso'),
+        condiciones_fisicas: yup.array().of(yup.string()).nullable(),
+        lesiones: yup.array().of(yup.string()).nullable(),
+        limitaciones: yup.array().of(yup.string()).nullable(),
     }),
 }).required();
 
-{/* Esquema para Cambio de Contraseña */ }
+// Esquema para Cambio de Contraseña
 const passwordSchema = yup.object({
     currentPassword: yup.string().required('La contraseña actual es obligatoria'),
     newPassword: yup
@@ -63,38 +69,82 @@ const passwordSchema = yup.object({
         .required('Debe confirmar la nueva contraseña'),
 }).required();
 
+// Helper para Tabs
+function CustomTabPanel(props) {
+    const { children, value, index, ...other } = props;
+    return (
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`profile-tabpanel-${index}`}
+            aria-labelledby={`profile-tab-${index}`}
+            {...other}
+        >
+            {value === index && (
+                <Box sx={{ pt: 3, pb: 2 }}>
+                    {children}
+                </Box>
+            )}
+        </div>
+    );
+}
+
+// Opciones Médicas
+const opcionesCondiciones = [
+    { value: 'Hipertension', label: 'Hipertensión o Problemas Cardíacos' },
+    { value: 'Asma', label: 'Asma o Complicaciones Respiratorias' },
+    { value: 'Diabetes', label: 'Diabetes' },
+    { value: 'Artritis', label: 'Artritis / Osteoartritis' },
+    { value: 'Ninguna', label: 'Ninguna de las Anteriores' },
+];
+const opcionesLesiones = [
+    { value: 'Rodilla', label: 'Rodilla (Esguinces, Meniscos)' },
+    { value: 'Espalda_Baja', label: 'Espalda Baja / Zona Lumbar' },
+    { value: 'Espalda_Alta_Cuello', label: 'Cervical / Espalda Alta' },
+    { value: 'Hombro', label: 'Hombro (Manguito Rotador)' },
+    { value: 'Tobillo', label: 'Tobillos / Pies' },
+    { value: 'Muneca', label: 'Muñecas / Codos' },
+    { value: 'Cadera', label: 'Cadera / Pelvis' },
+    { value: 'Ninguna', label: 'Ninguna Lesión Relevante' }
+];
+const opcionesLimitaciones = [
+    { value: 'Impacto', label: 'Prohibido ejercicios con Saltos/Impacto' },
+    { value: 'Carga_Pesada_Axial', label: 'Evitar cargas pesadas sobre la columna' },
+    { value: 'Rotacion', label: 'Restricción en rotaciones de torso bruscas' },
+    { value: 'Rango_Movimiento', label: 'Rango de movimiento limitado' },
+    { value: 'Ninguna', label: 'Sin limitaciones' }
+];
+
 export default function Profile() {
 
     const { user, updateUser } = useAuth();
-    const [isLoading, setIsLoading] = useState(false);
-    const [successMessage, setSuccessMessage] = useState('');
+
+    // Estados generales
+    const [tabValue, setTabValue] = useState(0);
     const [errorMessage, setErrorMessage] = useState('');
 
-    {/* --- Hooks del Formulario de Perfil --- */ }
+    // Estados visuales de botones
+    const [profileSaveStatus, setProfileSaveStatus] = useState('idle'); // 'idle' | 'loading' | 'success'
+    const [passwordSaveStatus, setPasswordSaveStatus] = useState('idle');
+
+    // --- Hooks del Formulario de Perfil ---
     const {
         register: registerProfile,
         handleSubmit: handleSubmitProfile,
         formState: { errors: profileErrors, isDirty: isProfileDirty },
         reset: resetProfile,
+        control: controlProfile,
     } = useForm({
         resolver: yupResolver(profileSchema),
+        mode: 'onChange', // Validación en tiempo real
         defaultValues: {
-            nombre: '',
-            correo: '',
-            edad: null,
-            peso: null,
-            estatura: null,
-            nivel_fisico: 'sedentario',
-            tiempo_disponible: null,
-            perfil_medico: {
-                condiciones_fisicas: '',
-                lesiones: '',
-                limitaciones: '',
-            }
+            nombre: '', correo: '', edad: null, peso: null, estatura: null,
+            nivel_fisico: 'sedentario', tiempo_disponible: null, objetivo_principal: '',
+            perfil_medico: { condiciones_fisicas: [], lesiones: [], limitaciones: [] }
         }
     });
 
-    {/* --- Hooks del Formulario de Contraseña --- */ }
+    // --- Hooks del Formulario de Contraseña ---
     const {
         register: registerPassword,
         handleSubmit: handleSubmitPassword,
@@ -102,87 +152,76 @@ export default function Profile() {
         reset: resetPassword,
     } = useForm({
         resolver: yupResolver(passwordSchema),
+        mode: 'onChange', // Validación en tiempo real
     });
 
-    {/* --- Cargar datos del usuario --- */ }
+    // --- Cargar datos del usuario ---
     useEffect(() => {
         if (user) {
-            {/* Mapeamos los datos del usuario al formulario */ }
-            {/* Nota: Nos aseguramos de usar 'estatura' consistentemente */ }
             resetProfile({
                 nombre: user.nombre || '',
                 correo: user.correo || '',
                 edad: user.edad || '',
                 peso: user.peso || '',
-                estatura: user.estatura || user.altura || '', // Fallback por si acaso viene como altura
+                estatura: user.estatura || user.altura || '',
                 nivel_fisico: user.nivel_fisico || 'sedentario',
                 tiempo_disponible: user.tiempo_disponible || '',
+                objetivo_principal: user.objetivo_principal || '',
                 perfil_medico: {
-                    condiciones_fisicas: user.perfil_medico?.condiciones_fisicas || '',
-                    lesiones: user.perfil_medico?.lesiones || '',
-                    limitaciones: user.perfil_medico?.limitaciones || '',
+                    condiciones_fisicas: user.perfil_medico?.condiciones_fisicas || [],
+                    lesiones: user.perfil_medico?.lesiones || [],
+                    limitaciones: user.perfil_medico?.limitaciones || [],
                 }
             });
         }
     }, [user, resetProfile]);
 
-    {/* Limpiar mensajes después de unos segundos */ }
+    // Limpiar mensaje de error
     useEffect(() => {
-        if (successMessage || errorMessage) {
-            const timer = setTimeout(() => {
-                setSuccessMessage('');
-                setErrorMessage('');
-            }, 5000);
+        if (errorMessage) {
+            const timer = setTimeout(() => setErrorMessage(''), 5000);
             return () => clearTimeout(timer);
         }
-    }, [successMessage, errorMessage]);
+    }, [errorMessage]);
 
+    // --- Handlers ---
+    const handleTabChange = (event, newValue) => {
+        setTabValue(newValue);
+    };
 
-    {/* --- Handlers --- */ }
-
-    {/* Actualizar Perfil */ }
+    // Actualizar Perfil
     const onSubmitProfile = async (formData) => {
-        setIsLoading(true);
+        setProfileSaveStatus('loading');
         setErrorMessage('');
-        setSuccessMessage('');
         try {
-            console.log('Enviando datos de perfil:', formData);
             const response = await usersAPI.updateProfile(formData);
+            if (response.data) updateUser(response.data);
+            else if (response.user) updateUser(response.user);
+            else updateUser(response);
 
-            {/* Actualizar contexto */ }
-            if (response.data) {
-                updateUser(response.data);
-            } else if (response.user) {
-                updateUser(response.user);
-            } else {
-                updateUser(response);
-            }
-
-            setSuccessMessage('¡Perfil actualizado con éxito!');
+            setProfileSaveStatus('success');
             resetProfile(formData);
 
+            setTimeout(() => setProfileSaveStatus('idle'), 3000);
         } catch (error) {
+            setProfileSaveStatus('idle');
             setErrorMessage('Error al actualizar el perfil. Intente nuevamente.');
-        } finally {
-            setIsLoading(false);
         }
     };
 
+    // Actualizar Contraseña
     const onSubmitPassword = async (formData) => {
-        setIsLoading(true);
+        setPasswordSaveStatus('loading');
         setErrorMessage('');
-        setSuccessMessage('');
         try {
             await usersAPI.changePassword(formData);
             resetPassword();
-            setSuccessMessage('¡Contraseña cambiada correctamente!');
+            setPasswordSaveStatus('success');
+
+            setTimeout(() => setPasswordSaveStatus('idle'), 3000);
         } catch (error) {
-            setErrorMessage(
-                error.response?.data?.detail ||
-                'Error al cambiar la contraseña. Verifique su contraseña actual.'
-            );
-        } finally {
-            setIsLoading(false);
+            setPasswordSaveStatus('idle');
+            setErrorMessage(error.response?.data?.detail || 'Error al cambiar la contraseña.');
         }
     };
 
@@ -191,48 +230,62 @@ export default function Profile() {
             sx={{
                 minHeight: '100vh',
                 background: (theme) =>
-                    `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`, // Diseño consistente con Home/Dashboard
+                    `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
                 pb: 8
             }}
         >
             <Header />
 
             <Container maxWidth="lg" sx={{ mt: 12, mb: 4 }}>
-                {/* Feedback Messages */}
-                {(successMessage || errorMessage) && (
+                {errorMessage && (
                     <Box sx={{ mb: 2, position: 'fixed', top: 100, right: 20, zIndex: 9999 }}>
-                        {successMessage && <Alert severity="success" sx={{ mb: 1 }}>{successMessage}</Alert>}
-                        {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+                        <Alert severity="error">{errorMessage}</Alert>
                     </Box>
                 )}
 
                 <Paper
                     elevation={6}
                     sx={{
-                        p: { xs: 3, md: 5 },
+                        p: { xs: 2, md: 5 },
                         borderRadius: 4,
-                        backdropFilter: "blur(16px)", // Glassmorphism consistente
-                        backgroundColor: "#d4e9f8ff", // Color base consistente con Dashboard
-                        opacity: 0.95
+                        backdropFilter: "blur(16px)",
+                        backgroundColor: "rgba(255, 255, 255, 0.8)", // Mejor contraste para glassmorphism
+                        border: '1px solid rgba(255,255,255,0.4)', // Refinado
+                        boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.15)',
                     }}
                 >
                     <Grid container spacing={4}>
-
-                        {/*  Columna Izquierda: Avatar y Resumen  */}
+                        {/* Columna Izquierda: Avatar y Resumen */}
                         <Grid item xs={12} md={4} sx={{ textAlign: 'center', borderRight: { md: '1px solid rgba(0,0,0,0.1)' } }}>
-                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'center' }}>
-                                <Avatar
-                                    sx={{
-                                        width: 150,
-                                        height: 150,
-                                        mb: 2,
-                                        fontSize: '4rem',
-                                        bgcolor: 'primary.main',
-                                        boxShadow: 3
-                                    }}
-                                >
-                                    {user?.nombre?.charAt(0)?.toUpperCase() || <PersonIcon fontSize="inherit" />}
-                                </Avatar>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+
+                                {/* Avatar Dinámico con Hover Effect */}
+                                <Box sx={{ position: 'relative', display: 'inline-block', mb: 2, cursor: 'pointer' }}>
+                                    <Avatar
+                                        sx={{
+                                            width: 150,
+                                            height: 150,
+                                            fontSize: '4rem',
+                                            bgcolor: 'primary.main',
+                                            boxShadow: 3,
+                                            transition: '0.3s ease',
+                                            '&:hover': { filter: 'brightness(0.7)' }
+                                        }}
+                                    >
+                                        {user?.nombre?.charAt(0)?.toUpperCase() || <PersonIcon fontSize="inherit" />}
+                                    </Avatar>
+                                    <Box
+                                        sx={{
+                                            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            opacity: 0, transition: 'opacity 0.3s', borderRadius: '50%',
+                                            '&:hover': { opacity: 1 }
+                                        }}
+                                    >
+                                        <PhotoCameraIcon sx={{ color: 'white', fontSize: 40 }} />
+                                    </Box>
+                                </Box>
+
                                 <Typography variant="h5" fontWeight="bold" gutterBottom>
                                     {user?.nombre || "Usuario"}
                                 </Typography>
@@ -240,33 +293,42 @@ export default function Profile() {
                                     {user?.correo}
                                 </Typography>
 
-                                <Box sx={{ mt: 4, width: '100%' }}>
+                                <Box sx={{ mt: 4, width: '100%', display: { xs: 'none', md: 'block' } }}>
                                     <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                                        "Mantén tus datos actualizados para un mejor seguimiento de tu progreso."
+                                        "Mantén tus datos actualizados para un seguimiento preciso de tu progreso."
                                     </Typography>
                                 </Box>
                             </Box>
                         </Grid>
 
-                        {/*  Columna Derecha: Formularios  */}
+                        {/* Columna Derecha: Sistema de Pestañas y Formularios */}
                         <Grid item xs={12} md={8}>
+                            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                                <Tabs
+                                    value={tabValue}
+                                    onChange={handleTabChange}
+                                    aria-label="perfil tabs"
+                                    variant="scrollable"
+                                    scrollButtons="auto"
+                                    textColor="primary"
+                                    indicatorColor="primary"
+                                >
+                                    <Tab icon={<PersonIcon />} iconPosition="start" label="Mi Perfil" id="profile-tab-0" />
+                                    <Tab icon={<MedicalServicesIcon />} iconPosition="start" label="Salud y Fitness" id="profile-tab-1" />
+                                    <Tab icon={<LockIcon />} iconPosition="start" label="Seguridad" id="profile-tab-2" />
+                                </Tabs>
+                            </Box>
 
-                            {/*  Categoría 1: Información Personal  */}
-                            <Box component="section" sx={{ mb: 5 }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                                    <PersonIcon color="primary" sx={{ mr: 1, fontSize: 30 }} />
-                                    <Typography variant="h5" fontWeight="600" color="primary.dark">
-                                        Información Personal
-                                    </Typography>
-                                </Box>
-
+                            {/* --- Pestaña 1: Información Personal --- */}
+                            <CustomTabPanel value={tabValue} index={0}>
                                 <form onSubmit={handleSubmitProfile(onSubmitProfile)}>
                                     <Grid container spacing={3}>
                                         <Grid item xs={12}>
                                             <Input
                                                 label="Nombre Completo"
                                                 {...registerProfile('nombre')}
-                                                error={profileErrors.nombre?.message}
+                                                error={!!profileErrors.nombre}
+                                                helperText={profileErrors.nombre?.message}
                                                 fullWidth
                                             />
                                         </Grid>
@@ -274,9 +336,9 @@ export default function Profile() {
                                             <Input
                                                 label="Correo Electrónico"
                                                 {...registerProfile('correo')}
-                                                error={profileErrors.correo?.message}
+                                                error={!!profileErrors.correo}
+                                                helperText={profileErrors.correo?.message}
                                                 fullWidth
-                                            // Correo usualmente no debería editarse tan fácil, pero lo permitimos si el backend lo soporta
                                             />
                                         </Grid>
                                         <Grid item xs={12} sm={6}>
@@ -284,29 +346,38 @@ export default function Profile() {
                                                 label="Edad (años)"
                                                 type="number"
                                                 {...registerProfile('edad')}
-                                                error={profileErrors.edad?.message}
+                                                error={!!profileErrors.edad}
+                                                helperText={profileErrors.edad?.message}
                                                 fullWidth
                                             />
                                         </Grid>
-
-                                        {/*  Categoría 2: Información Física / Médica  */}
-                                        <Grid item xs={12}>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, mb: 1 }}>
-                                                <MedicalServicesIcon color="primary" sx={{ mr: 1, fontSize: 30 }} />
-                                                <Typography variant="h5" fontWeight="600" color="primary.dark">
-                                                    Información Física y Médica
-                                                </Typography>
-                                            </Box>
-                                            <Divider sx={{ mb: 3 }} />
+                                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                                            <Button
+                                                variant="primary"
+                                                type="submit"
+                                                disabled={profileSaveStatus === 'loading' || profileSaveStatus === 'success' || !isProfileDirty}
+                                                sx={{ minWidth: 200, transition: '0.3s' }}
+                                            >
+                                                {profileSaveStatus === 'loading' && <CircularProgress size={24} color="inherit" />}
+                                                {profileSaveStatus === 'success' && <><CheckCircleIcon sx={{ mr: 1 }} /> ¡Guardado!</>}
+                                                {profileSaveStatus === 'idle' && 'Guardar General'}
+                                            </Button>
                                         </Grid>
+                                    </Grid>
+                                </form>
+                            </CustomTabPanel>
 
+                            {/* --- Pestaña 2: Información Física y Médica --- */}
+                            <CustomTabPanel value={tabValue} index={1}>
+                                <form onSubmit={handleSubmitProfile(onSubmitProfile)}>
+                                    <Grid container spacing={3}>
                                         <Grid item xs={12} sm={6}>
                                             <Input
                                                 label="Peso (kg)"
-                                                type="number"
-                                                step="0.1"
+                                                type="number" step="0.1"
                                                 {...registerProfile('peso')}
-                                                error={profileErrors.peso?.message}
+                                                error={!!profileErrors.peso}
+                                                helperText={profileErrors.peso?.message}
                                                 fullWidth
                                             />
                                         </Grid>
@@ -315,25 +386,32 @@ export default function Profile() {
                                                 label="Estatura (cm)"
                                                 type="number"
                                                 {...registerProfile('estatura')}
-                                                error={profileErrors.estatura?.message}
+                                                error={!!profileErrors.estatura}
+                                                helperText={profileErrors.estatura?.message}
                                                 fullWidth
                                             />
                                         </Grid>
 
                                         <Grid item xs={12} sm={6}>
-                                            <Input
-                                                select
-                                                label="Nivel Físico"
-                                                {...registerProfile('nivel_fisico')}
-                                                error={!!profileErrors.nivel_fisico}
-                                                helperText={profileErrors.nivel_fisico?.message}
-                                                fullWidth
-                                                options={[
-                                                    { value: 'sedentario', label: 'Sedentario (Poco o nada de ejercicio)' },
-                                                    { value: 'ligero', label: 'Ligero (1-3 días/sem)' },
-                                                    { value: 'moderado', label: 'Moderado (3-5 días/sem)' },
-                                                    { value: 'intenso', label: 'Intenso (6-7 días/sem)' },
-                                                ]}
+                                            <Controller
+                                                name="nivel_fisico"
+                                                control={controlProfile}
+                                                render={({ field }) => (
+                                                    <Input
+                                                        {...field}
+                                                        select
+                                                        label="Nivel Físico"
+                                                        error={!!profileErrors.nivel_fisico}
+                                                        helperText={profileErrors.nivel_fisico?.message}
+                                                        fullWidth
+                                                        options={[
+                                                            { value: 'sedentario', label: 'Sedentario' },
+                                                            { value: 'ligero', label: 'Ligero (1-3 días/sem)' },
+                                                            { value: 'moderado', label: 'Moderado (3-5 días/sem)' },
+                                                            { value: 'intenso', label: 'Intenso (6-7 días/sem)' },
+                                                        ]}
+                                                    />
+                                                )}
                                             />
                                         </Grid>
                                         <Grid item xs={12} sm={6}>
@@ -341,90 +419,188 @@ export default function Profile() {
                                                 label="Tiempo Disponible (min/día)"
                                                 type="number"
                                                 {...registerProfile('tiempo_disponible')}
-                                                error={profileErrors.tiempo_disponible?.message}
+                                                error={!!profileErrors.tiempo_disponible}
+                                                helperText={profileErrors.tiempo_disponible?.message}
                                                 fullWidth
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <Controller
+                                                name="objetivo_principal"
+                                                control={controlProfile}
+                                                render={({ field }) => (
+                                                    <Input
+                                                        {...field}
+                                                        select
+                                                        label="Objetivo Principal"
+                                                        error={!!profileErrors.objetivo_principal}
+                                                        helperText={profileErrors.objetivo_principal?.message}
+                                                        fullWidth
+                                                        options={[
+                                                            { value: 'Salud/Movilidad', label: 'Salud / Prevención' },
+                                                            { value: 'Fuerza/Hipertrofia', label: 'Construcción Muscular / Fuerza' },
+                                                            { value: 'Resistencia/Deporte', label: 'Capacidad Aeróbica / Deportiva' },
+                                                            { value: 'Rehabilitación', label: 'Rehabilitación Funcional' }
+                                                        ]}
+                                                    />
+                                                )}
                                             />
                                         </Grid>
 
                                         <Grid item xs={12}>
-                                            <Typography variant="subtitle1" color="primary" sx={{ mt: 2, mb: 1 }}>
-                                                Condiciones Físicas
+                                            <Divider sx={{ my: 1 }} />
+                                            <Typography variant="subtitle2" color="primary" sx={{ mb: 2 }}>
+                                                Perfil Médico (Selecciona todas las que apliquen)
                                             </Typography>
-                                            <Input
-                                                label="Condiciones (Ej: Asma, Hipertensión)"
-                                                multiline
-                                                rows={2}
-                                                {...registerProfile('perfil_medico.condiciones_fisicas')}
-                                                error={!!profileErrors.perfil_medico?.condiciones_fisicas}
-                                                helperText={profileErrors.perfil_medico?.condiciones_fisicas?.message || "Información encriptada para su seguridad."}
-                                                fullWidth
-                                                placeholder="Describa sus condiciones físicas..."
+
+                                            {/* Condiciones Médicas (Autocomplete Chips) */}
+                                            <Controller
+                                                name="perfil_medico.condiciones_fisicas"
+                                                control={controlProfile}
+                                                render={({ field: { onChange, value } }) => (
+                                                    <Autocomplete
+                                                        multiple
+                                                        options={opcionesCondiciones}
+                                                        getOptionLabel={(option) => option.label || option}
+                                                        isOptionEqualToValue={(option, val) => option.value === val}
+                                                        value={opcionesCondiciones.filter(opt => (value || []).includes(opt.value))}
+                                                        onChange={(event, newValue) => {
+                                                            onChange(newValue.map(item => item.value));
+                                                        }}
+                                                        renderTags={(tagValue, getTagProps) =>
+                                                            tagValue.map((option, index) => {
+                                                                const { key, ...tagProps } = getTagProps({ index });
+                                                                return (
+                                                                    <Chip
+                                                                        variant="filled"
+                                                                        label={option.label}
+                                                                        key={key}
+                                                                        {...tagProps}
+                                                                        color="primary"
+                                                                        size="small"
+                                                                    />
+                                                                );
+                                                            })
+                                                        }
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                variant="outlined"
+                                                                label="Condiciones Médicas Preexistentes"
+                                                                placeholder="Añadir..."
+                                                                error={!!profileErrors.perfil_medico?.condiciones_fisicas}
+                                                                helperText={profileErrors.perfil_medico?.condiciones_fisicas?.message}
+                                                                sx={{ mb: 2 }}
+                                                            />
+                                                        )}
+                                                    />
+                                                )}
                                             />
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <Typography variant="subtitle1" color="primary" sx={{ mt: 2, mb: 1 }}>
-                                                Lesiones
-                                            </Typography>
-                                            <Input
-                                                label="Lesiones (Ej: Esguince tobillo derecho)"
-                                                multiline
-                                                rows={2}
-                                                {...registerProfile('perfil_medico.lesiones')}
-                                                error={!!profileErrors.perfil_medico?.lesiones}
-                                                helperText={profileErrors.perfil_medico?.lesiones?.message || "Información encriptada para su seguridad."}
-                                                fullWidth
-                                                placeholder="Describa sus lesiones actuales o pasadas..."
+
+                                            {/* Lesiones (Autocomplete Chips) */}
+                                            <Controller
+                                                name="perfil_medico.lesiones"
+                                                control={controlProfile}
+                                                render={({ field: { onChange, value } }) => (
+                                                    <Autocomplete
+                                                        multiple
+                                                        options={opcionesLesiones}
+                                                        getOptionLabel={(option) => option.label || option}
+                                                        isOptionEqualToValue={(option, val) => option.value === val}
+                                                        value={opcionesLesiones.filter(opt => (value || []).includes(opt.value))}
+                                                        onChange={(event, newValue) => {
+                                                            onChange(newValue.map(item => item.value));
+                                                        }}
+                                                        renderTags={(tagValue, getTagProps) =>
+                                                            tagValue.map((option, index) => {
+                                                                const { key, ...tagProps } = getTagProps({ index });
+                                                                return (
+                                                                    <Chip variant="filled" label={option.label} key={key} {...tagProps} color="secondary" size="small" />
+                                                                );
+                                                            })
+                                                        }
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                variant="outlined"
+                                                                label="Lesiones Recientes o Crónicas"
+                                                                placeholder="Añadir..."
+                                                                error={!!profileErrors.perfil_medico?.lesiones}
+                                                                helperText={profileErrors.perfil_medico?.lesiones?.message}
+                                                                sx={{ mb: 2 }}
+                                                            />
+                                                        )}
+                                                    />
+                                                )}
                                             />
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <Typography variant="subtitle1" color="primary" sx={{ mt: 2, mb: 1 }}>
-                                                Limitaciones
-                                            </Typography>
-                                            <Input
-                                                label="Limitaciones (Ej: No levantar mucho peso)"
-                                                multiline
-                                                rows={2}
-                                                {...registerProfile('perfil_medico.limitaciones')}
-                                                error={!!profileErrors.perfil_medico?.limitaciones}
-                                                helperText={profileErrors.perfil_medico?.limitaciones?.message || "Información encriptada para su seguridad."}
-                                                fullWidth
-                                                placeholder="Describa sus limitaciones físicas..."
+
+                                            {/* Limitaciones (Autocomplete Chips) */}
+                                            <Controller
+                                                name="perfil_medico.limitaciones"
+                                                control={controlProfile}
+                                                render={({ field: { onChange, value } }) => (
+                                                    <Autocomplete
+                                                        multiple
+                                                        options={opcionesLimitaciones}
+                                                        getOptionLabel={(option) => option.label || option}
+                                                        isOptionEqualToValue={(option, val) => option.value === val}
+                                                        value={opcionesLimitaciones.filter(opt => (value || []).includes(opt.value))}
+                                                        onChange={(event, newValue) => {
+                                                            onChange(newValue.map(item => item.value));
+                                                        }}
+                                                        renderTags={(tagValue, getTagProps) =>
+                                                            tagValue.map((option, index) => {
+                                                                const { key, ...tagProps } = getTagProps({ index });
+                                                                return (
+                                                                    <Chip variant="filled" label={option.label} key={key} {...tagProps} color="error" size="small" />
+                                                                );
+                                                            })
+                                                        }
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                variant="outlined"
+                                                                label="Restricciones de Entrenamiento"
+                                                                placeholder="Añadir..."
+                                                                error={!!profileErrors.perfil_medico?.limitaciones}
+                                                                helperText={profileErrors.perfil_medico?.limitaciones?.message}
+                                                            />
+                                                        )}
+                                                    />
+                                                )}
                                             />
                                         </Grid>
 
-                                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
                                             <Button
                                                 variant="primary"
                                                 type="submit"
-                                                disabled={isLoading || !isProfileDirty}
-                                                sx={{ minWidth: 200 }}
+                                                disabled={profileSaveStatus === 'loading' || profileSaveStatus === 'success' || !isProfileDirty}
+                                                sx={{ minWidth: 200, transition: '0.3s' }}
                                             >
-                                                {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Guardar Cambios'}
+                                                {profileSaveStatus === 'loading' && <CircularProgress size={24} color="inherit" />}
+                                                {profileSaveStatus === 'success' && <><CheckCircleIcon sx={{ mr: 1 }} /> ¡Guardado!</>}
+                                                {profileSaveStatus === 'idle' && 'Guardar Salud'}
                                             </Button>
                                         </Grid>
                                     </Grid>
                                 </form>
-                            </Box>
+                            </CustomTabPanel>
 
-                            <Divider sx={{ my: 4 }} />
-
-                            {/*  Categoría 3: Preferencias y Seguridad  */}
-                            <Box component="section">
-                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                                    <LockIcon color="primary" sx={{ mr: 1, fontSize: 30 }} />
-                                    <Typography variant="h5" fontWeight="600" color="primary.dark">
-                                        Seguridad y Contraseña
-                                    </Typography>
-                                </Box>
-
+                            {/* --- Pestaña 3: Seguridad --- */}
+                            <CustomTabPanel value={tabValue} index={2}>
                                 <form onSubmit={handleSubmitPassword(onSubmitPassword)}>
                                     <Grid container spacing={3}>
                                         <Grid item xs={12}>
+                                            <Alert severity="info" sx={{ mb: 2 }}>
+                                                Usa una contraseña fuerte con al menos 6 caracteres.
+                                            </Alert>
                                             <Input
                                                 label="Contraseña Actual"
                                                 type="password"
                                                 {...registerPassword('currentPassword')}
-                                                error={passwordErrors.currentPassword?.message}
+                                                error={!!passwordErrors.currentPassword}
+                                                helperText={passwordErrors.currentPassword?.message}
                                                 fullWidth
                                             />
                                         </Grid>
@@ -433,7 +609,8 @@ export default function Profile() {
                                                 label="Nueva Contraseña"
                                                 type="password"
                                                 {...registerPassword('newPassword')}
-                                                error={passwordErrors.newPassword?.message}
+                                                error={!!passwordErrors.newPassword}
+                                                helperText={passwordErrors.newPassword?.message}
                                                 fullWidth
                                             />
                                         </Grid>
@@ -442,24 +619,27 @@ export default function Profile() {
                                                 label="Confirmar Nueva Contraseña"
                                                 type="password"
                                                 {...registerPassword('confirmNewPassword')}
-                                                error={passwordErrors.confirmNewPassword?.message}
+                                                error={!!passwordErrors.confirmNewPassword}
+                                                helperText={passwordErrors.confirmNewPassword?.message}
                                                 fullWidth
                                             />
                                         </Grid>
 
-                                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
                                             <Button
                                                 variant="secondary"
                                                 type="submit"
-                                                disabled={isLoading}
-                                                sx={{ minWidth: 200 }}
+                                                disabled={passwordSaveStatus === 'loading' || passwordSaveStatus === 'success'}
+                                                sx={{ minWidth: 200, transition: '0.3s' }}
                                             >
-                                                {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Cambiar Contraseña'}
+                                                {passwordSaveStatus === 'loading' && <CircularProgress size={24} color="inherit" />}
+                                                {passwordSaveStatus === 'success' && <><CheckCircleIcon sx={{ mr: 1 }} /> ¡Actualizada!</>}
+                                                {passwordSaveStatus === 'idle' && 'Cambiar Contraseña'}
                                             </Button>
                                         </Grid>
                                     </Grid>
                                 </form>
-                            </Box>
+                            </CustomTabPanel>
 
                         </Grid>
                     </Grid>
