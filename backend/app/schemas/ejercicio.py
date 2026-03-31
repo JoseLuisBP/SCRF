@@ -9,6 +9,9 @@ class EjercicioOut(BaseModel):
     tiempo: Optional[int]
     categoria: str
     advertencias: Optional[str]
+    enfoque: Optional[str] = None
+    nivel_dificultad: Optional[str] = None
+    contraindicaciones: Optional[list[str]] = []
 
     class Config:
         from_attributes = True

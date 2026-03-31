@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.core.config import settings
 from app.core.logging import logger
-from app.api.v1 import auth, users, exercises, progress, admin
+from app.api.v1 import auth, users, exercises, progress, admin, recommendations
 from app.db.postgresql import postgresql
 from app.db.mongodb import mongodb
 from app.middleware import setup_cors, setup_error_handlers
@@ -99,6 +99,12 @@ def create_app() -> FastAPI:
         admin.router,
         prefix=f"{settings.API_V1_PREFIX}/admin",
         tags=["Admin"]
+    )
+
+    application.include_router(
+        recommendations.router,
+        prefix=f"{settings.API_V1_PREFIX}/recommendations",
+        tags=["Recommendations"]
     )
 
     @application.get("/")

@@ -16,7 +16,7 @@ async def test_register_user_success(async_client):
         "edad": 30,
         "peso": 80.0,
         "estatura": 180,
-        "nivel_fisico": "Principiante",
+        "nivel_fisico": "sedentario",
         "tiempo_disponible": 60
     }
 

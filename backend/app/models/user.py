@@ -18,6 +18,7 @@ class User(Base):
     estatura = Column(Float, nullable=True)
     nivel_fisico = Column(String(100), nullable=True)
     tiempo_disponible = Column(Integer, nullable=True)
+    objetivo_principal = Column(String(50), nullable=True)
     # informacion_medica movida a tabla separada 'MedicalProfile'
 
     # Estado y permisos

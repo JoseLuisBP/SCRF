@@ -20,18 +20,18 @@ axiosInstance.interceptors.request.use(
   config => {
     // Obtiene el token del almacenamiento local del navegador
     const token = localStorage.getItem('token');
-    console.log('🔑 Interceptor - Token:', token ? 'Existe' : 'No existe');
+    console.log('Interceptor - Token:', token ? 'Existe' : 'No existe');
     if (token) {
       // Porta el token en el encabezado Authorization
       config.headers['Authorization'] = `Bearer ${token}`;
-      console.log('✅ Header Authorization agregado');
+      console.log('Header Authorization agregado');
     } else {
-      console.warn('⚠️ No hay token en localStorage');
+      console.warn('No hay token en localStorage');
     }
     return config;
   },
   error => {
-    console.error('❌ Error en request interceptor:', error);
+    console.error('Error en request interceptor:', error);
     return Promise.reject(error);
   }
 );
@@ -49,7 +49,7 @@ axiosInstance.interceptors.response.use(
           break;
         case 401:
           localStorage.removeItem('token');
-          //window.location.href = '/login';
+          window.location.href = '/login';
           break;
         case 403:
           alert('No tienes permiso para realizar esta acción.');
@@ -63,7 +63,7 @@ axiosInstance.interceptors.response.use(
         default:
           alert(
             error.response.data.message ||
-              'Ocurrió un error. Inténtalo de nuevo.'
+            'Ocurrió un error. Inténtalo de nuevo.'
           );
       }
     } else if (error.request) {

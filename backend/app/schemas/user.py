@@ -12,6 +12,7 @@ class UserBase(BaseModel):
     estatura: Optional[int] = Field(None, gt=0, description="Estatura del usuario en cm")
     nivel_fisico: Optional[str] = Field(None, max_length=100, description="Nivel físico del usuario")
     tiempo_disponible: Optional[int] = Field(None, ge=0, description="Tiempo disponible para entrenar en minutos por día")
+    objetivo_principal: Optional[str] = Field(None, max_length=50, description="Objetivo principal (ej. Hipertrofia, Rehabilitación)")
 
 # Schema para creación de Usuario (endpoint público /auth/register)
 # SEGURIDAD: id_rol NO se acepta aquí. El servicio siempre asigna id_rol=1 (Usuario normal).
