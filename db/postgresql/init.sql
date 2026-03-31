@@ -29,6 +29,7 @@ CREATE TABLE usuarios (
   estatura             REAL,
   nivel_fisico         VARCHAR(100),
   tiempo_disponible    INTEGER,
+  objetivo_principal   VARCHAR(50),
   fecha_registro       DATE DEFAULT CURRENT_DATE,
   confirmado           BOOLEAN DEFAULT FALSE, -- Indica si el usuario ha aceptado los términos y condiciones
   is_active           BOOLEAN DEFAULT TRUE, -- Indica si la cuenta del usuario está activa
@@ -49,9 +50,9 @@ CREATE TABLE configuracion (
 CREATE TABLE perfil_medico (
   id_perfil_medico   SERIAL PRIMARY KEY,
   id_usuario         INTEGER NOT NULL UNIQUE REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
-  condiciones_fisicas TEXT,
-  lesiones           TEXT,
-  limitaciones       TEXT,
+  condiciones_fisicas JSONB DEFAULT '[]'::jsonb,
+  lesiones           JSONB DEFAULT '[]'::jsonb,
+  limitaciones       JSONB DEFAULT '[]'::jsonb,
   cifrado_hash       VARCHAR(512)
 );
 
@@ -86,6 +87,9 @@ CREATE TABLE ejercicios (
   repeticiones      INTEGER,
   tiempo            INTEGER,
   categoria         VARCHAR(100),
+  enfoque           VARCHAR(50),
+  nivel_dificultad  VARCHAR(50),
+  contraindicaciones JSONB DEFAULT '[]'::jsonb,
   advertencias      TEXT,
   activo            BOOLEAN DEFAULT TRUE
 );
