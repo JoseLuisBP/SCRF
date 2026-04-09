@@ -5,7 +5,10 @@ import {
   Chip,
   Button,
   Box,
+  IconButton,
 } from '@mui/material';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { useState } from 'react';
 
 /**
  * Componente ExerciseCard
@@ -17,11 +20,33 @@ import {
  * - onViewDetails: función que se ejecuta al hacer clic en "Ver detalles"
  */
 export default function ExerciseCard({ exercise, onViewDetails }) {
+  console.log(exercise);
+
+  // 🔥 Estado para mostrar/ocultar video
+  const [showVideo, setShowVideo] = useState(false);
+
+  // 🔥 Convertir URL de YouTube a embed
+  const getEmbedUrl = (url) => {
+    if (!url) return null;
+
+    if (url.includes("youtu.be")) {
+      return url.replace("youtu.be/", "www.youtube.com/embed/");
+    }
+
+    if (url.includes("youtube.com/watch?v=")) {
+      return url.replace("watch?v=", "embed/");
+    }
+
+    return url;
+  };
+
+  const videoUrl = getEmbedUrl(exercise.videoUrl);
+  console.log(exercise);
   return (
     <Card
       sx={{
         width: '100%',
-        height: '100%', // Permite que todas las cards tengan la misma altura
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
         borderRadius: 3,
@@ -35,6 +60,7 @@ export default function ExerciseCard({ exercise, onViewDetails }) {
     >
       {/* Contenido principal de la tarjeta */}
       <CardContent sx={{ flexGrow: 1 }}>
+        
         {/* Nombre del ejercicio */}
         <Typography
           fontWeight="bold"
@@ -54,7 +80,7 @@ export default function ExerciseCard({ exercise, onViewDetails }) {
           sx={{ mb: 1 }}
         />
 
-        {/* Descripción (limitada a 3 líneas para evitar cards desiguales) */}
+        {/* Descripción */}
         <Typography
           color="text.secondary"
           sx={{
@@ -67,6 +93,39 @@ export default function ExerciseCard({ exercise, onViewDetails }) {
         >
           {exercise.descripcion}
         </Typography>
+
+        {/* 🔥 FLECHA PARA VIDEO */}
+        {videoUrl && (
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+            <IconButton
+              onClick={(e) => {
+                e.stopPropagation(); // 🔥 evita conflicto con botón
+                setShowVideo(!showVideo);
+              }}
+              sx={{
+                transform: showVideo ? 'rotate(90deg)' : 'rotate(0deg)',
+                transition: '0.3s',
+              }}
+            >
+              <ArrowForwardIosIcon />
+            </IconButton>
+          </Box>
+        )}
+
+        {/* 🔥 VIDEO */}
+        {showVideo && videoUrl && (
+          <Box mt={2}>
+            <Box
+              component="iframe"
+              width="100%"
+              height="200"
+              src={videoUrl}
+              title="video"
+              frameBorder="0"
+              allowFullScreen
+            />
+          </Box>
+        )}
       </CardContent>
 
       {/* Botón de acción, siempre alineado abajo */}
