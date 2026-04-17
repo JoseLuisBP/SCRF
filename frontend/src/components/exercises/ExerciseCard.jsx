@@ -22,10 +22,10 @@ import { useState } from 'react';
 export default function ExerciseCard({ exercise, onViewDetails }) {
   console.log(exercise);
 
-  // 🔥 Estado para mostrar/ocultar video
+  // Estado para mostrar/ocultar video
   const [showVideo, setShowVideo] = useState(false);
 
-  // 🔥 Convertir URL de YouTube a embed
+  // Convertir URL de YouTube a embed
   const getEmbedUrl = (url) => {
     if (!url) return null;
 
@@ -94,12 +94,12 @@ export default function ExerciseCard({ exercise, onViewDetails }) {
           {exercise.descripcion}
         </Typography>
 
-        {/* 🔥 FLECHA PARA VIDEO */}
+        {/*  FLECHA PARA VIDEO */}
         {videoUrl && (
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
             <IconButton
               onClick={(e) => {
-                e.stopPropagation(); // 🔥 evita conflicto con botón
+                e.stopPropagation();
                 setShowVideo(!showVideo);
               }}
               sx={{
@@ -112,7 +112,7 @@ export default function ExerciseCard({ exercise, onViewDetails }) {
           </Box>
         )}
 
-        {/* 🔥 VIDEO */}
+        {/* VIDEO */}
         {showVideo && videoUrl && (
           <Box mt={2}>
             <Box

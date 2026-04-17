@@ -100,7 +100,7 @@ export default function Header({ showSearchBar = false }) {
   const navigationItems = isLoggedIn
     ? [
       { text: 'Dashboard', path: '/dashboard' },
-      { text: 'Rutinas', path: '/rutinas' },
+      { text: 'Rutinas', path: '/routines' },
       { text: 'Ejercicios', path: '/Exercises' },
       { text: 'Progreso', path: '/progreso' },
       // Enlace al Panel Admin solo visible para usuarios con id_rol=3

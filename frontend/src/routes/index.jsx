@@ -11,6 +11,7 @@ const Login = lazy(() => import('../pages/Login'));
 const Register = lazy(() => import('../pages/Register'));
 const Dashboard = lazy(() => import('../pages/Dashboard'));
 const Exercises = lazy(() => import('../pages/Exercises'));
+const Routines = lazy(() => import('../pages/Routines'));
 const AdminPanel = lazy(() => import('../pages/AdminPanel'));
 const Profile = lazy(() => import('../pages/Profile'));
 
@@ -42,6 +43,7 @@ export default function AppRoutes() {
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/exercises" element={<Exercises />} />
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/routines" element={<Routines />} />
 
                     {/* Rutas de administración (requieren login + id_rol=3) */}
                     <Route element={<AdminRoute />}>

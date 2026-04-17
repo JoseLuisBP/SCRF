@@ -11,9 +11,23 @@ INSERT INTO usuarios (nombre, correo, contrasena_hash, edad, peso, estatura, niv
   ('Juan Pérez', 'juan@example.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYILSdGeQNm', 25, 70.0, 180.0, 'intermediate', 45, 'Ganar Masa', TRUE, TRUE, 1),
   ('María González', 'maria@example.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYILSdGeQNm', 28, 60.0, 165.0, 'beginner', 30, 'Salud', TRUE, TRUE, 1),
   ('Carlos Entrenador', 'carlos@fitness.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYILSdGeQNm', 35, 80.0, 178.0, 'advanced', 90, 'Entrenamiento', TRUE, TRUE, 2),
+
+  -- Usuarios tuyos
   ('luis2', 'hola@gmail.com', '$2b$12$4hMAx0E7VBQQgCO5fsb49uMvznMJc0XB1.AJ6hfqKHi7WBRy2JPTS', 21, 95.0, 190.0, 'intermediate', 30, 'Bajar peso', TRUE, TRUE, 1),
   ('luis2', 'hola2@gmail.com', '$2b$12$aLR6oEadbypTDDmMIlrxMe/Tu8.vF.rYr4QaFooACTUwZRusSAA0q', 21, 95.0, 190.0, 'advanced', 30, 'Competencia', TRUE, TRUE, 3),
-  ('luis2', 'hola4@gmail.com', '$2b$12$JkAAbyuqMNEcMFzwHwnXGuQ.7LRAFHIpoOtWWpZfRbcAZjFK/BKf2', 21, 95.0, 190.0, 'beginner', 30, 'Salud', TRUE, TRUE, 1);
+  ('luis2', 'hola4@gmail.com', '$2b$12$JkAAbyuqMNEcMFzwHwnXGuQ.7LRAFHIpoOtWWpZfRbcAZjFK/BKf2', 21, 95.0, 190.0, 'beginner', 30, 'Salud', TRUE, TRUE, 1),
+
+  -- Usuario Gym Bro (hash corregido)
+  ('Gym Bro', 'fuerza@test.com', '$2b$12$JkAAbyuqMNEcMFzwHwnXGuQ.7LRAFHIpoOtWWpZfRbcAZjFK/BKf2', 25, 80.0, 175.0, 'intenso', 60, 'Fuerza/Hipertrofia', TRUE, TRUE, 1),
+
+  -- Usuario Adulto Mayor (para probar ruta)
+  ('Adulto Mayor Test', 'adulto@test.com', '$2b$12$JkAAbyuqMNEcMFzwHwnXGuQ.7LRAFHIpoOtWWpZfRbcAZjFK/BKf2', 72, 68.0, 165.0, 'sedentario', 30, 'movilidad', TRUE, TRUE, 1),
+
+  -- Usuario con lesión (rehabilitación)
+  ('Rehab Test', 'rehab@test.com', '$2b$12$JkAAbyuqMNEcMFzwHwnXGuQ.7LRAFHIpoOtWWpZfRbcAZjFK/BKf2', 40, 75.0, 170.0, 'ligero', 30, 'Rehabilitación', TRUE, TRUE, 1),
+
+  -- Usuario híbrido (deporte)
+  ('Atleta Test', 'atleta@test.com', '$2b$12$JkAAbyuqMNEcMFzwHwnXGuQ.7LRAFHIpoOtWWpZfRbcAZjFK/BKf2', 30, 78.0, 178.0, 'moderado', 60, 'Resistencia/Deporte', TRUE, TRUE, 1);
 
 -- Configuración por Usuario
 INSERT INTO configuracion (id_usuario, modo_visual, tamano_fuente, notificaciones, preferencia_privacidad) VALUES
@@ -25,47 +39,60 @@ INSERT INTO configuracion (id_usuario, modo_visual, tamano_fuente, notificacione
 -- Ejercicios
 INSERT INTO ejercicios (nombre_ejercicio, descripcion, repeticiones, tiempo, categoria, advertencias, activo) VALUES
   -- PECHO
-  ('Press de Banca', 'Ejercicio fundamental para desarrollar el pecho. Acostado en banco plano, empuja la barra desde el pecho hasta extender los brazos.', 10, NULL, 'pecho', 'Usa un ayudante para ejercicios con peso pesado', TRUE),
-  ('Flexiones', 'Ejercicio de peso corporal para pecho, tríceps y hombros.', 15, NULL, 'pecho', 'Mantén la espalda recta durante todo el movimiento', TRUE),
-  ('Press Inclinado con Mancuernas', 'Variante del press de banca para trabajar la parte superior del pecho.', 12, NULL, 'pecho', NULL, TRUE),
-  ('Aperturas con Mancuernas', 'Ejercicio de aislamiento para el pecho.', 12, NULL, 'pecho', 'No bajes demasiado las mancuernas para evitar lesiones en hombros', TRUE),
-  
-  -- ESPALDA
-  ('Dominadas', 'Ejercicio compuesto para toda la espalda.', 8, NULL, 'espalda', 'Si eres principiante, usa banda elástica de ayuda', TRUE),
-  ('Remo con Barra', 'Ejercicio para espalda media y lats.', 10, NULL, 'espalda', 'Mantén la espalda recta, no uses impulso', TRUE),
-  ('Peso Muerto', 'Ejercicio compuesto para espalda baja, glúteos y piernas.', 8, NULL, 'espalda', 'IMPORTANTE: Técnica correcta es crucial. Consulta a un entrenador', TRUE),
-  ('Remo en Polea Baja', 'Ejercicio de máquina para espalda media.', 12, NULL, 'espalda', NULL, TRUE),
-  
-  -- PIERNAS
-  ('Sentadillas', 'Ejercicio rey para desarrollo de piernas.', 12, NULL, 'piernas', 'Rodillas no deben sobrepasar los dedos de los pies', TRUE),
-  ('Zancadas', 'Ejercicio unilateral para piernas y glúteos.', 12, NULL, 'piernas', NULL, TRUE),
-  ('Prensa de Piernas', 'Ejercicio en máquina para cuádriceps.', 15, NULL, 'piernas', 'No bloquees completamente las rodillas', TRUE),
-  ('Curl Femoral', 'Ejercicio de aislamiento para isquiotibiales.', 12, NULL, 'piernas', NULL, TRUE),
-  
-  -- HOMBROS
-  ('Press Militar', 'Ejercicio para hombros con barra o mancuernas.', 10, NULL, 'hombros', NULL, TRUE),
-  ('Elevaciones Laterales', 'Aislamiento para deltoides laterales.', 15, NULL, 'hombros', 'No uses impulso, movimiento controlado', TRUE),
-  ('Elevaciones Frontales', 'Aislamiento para deltoides frontales.', 15, NULL, 'hombros', NULL, TRUE),
-  
-  -- BRAZOS
-  ('Curl de Bíceps con Barra', 'Ejercicio básico para bíceps.', 12, NULL, 'brazos', 'No balancees el cuerpo', TRUE),
-  ('Curl Martillo', 'Variante de curl para bíceps y antebrazo.', 12, NULL, 'brazos', NULL, TRUE),
-  ('Extensiones de Tríceps en Polea', 'Ejercicio de aislamiento para tríceps.', 15, NULL, 'brazos', NULL, TRUE),
-  ('Fondos en Paralelas', 'Ejercicio compuesto para tríceps y pecho.', 10, NULL, 'brazos', 'Inclínate hacia adelante para enfatizar pecho', TRUE),
-  
-  -- CORE
-  ('Plancha', 'Ejercicio isométrico para core completo.', NULL, 60, 'core', 'Mantén el cuerpo en línea recta', TRUE),
-  ('Abdominales Crunch', 'Ejercicio clásico para abdomen.', 20, NULL, 'core', NULL, TRUE),
-  ('Russian Twist', 'Ejercicio para oblicuos.', 20, NULL, 'core', NULL, TRUE),
-  ('Elevación de Piernas', 'Ejercicio para abdomen bajo.', 15, NULL, 'core', NULL, TRUE),
-  
-  -- CARDIO
-  ('Correr', 'Ejercicio cardiovascular de bajo impacto.', NULL, 1200, 'cardio', 'Calienta antes de empezar', TRUE),
-  ('Burpees', 'Ejercicio de cuerpo completo de alta intensidad.', 15, NULL, 'cardio', 'Descansa si sientes mareo', TRUE),
-  ('Saltar la Cuerda', 'Cardio de alta intensidad.', NULL, 300, 'cardio', NULL, TRUE),
-  ('Mountain Climbers', 'Ejercicio cardiovascular y de core.', 30, NULL, 'cardio', NULL, TRUE);
+  ('Press de Banca', 'Ejercicio fundamental para desarrollar el pecho.', 10, 60, 'pecho', 'Usa un ayudante', TRUE),
+  ('Flexiones', 'Ejercicio de peso corporal.', 15, 45, 'pecho', 'Mantén la espalda recta', TRUE),
+  ('Press Inclinado con Mancuernas', 'Parte superior del pecho.', 12, 60, 'pecho', 'Sin advertencias', TRUE),
+  ('Aperturas con Mancuernas', 'Aislamiento de pecho.', 12, 50, 'pecho', 'Evita bajar demasiado', TRUE),
 
--- -- MULTIMEDIA CORREGIDO
+  -- ESPALDA
+  ('Dominadas', 'Ejercicio compuesto.', 8, 60, 'espalda', 'Usa banda si eres principiante', TRUE),
+  ('Remo con Barra', 'Espalda media.', 10, 60, 'espalda', 'No uses impulso', TRUE),
+  ('Peso Muerto', 'Espalda baja y piernas.', 8, 70, 'espalda', 'Cuida técnica', TRUE),
+  ('Remo en Polea Baja', 'Máquina.', 12, 55, 'espalda', 'Sin advertencias', TRUE),
+
+  -- PIERNAS
+  ('Sentadillas', 'Ejercicio base.', 12, 60, 'piernas', 'Rodillas alineadas', TRUE),
+  ('Zancadas', 'Unilateral.', 12, 60, 'piernas', 'Sin advertencias', TRUE),
+  ('Prensa de Piernas', 'Máquina.', 15, 60, 'piernas', 'No bloquear rodillas', TRUE),
+  ('Curl Femoral', 'Isquiotibiales.', 12, 50, 'piernas', 'Sin advertencias', TRUE),
+
+  -- HOMBROS
+  ('Press Militar', 'Hombros.', 10, 60, 'hombros', 'Sin advertencias', TRUE),
+  ('Elevaciones Laterales', 'Deltoides.', 15, 45, 'hombros', 'Movimiento controlado', TRUE),
+  ('Elevaciones Frontales', 'Deltoide frontal.', 15, 45, 'hombros', 'Sin advertencias', TRUE),
+
+  -- BRAZOS
+  ('Curl de Bíceps con Barra', 'Bíceps.', 12, 50, 'brazos', 'No balancear', TRUE),
+  ('Curl Martillo', 'Antebrazo.', 12, 50, 'brazos', 'Sin advertencias', TRUE),
+  ('Extensiones de Tríceps en Polea', 'Tríceps.', 15, 50, 'brazos', 'Sin advertencias', TRUE),
+  ('Fondos en Paralelas', 'Compuesto.', 10, 55, 'brazos', 'Inclínate para pecho', TRUE),
+
+  -- CORE
+  ('Plancha', 'Core isométrico.', 0, 60, 'core', 'Cuerpo recto', TRUE),
+  ('Abdominales Crunch', 'Abdomen.', 20, 45, 'core', 'Sin advertencias', TRUE),
+  ('Russian Twist', 'Oblicuos.', 20, 45, 'core', 'Sin advertencias', TRUE),
+  ('Elevación de Piernas', 'Abdomen bajo.', 15, 50, 'core', 'Sin advertencias', TRUE),
+
+  -- CARDIO
+  ('Correr', 'Cardio continuo.', 0, 1200, 'cardio', 'Calentar antes', TRUE),
+  ('Burpees', 'Alta intensidad.', 15, 60, 'cardio', 'Descansa si mareo', TRUE),
+  ('Saltar la Cuerda', 'Cardio.', 0, 300, 'cardio', 'Sin advertencias', TRUE),
+  ('Mountain Climbers', 'Cardio + core.', 30, 60, 'cardio', 'Sin advertencias', TRUE),
+
+  -- REHABILITACIÓN
+  ('Elevación de Pierna Recta', 'Fortalece cuádriceps sin impacto.', 15, 40, 'rehabilitacion', 'Movimiento controlado', TRUE),
+  ('Puente de Glúteos', 'Glúteos y lumbar.', 15, 45, 'rehabilitacion', 'No arquear espalda', TRUE),
+  ('Retracción Escapular', 'Postura y hombros.', 12, 40, 'rehabilitacion', 'Movimiento lento', TRUE),
+  ('Movilidad de Tobillo', 'Rango de movimiento.', 10, 35, 'rehabilitacion', 'Sin dolor', TRUE),
+
+  -- MOVILIDAD / ADULTO MAYOR
+  ('Rotaciones de Cuello', 'Movilidad cervical.', 10, 30, 'movilidad', 'Movimiento suave', TRUE),
+  ('Movilidad de Hombros', 'Rotaciones controladas.', 10, 35, 'movilidad', 'Sin dolor', TRUE),
+  ('Flexión Extensión de Rodillas', 'Articulación rodilla.', 12, 40, 'movilidad', 'Movimiento lento', TRUE),
+  ('Caminata Suave', 'Cardio ligero.', 0, 600, 'movilidad', 'Ritmo cómodo', TRUE),
+  ('Elevaciones de Talones', 'Pantorrilla y equilibrio.', 15, 40, 'movilidad', 'Sujétate si es necesario', TRUE);
+
+-- MULTIMEDIA 
 INSERT INTO multimedia (id_multimedia, id_ejercicio, tipo, url_archivo) VALUES 
   ('vid_press_banca', 1, 'youtube', 'https://youtu.be/TAH8RxOS0VI'),
   ('vid_flexiones', 2, 'youtube', 'https://youtube.com/shorts/YXI_V2sIO_Y'),
