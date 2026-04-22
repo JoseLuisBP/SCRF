@@ -16,6 +16,7 @@ import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import LockIcon from '@mui/icons-material/Lock';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import theme from '../styles/theme';
 
 // --- Esquemas de Validación ---
 
@@ -225,13 +226,17 @@ export default function Profile() {
         }
     };
 
+     //cambia el fondo dependiendo si el usuario usa el modo claro u oscuro
     return (
         <Box
             sx={{
                 minHeight: '100vh',
                 background: (theme) =>
-                    `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
-                pb: 8
+                    theme.palette.mode === "dark"
+                        ? "#000000"
+                        : `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
+                pb: 8,
+                transition: 'background 0.3s ease'
             }}
         >
             <Header />
@@ -249,8 +254,16 @@ export default function Profile() {
                         p: { xs: 2, md: 5 },
                         borderRadius: 4,
                         backdropFilter: "blur(16px)",
-                        backgroundColor: "rgba(255, 255, 255, 0.8)", // Mejor contraste para glassmorphism
-                        border: '1px solid rgba(255,255,255,0.4)', // Refinado
+                        backgroundColor: (theme) =>
+                            theme.palette.mode === "dark"
+                        
+                            ? "rgba(30, 30, 30, 0.85)" 
+                            : "rgba(255,255,255,0.8)",    // Mejor contraste para glassmorphism
+
+                        border: (theme) =>
+                            theme.palette.mode === "dark"
+                                ? "1px solid rgba(255,255,255,0.1)"
+                                : '1px solid rgba(255,255,255,0.4)', // Refinado
                         boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.15)',
                     }}
                 >
