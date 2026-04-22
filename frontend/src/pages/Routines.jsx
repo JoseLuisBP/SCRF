@@ -95,6 +95,7 @@ export default function Routines() {
     );
   }
 
+  //cambia el fondo dependiendo si el usuario usa el modo claro u oscuro
   return (
     <Box
       sx={{
@@ -102,6 +103,7 @@ export default function Routines() {
         background: (theme) =>
           `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
         pb: 10,
+        transition: "background 0.3s ease"
       }}
     >
       <Header showSearchBar={false} />
