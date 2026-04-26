@@ -102,7 +102,6 @@ export default function Header({ showSearchBar = false }) {
       { text: 'Dashboard', path: '/dashboard' },
       { text: 'Rutinas', path: '/routines' },
       { text: 'Ejercicios', path: '/Exercises' },
-      { text: 'Progreso', path: '/progreso' },
       // Panel Fisio visible para Rol 2 (Fisio) y Rol 3 (Admin)
       ...(isPhysio ? [{ text: 'Panel Fisio', path: '/physio' }] : []),
       // Panel Admin visible solo para Rol 3
