@@ -22,6 +22,7 @@ async def get_exercises(
         e.enfoque,
         e.nivel_dificultad,
         e.contraindicaciones,
+        e.is_verified_by_physio,
         m.url_archivo AS "videoUrl"
     FROM ejercicios e
     LEFT JOIN multimedia m 
@@ -32,4 +33,4 @@ async def get_exercises(
     result = await session_manager.pg_session.execute(query)
     rows = result.mappings().all()
 
-    return rows
+    return rows

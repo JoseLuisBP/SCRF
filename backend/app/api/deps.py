@@ -12,6 +12,8 @@ from app.services.user_service import UserService
 
 # Rol de Administrador en la tabla roles (seed.sql)
 ADMIN_ROL_ID = 3
+# Rol de Fisioterapeuta/Entrenador (scope clínico)
+PHYSIO_ROL_ID = 2
 
 
 # Configuración de OAuth2
@@ -163,4 +165,39 @@ async def require_admin(
     current_user: User = Depends(check_admin_role)
 ) -> User:
     """Alias de check_admin_role para retrocompatibilidad con endpoints existentes."""
+    return current_user
+
+
+async def check_physio_role(
+    token: str = Depends(oauth2_scheme),
+    current_user: User = Depends(get_current_user)
+) -> User:
+    """
+    Verifica que el usuario tenga rol de Fisioterapeuta (id_rol == 2)
+    O de Administrador (id_rol == 3), ya que el Admin puede hacer todo lo del Fisio.
+
+    Usa doble capa de validación:
+      1. Claim 'id_rol' del JWT (rápido, sin DB extra)
+      2. id_rol real del usuario en DB (fuente de verdad)
+
+    Args:
+        token: Token JWT del header Authorization
+        current_user: Usuario autenticado obtenido de get_current_user
+    Returns:
+        Usuario Fisioterapeuta o Administrador
+    Raises:
+        HTTPException 403: Si el usuario no tiene rol clínico (Rol 2 o 3)
+    """
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        id_rol_token = payload.get("id_rol")
+    except JWTError:
+        id_rol_token = None
+
+    # Fuente de verdad: id_rol real en DB
+    if current_user.id_rol not in (PHYSIO_ROL_ID, ADMIN_ROL_ID):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Se requiere rol de Fisioterapeuta (2) o Administrador (3) para esta operación"
+        )
     return current_user

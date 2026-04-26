@@ -65,7 +65,12 @@ CREATE TABLE rutinas (
   duracion_estimada INTEGER,
   categoria VARCHAR(100),
   creado_por INTEGER REFERENCES usuarios(id_usuario) ON DELETE SET NULL,
-  fecha_creacion DATE DEFAULT CURRENT_DATE
+  fecha_creacion DATE DEFAULT CURRENT_DATE,
+  -- Flags de ML y verificación clínica
+  is_machine_learning_generated BOOLEAN DEFAULT FALSE,
+  is_verified_by_physio BOOLEAN DEFAULT FALSE,
+  verified_by INTEGER REFERENCES usuarios(id_usuario) ON DELETE SET NULL,
+  verified_at TIMESTAMP
 );
 
 -- Multimedia
@@ -90,7 +95,11 @@ CREATE TABLE ejercicios (
   nivel_dificultad VARCHAR(50),
   contraindicaciones JSONB DEFAULT '[]'::jsonb,
   advertencias TEXT,
-  activo BOOLEAN DEFAULT TRUE
+  activo BOOLEAN DEFAULT TRUE,
+  -- Verificación clínica del Fisioterapeuta (Rol 2)
+  is_verified_by_physio BOOLEAN DEFAULT FALSE,
+  created_by INTEGER REFERENCES usuarios(id_usuario) ON DELETE SET NULL,
+  verification_notes TEXT
 );
 
 -- Rutina_Ejercicio
@@ -145,6 +154,10 @@ CREATE INDEX idx_usuarios_correo ON usuarios (correo);
 CREATE INDEX idx_usuarios_rol ON usuarios (id_rol);
 CREATE INDEX idx_resenas_rutina ON resenas (id_rutina);
 CREATE INDEX idx_resenas_usuario ON resenas (id_usuario);
+-- Índices de verificación clínica
+CREATE INDEX idx_rutinas_ml_flag ON rutinas (is_machine_learning_generated);
+CREATE INDEX idx_rutinas_verified ON rutinas (is_verified_by_physio);
+CREATE INDEX idx_ejercicios_verified ON ejercicios (is_verified_by_physio);
 
 -- Comentarios
 COMMENT ON TABLE roles IS 'Roles del sistema (admin, usuario, etc.)';

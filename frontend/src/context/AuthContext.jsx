@@ -3,8 +3,9 @@ import authAPI from '../api/auth';
 
 const AuthContext = createContext();
 
-// ID del rol Administrador según la tabla roles de PostgreSQL
+// IDs de roles según la tabla roles de PostgreSQL
 const ADMIN_ROL_ID = 3;
+const PHYSIO_ROL_ID = 2;
 
 export function AuthProvider({ children }) {
   const [authState, setAuthState] = useState({
@@ -91,12 +92,15 @@ export function AuthProvider({ children }) {
     });
   };
 
-  // Helper derivado: true solo si el usuario tiene rol de Administrador
+  // Helpers derivados de id_rol
   const isAdmin = authState.id_rol === ADMIN_ROL_ID;
+  // Fisio (Rol 2) o Admin (Rol 3) tienen scope clínico — espeja check_physio_role del backend
+  const isPhysio = authState.id_rol === PHYSIO_ROL_ID || authState.id_rol === ADMIN_ROL_ID;
 
   const value = {
     ...authState,
     isAdmin,
+    isPhysio,
     login,
     logout,
   };

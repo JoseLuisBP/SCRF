@@ -1,7 +1,7 @@
-//Importaciones
-import { Box, Typography, Button, CircularProgress, Alert, Card, CardContent, Avatar, Grid } from '@mui/material';
+import { Box, Typography, Button, CircularProgress, Alert, Card, CardContent, Avatar, Grid, Chip } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../api';
 import Header from '../components/layout/Header';
 
@@ -23,10 +23,10 @@ import { jsPDF } from "jspdf";
 const IMAGE_URL =
   "https://wtrekbnyoeenxlzzxnka.supabase.co/storage/v1/object/public/imagenes/ejercicios/onu.jpg";
 
-//Componente Dashboard
 export default function Dashboard() {
 
-  const { logout } = useAuth();
+  const { logout, isPhysio } = useAuth();
+  const navigate = useNavigate();
 
   //Estados
   const [user, setUser] = useState(null);
@@ -184,6 +184,30 @@ export default function Dashboard() {
               <Typography variant="h6" sx={{ opacity: 0.9 }}>
                 Bienvenido a tu panel de progreso
               </Typography>
+
+              {/* Acceso rápido al Panel del Fisioterapeuta — solo Rol 2 y 3 */}
+              {isPhysio && (
+                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center', gap: 1, flexWrap: 'wrap' }}>
+                  <Chip
+                    label="Panel Fisioterapeuta"
+                    onClick={() => navigate('/physio')}
+                    sx={{
+                      bgcolor: '#10B981', color: 'white', fontWeight: 700,
+                      cursor: 'pointer', px: 1,
+                      '&:hover': { bgcolor: '#059669' },
+                    }}
+                    icon={
+                      <span style={{ color: 'white', fontSize: 16, marginLeft: 6 }}>✦</span>
+                    }
+                  />
+                  <Chip
+                    label="Rutinas pendientes"
+                    onClick={() => navigate('/physio/routines/pending')}
+                    variant="outlined"
+                    sx={{ fontWeight: 600, cursor: 'pointer', borderColor: '#D97706', color: '#D97706' }}
+                  />
+                </Box>
+              )}
             </Box>
 
             <Grid container justifyContent="center" spacing={3} sx={{ mb: 4 }}>

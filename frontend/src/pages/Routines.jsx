@@ -135,7 +135,11 @@ export default function Routines() {
             {/* 🔹 Resultado */}
             {rutina && (
               <>
-                <RutaCard ruta={rutina.ruta_ml} />
+                <RutaCard
+                  ruta={rutina.ruta_ml}
+                  badge={rutina.rutina_generada?.verification_badge}
+                  verified={rutina.rutina_generada?.is_verified_by_physio}
+                />
 
                 <UserInfo info={rutina.inference_features} />
 

@@ -49,7 +49,7 @@ export default function Header({ showSearchBar = false }) {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   //Información del usuario desde el contexto de autenticación.
-  const { isLoggedIn, user, logout, isAdmin } = useAuth();
+  const { isLoggedIn, user, logout, isAdmin, isPhysio } = useAuth();
   //Configuraciones de accesibilidad desde el contexto global.
   const { fontSize, highContrast, seniorMode, increaseFontSize, toggleContrast, toggleSeniorMode } = useAccessibility();
 
@@ -103,7 +103,9 @@ export default function Header({ showSearchBar = false }) {
       { text: 'Rutinas', path: '/routines' },
       { text: 'Ejercicios', path: '/Exercises' },
       { text: 'Progreso', path: '/progreso' },
-      // Enlace al Panel Admin solo visible para usuarios con id_rol=3
+      // Panel Fisio visible para Rol 2 (Fisio) y Rol 3 (Admin)
+      ...(isPhysio ? [{ text: 'Panel Fisio', path: '/physio' }] : []),
+      // Panel Admin visible solo para Rol 3
       ...(isAdmin ? [{ text: 'Panel Admin', path: '/admin' }] : []),
     ]
     : [
