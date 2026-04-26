@@ -4,6 +4,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
+from sklearn.metrics import classification_report
 import joblib
 import os
 
@@ -43,6 +44,8 @@ def train_and_save_model(data_path: str, model_path: str):
     # Métricas sencillas
     acc = pipeline.score(X_test, y_test)
     print(f"Exactitud del modelo en el test set: {acc:.2f}")
+    y_pred = pipeline.predict(X_test)
+    print(classification_report(y_test, y_pred))
     
     # Exportar serialización en Joblib (.pkl)
     os.makedirs(os.path.dirname(model_path), exist_ok=True)
