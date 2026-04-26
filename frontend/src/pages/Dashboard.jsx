@@ -138,14 +138,19 @@ export default function Dashboard() {
   }
 
   //Contenido principal
+   //cambia el fondo dependiendo si el usuario usa el modo claro u oscuro
   return (
     <Box
       sx={{
         minHeight: '100vh',
         background: (theme) =>
-          `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
+          theme.palette.mode === "dark"
+            ? "#000000"
+          : `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
+          
         color: 'white',
         pb: 10,
+        transition: 'background 0.3s ease'
       }}
     >
       <Header showSearchBar={true} />
@@ -158,7 +163,10 @@ export default function Dashboard() {
             borderRadius: 4,
             boxShadow: 6,
             backdropFilter: "blur(16px)",
-            backgroundColor: "#d4e9f8ff",
+            backgroundColor: (theme) => 
+              theme.palette.mode === "dark"
+                ? "rgba (30,30,30,0.85)"
+                : "#d4e9f8ff",
           }}
         >
           <CardContent>

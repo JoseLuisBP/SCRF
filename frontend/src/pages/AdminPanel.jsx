@@ -90,8 +90,18 @@ export default function AdminPanel() {
         return <Chip icon={<PersonIcon />} label="Usuario" color="default" size="small" />;
     };
 
+    // //cambia el fondo dependiendo si el usuario usa el modo claro u oscuro 
     return (
-        <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+        <Box sx={{ minHeight: '100vh',
+            // bgcolor: 'background.default' 
+            background: (theme) =>
+        theme.palette.mode === "dark"
+          ? "#000000"
+          : `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
+      transition: 'background 0.3s ease'
+    }}
+  >
+            
             <Header />
             <Container maxWidth="lg" sx={{ py: 4 }}>
 

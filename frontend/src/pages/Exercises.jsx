@@ -1,7 +1,7 @@
-// React
-import { useState, useEffect } from "react";
+//React
+import { useState, useEffect } from 'react';
 
-// Material UI
+//Material UI
 import {
   Box,
   Container,
@@ -10,14 +10,15 @@ import {
   InputLabel,
   Select,
   MenuItem,
-} from "@mui/material";
+} from '@mui/material';
 
-// Layout
-import Header from "../components/layout/Header";
-import Footer from "../components/layout/Footer";
+{/* Layout */}
+import Header from '../components/layout/Header';
+import Footer from '../components/layout/Footer';
 
-// Componentes
-import ExerciseList from "../components/exercises/ExerciseList";
+{/* Componentes de ejercicios */}
+import ExerciseList from '../components/exercises/ExerciseList';
+
 /**
  * Vista principal de ejercicios
  * - Obtiene ejercicios desde el backend
@@ -25,45 +26,35 @@ import ExerciseList from "../components/exercises/ExerciseList";
  * - Muestra la lista usando componentes reutilizables
  */
 export default function Exercises() {
-  const [category, setCategory] = useState("");
+  {/* Categoría seleccionada */}
+  const [category, setCategory] = useState('');
+
+  {/*Lista completa de ejercicios */}
   const [exercises, setExercises] = useState([]);
-{/* Lista filtrada */}
+
+  {/* Lista filtrada */}
   const [filtered, setFiltered] = useState([]);
-    {/* Manejo de errores */}
+
+  {/* Manejo de errores */}
   const [error, setError] = useState(null);
 
   /**
-  * Cargar ejercicios desde la API
-  */
+   * Cargar ejercicios desde la API
+   */
   useEffect(() => {
     const loadExercises = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8000/api/v1/exercises"
-        );
+        const response = await fetch('http://localhost:8000/api/v1/exercises');
 
         if (!response.ok) {
-          throw new Error("No se pudieron cargar los ejercicios");
+          throw new Error('No se pudieron cargar los ejercicios');
         }
 
         const data = await response.json();
-
-        /**
-         * Adaptamos los datos para incluir videoUrl
-         * dependiendo de cómo venga del backend
-         */
-        const mappedData = data.map((e) => ({
-          ...e,
-          videoUrl:
-            e.videoUrl || // si ya viene directo
-            e.video ||       // por si tu backend usa otro nombre
-            null,
-        }));
-
-        setExercises(mappedData);
+        setExercises(data);
       } catch (err) {
-        console.error("Error cargando ejercicios:", err);
-        setError("No se pudieron cargar los ejercicios");
+        console.error('Error cargando ejercicios:', err);
+        setError('No se pudieron cargar los ejercicios');
       }
     };
 
@@ -71,7 +62,7 @@ export default function Exercises() {
   }, []);
 
   /**
-   * Filtrado
+   * Filtrar ejercicios por categoría
    */
   useEffect(() => {
     if (category) {
@@ -81,18 +72,20 @@ export default function Exercises() {
     }
   }, [category, exercises]);
 
-  /**
-   * Categorías únicas
-   */
+  /*Obtener categorías únicas*/
   const categories = [...new Set(exercises.map((e) => e.categoria))];
 
+   //cambia el fondo dependiendo si el usuario usa el modo claro u oscuro
   return (
     <Box
       sx={{
-        minHeight: "100vh",
+        minHeight: '100vh',
         background: (theme) =>
-          `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
-      }}
+          theme.palette.mode === "dark"
+            ? "#000000"
+            : `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
+        transition: 'background 0.3s ease'
+          }}
     >
       <Header />
 
@@ -101,12 +94,12 @@ export default function Exercises() {
           variant="h4"
           align="center"
           gutterBottom
-          sx={{ fontWeight: "bold", mb: 4 }}
+          sx={{ fontWeight: 'bold', mb: 4 }}
         >
           Ejercicios Disponibles
         </Typography>
 
-        {/* Selector */}
+        {/* Selector de categoría */}
         <Box display="flex" justifyContent="center" mb={4}>
           <FormControl sx={{ minWidth: 220 }}>
             <InputLabel>Categoría</InputLabel>
@@ -125,14 +118,14 @@ export default function Exercises() {
           </FormControl>
         </Box>
 
-        {/* Error */}
+        {/* Mensaje de error */}
         {error && (
           <Typography color="error" align="center" sx={{ mb: 3 }}>
             {error}
           </Typography>
         )}
 
-        {/*Mndamos videoUrl implícito*/}
+        {/* Lista de ejercicios */}
         <ExerciseList exercises={filtered} />
       </Container>
 
