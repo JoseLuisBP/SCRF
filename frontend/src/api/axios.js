@@ -43,7 +43,12 @@ axiosInstance.interceptors.response.use(
   },
   error => {
     if (error.response) {
-      switch (error.response.status) {
+      const status = error.response.status;
+      // Algunos requests declaran silentNotFound=true en config.metadata
+      // para indicar que un 404 es un estado vacío esperado, no un error de usuario.
+      const silent404 = error.config?.metadata?.silentNotFound === true;
+
+      switch (status) {
         case 400:
           alert('Solicitud incorrecta. Verifica los datos enviados.');
           break;
@@ -55,7 +60,10 @@ axiosInstance.interceptors.response.use(
           alert('No tienes permiso para realizar esta acción.');
           break;
         case 404:
-          alert('Recurso no encontrado.');
+          // Solo mostrar el alert si el request NO marcó silentNotFound
+          if (!silent404) {
+            alert('Recurso no encontrado.');
+          }
           break;
         case 500:
           alert('Error del servidor. Inténtalo de nuevo más tarde.');
@@ -74,5 +82,6 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
 
 export default axiosInstance;

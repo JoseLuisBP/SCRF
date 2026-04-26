@@ -1,20 +1,22 @@
-/**
- * ExerciseCreator — Formulario para crear ejercicios clínicos verificados.
- * Solo accesible para Rol 2 (Fisio) y Rol 3 (Admin).
- * El ejercicio se crea con is_verified_by_physio=True por defecto.
- */
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    Box, Typography, TextField, Button, Grid, Alert,
-    FormControl, InputLabel, Select, MenuItem, Chip,
-    Paper, CircularProgress, Autocomplete,
+    Box, Container, Typography, TextField, Button, Grid, Alert,
+    FormControl, InputLabel, Select, MenuItem, Paper, Avatar,
+    CircularProgress, Chip, Autocomplete, Stack, Divider, useTheme,
 } from '@mui/material';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
+import Header from '../../components/layout/Header';
+import Footer from '../../components/layout/Footer';
 import { usePhysioRoutines } from '../../hooks/usePhysioRoutines';
 
-const CATEGORIAS = ['pecho', 'espalda', 'piernas', 'hombros', 'brazos', 'core', 'cardio', 'rehabilitacion', 'movilidad'];
+const CATEGORIAS = [
+    'pecho', 'espalda', 'piernas', 'hombros', 'brazos',
+    'core', 'cardio', 'rehabilitacion', 'movilidad',
+];
 const NIVELES = ['principiante', 'intermedio', 'avanzado'];
 const ENFOQUES = ['fuerza', 'hipertrofia', 'resistencia', 'movilidad', 'rehabilitacion', 'flexibilidad'];
 const LESIONES_COMUNES = [
@@ -24,6 +26,7 @@ const LESIONES_COMUNES = [
 
 export default function ExerciseCreator() {
     const navigate = useNavigate();
+    const theme = useTheme();
     const { createExercise, loading, error } = usePhysioRoutines();
     const [success, setSuccess] = useState(false);
     const [form, setForm] = useState({
@@ -59,117 +62,233 @@ export default function ExerciseCreator() {
     };
 
     return (
-        <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 800, mx: 'auto' }}>
-            <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
-                <FitnessCenterIcon sx={{ color: '#10B981', fontSize: 36 }} />
-                <Box>
-                    <Typography variant="h4" fontWeight={700}>Crear Ejercicio Clínico</Typography>
-                    <Typography color="text.secondary">
-                        El ejercicio se creará con verificación clínica automática (tu aval profesional).
-                    </Typography>
-                </Box>
-            </Box>
+        <Box
+            sx={{
+                minHeight: '100vh',
+                background: (theme) =>
+                    theme.palette.mode === 'dark'
+                        ? '#000000'
+                        : `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
+                transition: 'background 0.3s ease',
+            }}
+        >
+            <Header />
 
-            {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
-            {success && (
-                <Alert severity="success" icon={<CheckCircleOutlineIcon />} sx={{ mb: 3 }}>
-                    ¡Ejercicio creado y verificado! Redirigiendo al panel...
-                </Alert>
-            )}
+            <Container maxWidth="lg" sx={{ py: 4 }}>
 
-            <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', borderRadius: 3 }}>
-                <form onSubmit={handleSubmit}>
-                    <Grid container spacing={3}>
-                        <Grid item xs={12}>
+                {/* Encabezado — mismo patrón que AdminPanel */}
+                <Stack direction="row" alignItems="center" spacing={2} mb={4}>
+                    <Avatar sx={{ bgcolor: 'success.main', width: 48, height: 48 }}>
+                        <FitnessCenterIcon />
+                    </Avatar>
+                    <Box>
+                        <Typography variant="h4" fontWeight={700}>
+                            Crear Ejercicio Clínico
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            El ejercicio se creará con tu verificación clínica de forma automática
+                        </Typography>
+                    </Box>
+                </Stack>
+
+                {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
+                {success && (
+                    <Alert severity="success" icon={<CheckCircleOutlineIcon />} sx={{ mb: 3 }}>
+                        ¡Ejercicio creado y verificado! Redirigiendo al panel...
+                    </Alert>
+                )}
+
+                <Paper
+                    elevation={2}
+                    sx={{ p: 3, borderRadius: 3, border: `1px solid ${theme.palette.divider}` }}
+                >
+                    <Stack direction="row" alignItems="center" spacing={1} mb={3}>
+                        <FitnessCenterIcon color="success" />
+                        <Typography variant="h6" fontWeight={600}>
+                            Datos del Ejercicio
+                        </Typography>
+                    </Stack>
+
+                    <Alert severity="info" sx={{ mb: 3 }}>
+                        El ejercicio se creará con <strong>is_verified_by_physio = True</strong> de forma automática — tu aval profesional queda registrado.
+                    </Alert>
+
+                    <Box component="form" onSubmit={handleSubmit} autoComplete="off">
+                        <Stack spacing={2.5}>
                             <TextField
-                                fullWidth label="Nombre del Ejercicio" name="nombre_ejercicio"
-                                value={form.nombre_ejercicio} onChange={handleChange}
-                                required variant="outlined"
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth multiline rows={3} label="Descripción clínica"
-                                name="descripcion" value={form.descripcion} onChange={handleChange}
+                                fullWidth
+                                label="Nombre del Ejercicio"
+                                name="nombre_ejercicio"
+                                value={form.nombre_ejercicio}
+                                onChange={handleChange}
                                 required
+                                size="small"
                             />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <FormControl fullWidth required>
-                                <InputLabel>Categoría</InputLabel>
-                                <Select name="categoria" value={form.categoria} onChange={handleChange} label="Categoría">
-                                    {CATEGORIAS.map(c => <MenuItem key={c} value={c}>{c}</MenuItem>)}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <FormControl fullWidth>
-                                <InputLabel>Nivel de Dificultad</InputLabel>
-                                <Select name="nivel_dificultad" value={form.nivel_dificultad} onChange={handleChange} label="Nivel de Dificultad">
-                                    {NIVELES.map(n => <MenuItem key={n} value={n}>{n}</MenuItem>)}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
+
                             <TextField
-                                fullWidth type="number" label="Repeticiones" name="repeticiones"
-                                value={form.repeticiones} onChange={handleChange}
-                                inputProps={{ min: 0 }}
+                                fullWidth
+                                multiline
+                                rows={3}
+                                label="Descripción clínica"
+                                name="descripcion"
+                                value={form.descripcion}
+                                onChange={handleChange}
+                                required
+                                size="small"
                             />
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                            <TextField
-                                fullWidth type="number" label="Tiempo (seg)" name="tiempo"
-                                value={form.tiempo} onChange={handleChange}
-                                inputProps={{ min: 0 }}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                            <FormControl fullWidth>
-                                <InputLabel>Enfoque</InputLabel>
-                                <Select name="enfoque" value={form.enfoque} onChange={handleChange} label="Enfoque">
-                                    {ENFOQUES.map(e => <MenuItem key={e} value={e}>{e}</MenuItem>)}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12}>
+
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6}>
+                                    <FormControl fullWidth required size="small">
+                                        <InputLabel>Categoría</InputLabel>
+                                        <Select
+                                            name="categoria"
+                                            value={form.categoria}
+                                            onChange={handleChange}
+                                            label="Categoría"
+                                        >
+                                            {CATEGORIAS.map(c => (
+                                                <MenuItem key={c} value={c}>
+                                                    {c.charAt(0).toUpperCase() + c.slice(1)}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <FormControl fullWidth size="small">
+                                        <InputLabel>Nivel de Dificultad</InputLabel>
+                                        <Select
+                                            name="nivel_dificultad"
+                                            value={form.nivel_dificultad}
+                                            onChange={handleChange}
+                                            label="Nivel de Dificultad"
+                                        >
+                                            {NIVELES.map(n => (
+                                                <MenuItem key={n} value={n}>
+                                                    {n.charAt(0).toUpperCase() + n.slice(1)}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12} sm={4}>
+                                    <TextField
+                                        fullWidth
+                                        type="number"
+                                        label="Repeticiones"
+                                        name="repeticiones"
+                                        value={form.repeticiones}
+                                        onChange={handleChange}
+                                        inputProps={{ min: 0 }}
+                                        size="small"
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={4}>
+                                    <TextField
+                                        fullWidth
+                                        type="number"
+                                        label="Tiempo (seg)"
+                                        name="tiempo"
+                                        value={form.tiempo}
+                                        onChange={handleChange}
+                                        inputProps={{ min: 0 }}
+                                        size="small"
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={4}>
+                                    <FormControl fullWidth size="small">
+                                        <InputLabel>Enfoque</InputLabel>
+                                        <Select
+                                            name="enfoque"
+                                            value={form.enfoque}
+                                            onChange={handleChange}
+                                            label="Enfoque"
+                                        >
+                                            {ENFOQUES.map(e => (
+                                                <MenuItem key={e} value={e}>
+                                                    {e.charAt(0).toUpperCase() + e.slice(1)}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                            </Grid>
+
                             <Autocomplete
-                                multiple freeSolo
+                                multiple
+                                freeSolo
                                 options={LESIONES_COMUNES}
                                 value={form.contraindicaciones}
-                                onChange={(_, newVal) => setForm(prev => ({ ...prev, contraindicaciones: newVal }))}
+                                onChange={(_, newVal) =>
+                                    setForm(prev => ({ ...prev, contraindicaciones: newVal }))
+                                }
                                 renderTags={(value, getTagProps) =>
                                     value.map((option, index) => (
-                                        <Chip variant="outlined" label={option} size="small" color="warning" {...getTagProps({ index })} />
+                                        <Chip
+                                            variant="outlined"
+                                            label={option}
+                                            size="small"
+                                            color="warning"
+                                            {...getTagProps({ index })}
+                                        />
                                     ))
                                 }
                                 renderInput={(params) => (
-                                    <TextField {...params} label="Contraindicaciones" placeholder="Añadir contraindicación..." />
+                                    <TextField
+                                        {...params}
+                                        label="Contraindicaciones"
+                                        placeholder="Añadir contraindicación..."
+                                        size="small"
+                                    />
                                 )}
                             />
-                        </Grid>
-                        <Grid item xs={12}>
+
                             <TextField
-                                fullWidth multiline rows={2} label="Advertencias clínicas"
-                                name="advertencias" value={form.advertencias} onChange={handleChange}
+                                fullWidth
+                                multiline
+                                rows={2}
+                                label="Advertencias clínicas"
+                                name="advertencias"
+                                value={form.advertencias}
+                                onChange={handleChange}
+                                size="small"
                             />
-                        </Grid>
-                        <Grid item xs={12} sx={{ display: 'flex', gap: 2 }}>
-                            <Button
-                                type="submit" variant="contained" size="large"
-                                disabled={loading || success}
-                                startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <CheckCircleOutlineIcon />}
-                                sx={{ bgcolor: '#10B981', '&:hover': { bgcolor: '#059669' }, borderRadius: 2, px: 4 }}
-                            >
-                                {loading ? 'Guardando...' : 'Crear y Verificar Ejercicio'}
-                            </Button>
-                            <Button variant="outlined" size="large" onClick={() => navigate('/physio')} sx={{ borderRadius: 2 }}>
-                                Cancelar
-                            </Button>
-                        </Grid>
-                    </Grid>
-                </form>
-            </Paper>
+
+                            <Divider />
+
+                            <Stack direction="row" spacing={2}>
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    color="success"
+                                    size="large"
+                                    disabled={loading || success}
+                                    startIcon={
+                                        loading
+                                            ? <CircularProgress size={18} color="inherit" />
+                                            : <CheckCircleOutlineIcon />
+                                    }
+                                    sx={{ px: 4 }}
+                                >
+                                    {loading ? 'Guardando...' : 'Crear y Verificar Ejercicio'}
+                                </Button>
+                                <Button
+                                    variant="outlined"
+                                    size="large"
+                                    startIcon={<ArrowBackIcon />}
+                                    onClick={() => navigate('/physio')}
+                                >
+                                    Cancelar
+                                </Button>
+                            </Stack>
+                        </Stack>
+                    </Box>
+                </Paper>
+
+            </Container>
+
+            <Footer />
         </Box>
     );
 }

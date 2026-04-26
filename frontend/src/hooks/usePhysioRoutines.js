@@ -35,19 +35,45 @@ export function usePhysioRoutines() {
 
     /**
      * Obtiene las rutinas ML pendientes de verificación.
+     * Un estado vacío (0 rutinas) se trata como 200 [] — nunca propaga error.
+     * Un 404 real (endpoint no encontrado) se captura silenciosamente → [].
+     * Otros errores (401, 403, 500) sí propagan a handleRequest.
+     *
      * @param {number} [skip=0]
      * @param {number} [limit=20]
-     * @returns {Promise<Array>} Lista de rutinas con badge="ml_generated"
+     * @returns {Promise<Array>} Lista de rutinas con badge="ml_generated" o []
      */
     const getPendingRoutines = useCallback(
-        (skip = 0, limit = 20) =>
-            handleRequest(async () => {
-                const { data } = await axiosInstance.get('/physio/routines/pending', {
+        async (skip = 0, limit = 20) => {
+            setLoading(true);
+            setError(null);
+            try {
+                const { data } = await axiosInstance.get('/v1/physio/routines/pending', {
                     params: { skip, limit },
+                    // Le indicamos al interceptor que NO dispare alert() para este request.
+                    // El interceptor lee este flag antes de mostrar dialogs natívos.
+                    metadata: { silentNotFound: true },
                 });
-                return data;
-            }),
-        [handleRequest]
+                return Array.isArray(data) ? data : [];
+            } catch (err) {
+                const status = err?.response?.status;
+                // 404 o respuesta vacía = estado normal, no un error del usuario
+                if (status === 404 || status === undefined) {
+                    return [];
+                }
+                // Cualquier otro error sí se propaga al estado de error del hook
+                const message =
+                    err?.response?.data?.detail ??
+                    err?.message ??
+                    'Error desconocido';
+                setError(message);
+                return [];
+            } finally {
+                setLoading(false);
+            }
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        []
     );
 
     /**
@@ -60,7 +86,7 @@ export function usePhysioRoutines() {
         (id_rutina) =>
             handleRequest(async () => {
                 const { data } = await axiosInstance.patch(
-                    `/physio/routines/${id_rutina}/verify`
+                    `/v1/physio/routines/${id_rutina}/verify`
                 );
                 return data;
             }),
@@ -75,7 +101,7 @@ export function usePhysioRoutines() {
     const createRoutine = useCallback(
         (routinePayload) =>
             handleRequest(async () => {
-                const { data } = await axiosInstance.post('/physio/routines', routinePayload);
+                const { data } = await axiosInstance.post('/v1/physio/routines', routinePayload);
                 return data;
             }),
         [handleRequest]
@@ -89,7 +115,7 @@ export function usePhysioRoutines() {
     const createExercise = useCallback(
         (exercisePayload) =>
             handleRequest(async () => {
-                const { data } = await axiosInstance.post('/physio/exercises', exercisePayload);
+                const { data } = await axiosInstance.post('/v1/physio/exercises', exercisePayload);
                 return data;
             }),
         [handleRequest]
@@ -105,7 +131,7 @@ export function usePhysioRoutines() {
         (id_ejercicio, notes = null) =>
             handleRequest(async () => {
                 const { data } = await axiosInstance.patch(
-                    `/physio/exercises/${id_ejercicio}/verify`,
+                    `/v1/physio/exercises/${id_ejercicio}/verify`,
                     notes ? { notes } : undefined
                 );
                 return data;
