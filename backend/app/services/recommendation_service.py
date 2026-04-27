@@ -195,7 +195,7 @@ class RecommendationService:
 
         rutina.is_verified_by_physio = True
         rutina.verified_by = physio.id_usuario
-        rutina.verified_at = datetime.now(timezone.utc)
+        rutina.verified_at = datetime.now(timezone.utc).replace(tzinfo=None)
 
         await db.flush()
         return rutina
@@ -226,7 +226,7 @@ class RecommendationService:
         Returns:
             Nueva Rutina persistida (sin commit — el router/caller hace commit)
         """
-        now = datetime.now(timezone.utc)
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
         nueva_rutina = Rutina(
             nombre_rutina=data.nombre_rutina,
             descripcion=data.descripcion,

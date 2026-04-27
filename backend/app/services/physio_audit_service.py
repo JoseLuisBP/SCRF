@@ -88,7 +88,7 @@ class PhysioAuditService:
                 "type": entity_type,
                 "id": entity_id,
             },
-            "timestamp": datetime.now(timezone.utc),
+            "timestamp": datetime.now(timezone.utc).replace(tzinfo=None),
             "metadata": metadata or {},
         }
 

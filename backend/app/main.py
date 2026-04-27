@@ -94,6 +94,13 @@ def create_app() -> FastAPI:
         prefix="/api/v1"
     )
 
+    from app.api.v1 import routines
+    application.include_router(
+        routines.router,
+        prefix=f"{settings.API_V1_PREFIX}/routines",
+        tags=["Routines"]
+    )
+
     # Router de administración — solo accesible con id_rol=3
     application.include_router(
         admin.router,
