@@ -33,7 +33,7 @@ async def get_personalized_routine(
     session_manager: SessionManager = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ) -> RutinaMLOut:
-    # 🔐 Solo el propio usuario o un Admin/Fisio puede solicitar la rutina de otro
+    # Solo el propio usuario o un Admin/Fisio puede solicitar la rutina de otro
     if current_user.id_usuario != id_usuario and current_user.id_rol not in (2, ADMIN_ROL_ID):
         raise HTTPException(status_code=403, detail="No tienes permiso para acceder a esta rutina")
 

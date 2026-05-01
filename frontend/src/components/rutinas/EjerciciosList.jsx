@@ -1,43 +1,66 @@
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useState } from 'react';
 import ExerciseCard from '../exercises/ExerciseCard';
 import ExerciseDetail from '../exercises/ExerciseDetail';
 
-/**
- * ExerciseList
- * ------------
- * Renderiza los ejercicios usando CSS Grid para que
- * siempre ocupen todo el ancho disponible.
- */
 export default function ExerciseList({ exercises }) {
   const [selectedExercise, setSelectedExercise] = useState(null);
 
+  if (!exercises || Object.keys(exercises).length === 0) {
+    return (
+      <Typography textAlign="center" color="text.secondary">
+        No hay ejercicios disponibles
+      </Typography>
+    );
+  }
+
   return (
     <>
-      {/* Grid responsivo real */}
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: {
-            xs: '1fr',                          // 1 columna en móvil
-            sm: 'repeat(2, 1fr)',               // 2 columnas
-            md: 'repeat(3, 1fr)',               // 3 columnas
-            lg: 'repeat(auto-fit, minmax(280px, 1fr))',
-          },
-          gap: 3,
-          alignItems: 'stretch',
-        }}
-      >
-        {exercises.map((exercise) => (
-          <ExerciseCard
-            key={exercise.id_ejercicio}
-            exercise={exercise}
-            onViewDetails={setSelectedExercise}
-          />
-        ))}
-      </Box>
+      {Object.entries(exercises).map(([grupo, lista]) => {
+        if (!lista || lista.length === 0) return null;
 
-      {/* Modal de detalles */}
+        return (
+          <Box key={grupo} sx={{ mb: 4 }}>
+            
+            {/* 🔥 Título del grupo */}
+            <Typography
+              variant="h5"
+              sx={{
+                mb: 2,
+                fontWeight: 'bold',
+                textTransform: 'capitalize',
+              }}
+            >
+              {grupo}
+            </Typography>
+
+            {/* 🔹 Grid */}
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: '1fr',
+                  sm: 'repeat(2, 1fr)',
+                  md: 'repeat(3, 1fr)',
+                  lg: 'repeat(auto-fit, minmax(280px, 1fr))',
+                },
+                gap: 3,
+                alignItems: 'stretch',
+              }}
+            >
+              {lista.map((exercise) => (
+                <ExerciseCard
+                  key={exercise.id_ejercicio}
+                  exercise={exercise}
+                  onViewDetails={setSelectedExercise}
+                />
+              ))}
+            </Box>
+          </Box>
+        );
+      })}
+
+      {/* 🔥 Modal */}
       {selectedExercise && (
         <ExerciseDetail
           exercise={selectedExercise}

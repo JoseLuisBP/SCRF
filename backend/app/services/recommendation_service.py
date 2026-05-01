@@ -1,18 +1,9 @@
-"""
-Servicio de recomendación de rutinas.
-Separa la lógica de negocio del router HTTP (recommendations.py).
-
-Responsabilidades:
-  - Inferencia con modelo CART (MLService)
-  - Filtrado de ejercicios por ruta y contraindicaciones
-  - Persistencia de rutinas ML en la BD
-  - Validación de rutinas ML por el Fisioterapeuta
-  - Creación de rutinas manuales por el Fisioterapeuta
-"""
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import List
+from typing import List, Dict
+from collections import defaultdict
+import random
 
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,45 +11,143 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.ejercicio import Ejercicio
 from app.models.rutina import Rutina
 from app.models.user import User
-from app.schemas.rutina import RutinaCreateIn, RutinaMLDetalle, RutinaMLOut, EjercicioEnRutinaOut
+from app.schemas.rutina import (
+    RutinaCreateIn,
+    RutinaMLDetalle,
+    RutinaMLOut,
+    EjercicioEnRutinaOut
+)
 from app.services.ml_service import MLService
 
-# Mapeo de rutas CART → categorías de ejercicios permitidas
+
+# ─────────────────────────────────────────────────────────────
+# Configuración base
+# ─────────────────────────────────────────────────────────────
 _RUTA_CATEGORIAS: dict[str, list[str]] = {
-    "Rehabilitación": ["core", "cardio", "piernas", "rehabilitacion"],
-    "Fuerza/Joven":   ["pecho", "espalda", "piernas", "hombros", "brazos"],
-    "Adulto Mayor":   ["movilidad", "rehabilitacion"],
+    "Rehabilitación": ["core", "cardio", "piernas", "rehabilitacion", "movilidad"],
+    "Fuerza/Joven":   ["pecho", "espalda", "piernas", "hombros", "brazos", "core"],
+    "Adulto Mayor":   ["movilidad", "rehabilitacion", "core", "piernas"],
     "Híbrido":        ["core", "cardio", "piernas", "pecho", "espalda"],
 }
-
-# Límite de ejercicios en una rutina ML
-_ML_EJERCICIO_LIMIT = 15
 
 
 class RecommendationService:
 
-    # ──────────────────────────────────────────────────────────────────────────
-    # Inferencia ML + Filtrado → Rutina efímera (NO persiste en BD)
-    # ──────────────────────────────────────────────────────────────────────────
+    # ─────────────────────────────────────────────────────────────
+    #  Rotación inteligente de grupo
+    # ─────────────────────────────────────────────────────────────
+    @staticmethod
+    async def _get_next_grupo(db, user_id: int, ruta: str):
+        result = await db.execute(text("""
+            SELECT grupo_trabajado
+            FROM historial_progreso
+            WHERE id_usuario = :user_id
+            ORDER BY fecha DESC
+            LIMIT 1
+        """), {"user_id": user_id})
+
+        last = result.scalar()
+
+        orden = {
+            "Fuerza/Joven": ["piernas", "pecho", "espalda", "hombros", "core"],
+            "Híbrido": ["piernas", "espalda", "pecho", "core", "cardio"],
+            "Adulto Mayor": ["movilidad", "core", "piernas"],
+            "Rehabilitación": ["rehabilitacion", "movilidad", "core"]
+        }
+
+        lista = orden.get(ruta, ["core"])
+
+        if not last or last not in lista:
+            return lista[0]
+
+        idx = lista.index(last)
+        return lista[(idx + 1) % len(lista)]
+
+    # ─────────────────────────────────────────────────────────────
+    #  Estructurar rutina por grupos (DINÁMICA)
+    # ─────────────────────────────────────────────────────────────
+    @staticmethod
+    def _estructurar_rutina_por_grupos(
+        ejercicios: List[EjercicioEnRutinaOut],
+        ruta: str,
+        nivel_fisico: str
+    ) -> Dict[str, List[EjercicioEnRutinaOut]]:
+
+        grupos = defaultdict(list)
+
+        for ej in ejercicios:
+            grupos[ej.categoria].append(ej)
+
+        #  Base por nivel
+        if nivel_fisico == "sedentario":
+            base = 2
+        elif nivel_fisico == "moderado":
+            base = 3
+        else:
+            base = 4
+
+        #  Límites por ruta
+        if ruta == "Fuerza/Joven":
+            limite = {
+                "piernas": base + 1,
+                "pecho": base,
+                "espalda": base,
+                "hombros": base,
+                "brazos": base - 1,
+                "core": base - 1,
+            }
+
+        elif ruta == "Híbrido":
+            limite = {
+                "piernas": base,
+                "espalda": base,
+                "pecho": base,
+                "core": base - 1,
+                "cardio": base - 1,
+            }
+
+        elif ruta == "Adulto Mayor":
+            limite = {
+                "movilidad": base + 1,
+                "core": base - 1,
+                "piernas": base - 1,
+            }
+
+        elif ruta == "Rehabilitación":
+            limite = {
+                "rehabilitacion": base + 1,
+                "movilidad": base,
+                "core": base - 1,
+            }
+
+        else:
+            limite = {}
+
+        rutina = {}
+
+        for categoria, cantidad in limite.items():
+            if categoria in grupos:
+                disponibles = grupos[categoria]
+
+                cantidad = max(1, cantidad)
+
+                rutina[categoria] = random.sample(
+                    disponibles,
+                    min(len(disponibles), cantidad)
+                )
+
+        return rutina
+
+    # ─────────────────────────────────────────────────────────────
+    #  Generar rutina ML
+    # ─────────────────────────────────────────────────────────────
     @staticmethod
     async def generate_ml_routine(
         db: AsyncSession,
         user: User,
         ml_svc: MLService,
     ) -> RutinaMLOut:
-        """
-        Genera una rutina personalizada usando el modelo CART.
 
-        El resultado NO se persiste — es una respuesta en tiempo real.
-        El badge será siempre 'ml_generated' (pendiente de revisión del Fisio).
-
-        Args:
-            db:     Sesión de PostgreSQL
-            user:   Usuario solicitante (debe tener perfil médico cargado)
-            ml_svc: Instancia del servicio ML (singleton)
-        Returns:
-            RutinaMLOut con los ejercicios filtrados y el badge correspondiente
-        """
         medical_profile = user.perfil_medico
         lesiones_usuario: list[str] = (
             medical_profile.lesiones
@@ -71,7 +160,7 @@ class RecommendationService:
         nivel_fisico = user.nivel_fisico or "sedentario"
         objetivo_principal = user.objetivo_principal or "Salud/Movilidad"
 
-        # 1. Inferencia CART
+        # 1. ML
         ruta_recomendada = ml_svc.predict_routine_path(
             edad=edad,
             nivel_fisico=nivel_fisico,
@@ -79,30 +168,39 @@ class RecommendationService:
             tiene_lesion=tiene_lesion,
         )
 
-        # 2. Filtro por categorías de la ruta
+        # 2. Grupo del día
+        grupo_del_dia = await RecommendationService._get_next_grupo(
+            db, user.id_usuario, ruta_recomendada
+        )
+
+        # 3. Query ejercicios
         categorias = _RUTA_CATEGORIAS.get(ruta_recomendada, [])
         query = select(Ejercicio).where(Ejercicio.activo == True)
+
         if categorias:
             query = query.where(Ejercicio.categoria.in_(categorias))
 
         result = await db.execute(query)
         ejercicios: list[Ejercicio] = list(result.scalars().all())
 
-        # 3. Mapa de multimedia
+        # 4. Multimedia
         multimedia_result = await db.execute(text(
             "SELECT id_ejercicio, url_archivo FROM multimedia"
         ))
-        multimedia_map: dict[int, str] = {
+
+        multimedia_map = {
             row["id_ejercicio"]: row["url_archivo"]
             for row in multimedia_result.mappings().all()
         }
 
-        # 4. Filtro por contraindicaciones
-        ejercicios_seguros: list[EjercicioEnRutinaOut] = []
+        # 5. Filtrar contraindicaciones
+        ejercicios_seguros: List[EjercicioEnRutinaOut] = []
+
         for ej in ejercicios:
             if isinstance(ej.contraindicaciones, list):
                 if any(l in ej.contraindicaciones for l in lesiones_usuario):
                     continue
+
             ejercicios_seguros.append(EjercicioEnRutinaOut(
                 id_ejercicio=ej.id_ejercicio,
                 nombre_ejercicio=ej.nombre_ejercicio,
@@ -118,6 +216,19 @@ class RecommendationService:
                 is_verified_by_physio=ej.is_verified_by_physio,
             ))
 
+        # 6. Estructurar rutina
+        rutina_estructurada = RecommendationService._estructurar_rutina_por_grupos(
+            ejercicios_seguros,
+            ruta_recomendada,
+            nivel_fisico
+        )
+
+        #  SOLO grupo del día
+        rutina_estructurada = {
+            grupo_del_dia: rutina_estructurada.get(grupo_del_dia, [])
+        }
+
+        # 7. Response
         return RutinaMLOut(
             ruta_ml=ruta_recomendada,
             usuario_id=user.id_usuario,
@@ -131,23 +242,20 @@ class RecommendationService:
                 descripcion=f"Rutina ML: {ruta_recomendada}",
                 is_machine_learning_generated=True,
                 is_verified_by_physio=False,
-                ejercicios_habilitados=ejercicios_seguros[:_ML_EJERCICIO_LIMIT],
+                ejercicios_habilitados=rutina_estructurada,
             ),
+            grupo_objetivo=grupo_del_dia,
         )
 
-    # ──────────────────────────────────────────────────────────────────────────
-    # Rutinas ML pendientes de verificación (para el dashboard del Fisio)
-    # ──────────────────────────────────────────────────────────────────────────
+    # ─────────────────────────────────────────────────────────────
+    # RESTO SIN CAMBIOS
+    # ─────────────────────────────────────────────────────────────
     @staticmethod
     async def get_pending_verification_routines(
         db: AsyncSession,
         skip: int = 0,
         limit: int = 20,
     ) -> list[Rutina]:
-        """
-        Retorna rutinas generadas por ML que aún no han sido verificadas.
-        Ordenadas por fecha de creación descendente.
-        """
         result = await db.execute(
             select(Rutina)
             .where(
@@ -160,32 +268,12 @@ class RecommendationService:
         )
         return list(result.scalars().all())
 
-    # ──────────────────────────────────────────────────────────────────────────
-    # Verificación de rutina ML por el Fisioterapeuta
-    # ──────────────────────────────────────────────────────────────────────────
     @staticmethod
     async def verify_routine(
         db: AsyncSession,
         id_rutina: int,
         physio: User,
     ) -> Rutina:
-        """
-        El Fisioterapeuta (Rol 2) o Admin (Rol 3) valida una rutina ML.
-
-        Actualiza:
-          - is_verified_by_physio = True
-          - verified_by           = physio.id_usuario
-          - verified_at           = ahora (UTC)
-
-        Args:
-            db:       Sesión de PostgreSQL
-            id_rutina: ID de la rutina a verificar
-            physio:   Usuario con Rol 2 o 3
-        Returns:
-            Rutina actualizada
-        Raises:
-            ValueError: Si la rutina no existe
-        """
         result = await db.execute(
             select(Rutina).where(Rutina.id_rutina == id_rutina)
         )
@@ -200,33 +288,14 @@ class RecommendationService:
         await db.flush()
         return rutina
 
-    # ──────────────────────────────────────────────────────────────────────────
-    # Creación de rutina manual por el Fisioterapeuta
-    # ──────────────────────────────────────────────────────────────────────────
     @staticmethod
     async def create_physio_routine(
         db: AsyncSession,
         data: RutinaCreateIn,
         physio: User,
     ) -> Rutina:
-        """
-        Crea una rutina manualmente por un Fisioterapeuta o Admin.
-
-        Defaults automáticos:
-          - is_machine_learning_generated = False  (no es ML)
-          - is_verified_by_physio         = True   (el propio creador la avala)
-          - verified_by                   = physio.id_usuario
-          - verified_at                   = ahora (UTC)
-          - creado_por                    = physio.id_usuario
-
-        Args:
-            db:    Sesión de PostgreSQL
-            data:  Datos de la rutina a crear
-            physio: Usuario con Rol 2 o 3
-        Returns:
-            Nueva Rutina persistida (sin commit — el router/caller hace commit)
-        """
         now = datetime.now(timezone.utc).replace(tzinfo=None)
+
         nueva_rutina = Rutina(
             nombre_rutina=data.nombre_rutina,
             descripcion=data.descripcion,
@@ -239,13 +308,11 @@ class RecommendationService:
             verified_by=physio.id_usuario,
             verified_at=now,
         )
+
         db.add(nueva_rutina)
-        await db.flush()  # Genera el id_rutina antes del return
+        await db.flush()
         return nueva_rutina
 
-    # ──────────────────────────────────────────────────────────────────────────
-    # Verificación de ejercicio individual
-    # ──────────────────────────────────────────────────────────────────────────
     @staticmethod
     async def verify_exercise(
         db: AsyncSession,
@@ -253,19 +320,6 @@ class RecommendationService:
         physio: User,
         notes: str | None = None,
     ) -> Ejercicio:
-        """
-        El Fisioterapeuta valida clínicamente un ejercicio.
-
-        Args:
-            db:           Sesión de PostgreSQL
-            id_ejercicio: ID del ejercicio a verificar
-            physio:       Usuario con Rol 2 o 3
-            notes:        Notas clínicas opcionales
-        Returns:
-            Ejercicio actualizado
-        Raises:
-            ValueError: Si el ejercicio no existe
-        """
         result = await db.execute(
             select(Ejercicio).where(Ejercicio.id_ejercicio == id_ejercicio)
         )
@@ -276,5 +330,6 @@ class RecommendationService:
         ejercicio.is_verified_by_physio = True
         if notes:
             ejercicio.verification_notes = notes
+
         await db.flush()
         return ejercicio

@@ -17,7 +17,7 @@ import Alert from '@mui/material/Alert';
 import FormHelperText from '@mui/material/FormHelperText';
 
 // React Hook Form
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 // Yup
@@ -66,6 +66,7 @@ const registerSchema = yup.object({
     .transform((value) => (isNaN(value) ? undefined : value))
     .min(0, 'Ingresa un valor valido')
     .nullable(),
+  objetivo_principal: yup.string().nullable(),
   acceptedTerms: yup
     .boolean()
     .oneOf([true], 'Debes aceptar los términos y condiciones'),
@@ -80,6 +81,7 @@ export default function Register() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
     reset,
     setValue,
@@ -97,6 +99,7 @@ export default function Register() {
       estatura: '',
       nivelFisico: '',
       tiempoDisponible: '',
+      objetivo_principal: '',
       acceptedTerms: false,
     },
   });
@@ -110,6 +113,19 @@ export default function Register() {
 
   const handleCloseTerms = () => setOpenTerms(false);
 
+  // FIX 3: Parsear correctamente el detail del error 422 de FastAPI
+  // FastAPI devuelve detail como array de objetos cuando falla la validación de Pydantic
+  const parseErrorMessage = (error) => {
+    const detail = error.response?.data?.detail;
+    if (!detail) return error?.message || 'Error al registrar usuario.';
+    if (typeof detail === 'string') return detail;
+    if (Array.isArray(detail)) {
+      // Cada elemento tiene { msg, loc, type } — extraemos solo el msg
+      return detail.map((e) => e.msg).join(', ');
+    }
+    return 'Error al registrar usuario.';
+  };
+
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
@@ -118,11 +134,14 @@ export default function Register() {
         nombre: data.nombre,
         correo: data.correo,
         contrasena: data.password,
-        edad: parseInt(data.age),
+        // FIX 2: Asegurar que edad llegue como número entero al backend
+        edad: data.age ? parseInt(data.age, 10) : null,
         peso: data.peso ? parseFloat(data.peso) : null,
         estatura: data.estatura ? parseFloat(data.estatura) : null,
+        // FIX 1: Convertir string vacío a null para campos opcionales
         nivel_fisico: data.nivelFisico || null,
-        tiempo_disponible: data.tiempoDisponible ? parseInt(data.tiempoDisponible) : 0,
+        tiempo_disponible: data.tiempoDisponible ? parseInt(data.tiempoDisponible, 10) : 0,
+        objetivo_principal: data.objetivo_principal || null,
         confirmado: data.acceptedTerms,
       };
 
@@ -137,18 +156,11 @@ export default function Register() {
       reset();
 
     } catch (error) {
-
-      const errorMessage =
-        error.response?.data?.detail ||
-        error?.message ||
-        'Error al registrar usuario.';
-
       setSnackbar({
         open: true,
-        message: errorMessage,
+        message: parseErrorMessage(error),
         severity: 'error'
       });
-
     } finally {
       setIsLoading(false);
     }
@@ -160,15 +172,11 @@ export default function Register() {
       sx={{
         minHeight: '100vh',
         minWidth: '100vw',
-
-        //cambio de fondo dependiendo modo claro u oscuro
         background: (theme) =>
           theme.palette.mode === "dark"
             ? "#000000"
             : theme.palette.primary.light,
-
         transition: "background 0.3s ease",
-
         color: 'text.primary'
       }}
     >
@@ -277,18 +285,54 @@ export default function Register() {
             sx={{ maxWidth: 400, mx: 'auto', mb: 2 }}
           />
 
-          <Input
-            label="Nivel físico"
-            select
-            options={[
-              { value: 'sedentario', label: 'Sedentario (Poco o nada de ejercicio)' },
-              { value: 'ligero', label: 'Ligero (1-3 días/sem)' },
-              { value: 'moderado', label: 'Moderado (3-5 días/sem)' },
-              { value: 'intenso', label: 'Intenso (6-7 días/sem)' },
-            ]}
-            fullWidth
-            {...register('nivelFisico')}
-            sx={{ maxWidth: 400, mx: 'auto', mb: 2 }}
+          {/*
+            FIX 1: Usar Controller para los selects de MUI.
+            El {...register()} solo con useForm no sincroniza bien el value
+            de MUI Select — MUI necesita value+onChange controlados explícitamente.
+            Controller actúa de puente entre React Hook Form y MUI.
+          */}
+          <Controller
+            name="nivelFisico"
+            control={control}
+            render={({ field }) => (
+              <Input
+                label="Nivel físico"
+                select
+                options={[
+                  { value: '', label: 'Selecciona una opción' },
+                  { value: 'sedentario', label: 'Sedentario (Poco o nada de ejercicio)' },
+                  { value: 'ligero', label: 'Ligero (1-3 días/sem)' },
+                  { value: 'moderado', label: 'Moderado (3-5 días/sem)' },
+                  { value: 'intenso', label: 'Intenso (6-7 días/sem)' },
+                ]}
+                fullWidth
+                {...field}
+                value={field.value ?? ''}
+                sx={{ maxWidth: 400, mx: 'auto', mb: 2 }}
+              />
+            )}
+          />
+
+          <Controller
+            name="objetivo_principal"
+            control={control}
+            render={({ field }) => (
+              <Input
+                label="Objetivo Principal"
+                select
+                options={[
+                  { value: '', label: 'Selecciona una opción' },
+                  { value: 'Salud/Movilidad', label: 'Salud y movilidad' },
+                  { value: 'Fuerza/Hipertrofia', label: 'Fuerza / Hipertrofia' },
+                  { value: 'Rehabilitación', label: 'Rehabilitación' },
+                  { value: 'Resistencia/Deporte', label: 'Resistencia / Deporte' },
+                ]}
+                fullWidth
+                {...field}
+                value={field.value ?? ''}
+                sx={{ maxWidth: 400, mx: 'auto', mb: 2 }}
+              />
+            )}
           />
 
           <Input
@@ -353,7 +397,7 @@ export default function Register() {
 
         <DialogContent dividers>
 
-         <Typography variant="body2" component="p" sx={{ mb: 2 }}>
+          <Typography variant="body2" component="p" sx={{ mb: 2 }}>
             Al registrarte en nuestra plataforma, aceptas los siguientes términos:
           </Typography>
           <Typography variant="body2" component="p" sx={{ mb: 2 }}>
@@ -374,7 +418,6 @@ export default function Register() {
           <Typography variant="body2" component="p" sx={{ mb: 2 }}>
             Se recomienda que cualquier entrenamiento se realice bajo la supervisión de un profesional o persona capacitada que pueda asistir en caso de requerir ayuda.
           </Typography>
-
 
         </DialogContent>
 

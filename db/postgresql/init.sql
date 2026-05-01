@@ -100,6 +100,7 @@ CREATE TABLE ejercicios (
   is_verified_by_physio BOOLEAN DEFAULT FALSE,
   created_by INTEGER REFERENCES usuarios(id_usuario) ON DELETE SET NULL,
   verification_notes TEXT
+  
 );
 
 -- Rutina_Ejercicio
