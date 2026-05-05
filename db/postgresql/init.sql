@@ -133,7 +133,8 @@ CREATE TABLE historial_progreso (
   fecha DATE DEFAULT CURRENT_DATE,
   duracion_real INTEGER,
   estado VARCHAR(50),
-  notas TEXT
+  notas TEXT,
+  grupo_trabajado VARCHAR(100)
 );
 
 -- Auditoría
