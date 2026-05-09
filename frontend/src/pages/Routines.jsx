@@ -117,6 +117,11 @@ export default function Routines() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+
+          background: (theme) =>
+            theme.palette.mode === "dark"
+              ? "#000000"
+              : "#ffffff",
         }}
       >
         <CircularProgress />
@@ -128,28 +133,79 @@ export default function Routines() {
     <Box
       sx={{
         minHeight: "100vh",
+
         background: (theme) =>
           theme.palette.mode === "dark"
             ? "#000000"
             : `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
+
+        color: (theme) =>
+          theme.palette.mode === "dark"
+            ? "#ffffff"
+            : "#000000",
+
+        transition: "all 0.3s ease",
+
         pb: 10,
       }}
     >
       <Header showSearchBar={false} />
 
-      <Container maxWidth="lg" sx={{ mt: 10 }}>
-        {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
+      <Container
+        maxWidth="lg"
+        sx={{
+          mt: 10,
+          transition: "all 0.3s ease",
+        }}
+      >
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
 
         {/* 🔹 Rutina Inteligente */}
         <Box sx={{ display: "flex", justifyContent: "center", mb: 6 }}>
-          <Card sx={{ width: "100%", borderRadius: 4, boxShadow: 3 }}>
+          <Card
+            sx={{
+              width: "100%",
+              borderRadius: 4,
+              boxShadow: 3,
+
+              backgroundColor: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "#111111"
+                  : "#ffffff",
+
+              color: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "#ffffff"
+                  : "#000000",
+
+              transition: "all 0.3s ease",
+            }}
+          >
             <CardContent sx={{ p: { xs: 2, md: 4 } }}>
 
-              <Typography variant="h4" textAlign="center" mb={1} fontWeight="bold">
+              <Typography
+                variant="h4"
+                textAlign="center"
+                mb={1}
+                fontWeight="bold"
+              >
                 Rutina Inteligente
               </Typography>
 
-              <Typography textAlign="center" color="text.secondary" mb={3}>
+              <Typography
+                textAlign="center"
+                mb={3}
+                sx={{
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "#cccccc"
+                      : "text.secondary",
+                }}
+              >
                 Genera una rutina personalizada basada en tu perfil clínico usando Machine Learning.
               </Typography>
 
@@ -160,14 +216,35 @@ export default function Routines() {
                   size="large"
                   onClick={generarRutina}
                   disabled={loadingRutinaML}
-                  sx={{ px: 4, py: 1.5, borderRadius: 2 }}
+                  sx={{
+                    px: 4,
+                    py: 1.5,
+                    borderRadius: 2,
+                    transition: "all 0.3s ease",
+                  }}
                 >
-                  {loadingRutinaML ? "Generando..." : "+ Generar Rutina Inteligente"}
+                  {loadingRutinaML
+                    ? "Generando..."
+                    : "+ Generar Rutina Inteligente"}
                 </Button>
               </Box>
 
               {rutinaML && (
-                <Box sx={{ mt: 2, p: 2, bgcolor: "rgba(0,0,0,0.02)", borderRadius: 3 }}>
+                <Box
+                  sx={{
+                    mt: 2,
+                    p: 2,
+
+                    bgcolor: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? "#1a1a1a"
+                        : "rgba(0,0,0,0.02)",
+
+                    borderRadius: 3,
+
+                    transition: "all 0.3s ease",
+                  }}
+                >
 
                   {/* 🔥 Ruta + badge */}
                   <RutaCard
@@ -202,7 +279,10 @@ export default function Routines() {
                     variant="contained"
                     color="success"
                     fullWidth
-                    sx={{ mt: 4 }}
+                    sx={{
+                      mt: 4,
+                      transition: "all 0.3s ease",
+                    }}
                     onClick={() => setOpenModal(true)}
                   >
                     Terminar rutina
@@ -216,7 +296,25 @@ export default function Routines() {
       </Container>
 
       {/* 🔥 MODAL */}
-      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
+      <Dialog
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        PaperProps={{
+          sx: {
+            backgroundColor: (theme) =>
+              theme.palette.mode === "dark"
+                ? "#111111"
+                : "#ffffff",
+
+            color: (theme) =>
+              theme.palette.mode === "dark"
+                ? "#ffffff"
+                : "#000000",
+
+            transition: "all 0.3s ease",
+          },
+        }}
+      >
         <DialogTitle>Registrar progreso</DialogTitle>
 
         <DialogContent>
@@ -225,7 +323,40 @@ export default function Routines() {
             fullWidth
             value={duracion}
             onChange={(e) => setDuracion(e.target.value)}
-            sx={{ mb: 2 }}
+            sx={{
+              mb: 2,
+              mt: 1,
+
+              input: {
+                color: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "#ffffff"
+                    : "#000000",
+              },
+
+              label: {
+                color: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "#cccccc"
+                    : "#000000",
+              },
+
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "#555"
+                      : "#ccc",
+                },
+
+                "&:hover fieldset": {
+                  borderColor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "#888"
+                      : "#000",
+                },
+              },
+            }}
           />
 
           <TextField
@@ -235,12 +366,56 @@ export default function Routines() {
             rows={3}
             value={notas}
             onChange={(e) => setNotas(e.target.value)}
+            sx={{
+              input: {
+                color: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "#ffffff"
+                    : "#000000",
+              },
+
+              textarea: {
+                color: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "#ffffff"
+                    : "#000000",
+              },
+
+              label: {
+                color: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "#cccccc"
+                    : "#000000",
+              },
+
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "#555"
+                      : "#ccc",
+                },
+
+                "&:hover fieldset": {
+                  borderColor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "#888"
+                      : "#000",
+                },
+              },
+            }}
           />
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={() => setOpenModal(false)}>Cancelar</Button>
-          <Button onClick={guardarProgreso} variant="contained">
+          <Button onClick={() => setOpenModal(false)}>
+            Cancelar
+          </Button>
+
+          <Button
+            onClick={guardarProgreso}
+            variant="contained"
+          >
             Guardar
           </Button>
         </DialogActions>
