@@ -3,28 +3,84 @@ Router del Fisioterapeuta — endpoints exclusivos para Rol 2 (Fisio) y Rol 3 (A
 Todos los endpoints están protegidos por check_physio_role.
 
 Endpoints:
-  POST   /physio/exercises              → Crear ejercicio verificado
-  POST   /physio/routines               → Crear rutina manual verificada
-  GET    /physio/routines/pending       → Lista de rutinas ML sin verificar
-  PATCH  /physio/routines/{id}/verify   → Validar rutina ML
-  PATCH  /physio/exercises/{id}/verify  → Validar ejercicio individual
-  GET    /physio/exercises              → Listar todos los ejercicios (incl. inactivos)
+  GET    /physio/stats                        → Estadísticas del fisioterapeuta
+  GET    /physio/exercises                    → Listar todos los ejercicios (incl. inactivos)
+  GET    /physio/exercises/unverified         → Ejercicios sin verificación clínica
+  POST   /physio/exercises                    → Crear ejercicio verificado
+  PATCH  /physio/exercises/{id}/verify        → Validar ejercicio individual
+  PATCH  /physio/exercises/{id}               → Editar ejercicio
+  PATCH  /physio/exercises/{id}/toggle-active → Activar/desactivar ejercicio
+  GET    /physio/routines/pending             → Lista de rutinas ML sin verificar
+  POST   /physio/routines                     → Crear rutina manual verificada
+  PATCH  /physio/routines/{id}/verify         → Validar rutina ML
+  PATCH  /physio/routines/{id}/reject         → Rechazar rutina ML con motivo
 """
 from fastapi import APIRouter, Depends, HTTPException, Body, status
-from sqlalchemy import select
+from sqlalchemy import select, func
 from typing import List, Optional
 
 from app.api.deps import check_physio_role, get_session
 from app.db.session import SessionManager
 from app.models.ejercicio import Ejercicio
+from app.models.rutina import Rutina
 from app.models.user import User
-from app.schemas.ejercicio import EjercicioOut
+from app.schemas.ejercicio import EjercicioOut, EjercicioUpdateIn, PhysioStatsOut
 from app.schemas.rutina import RutinaPublicOut, RutinaCreateIn
 from app.services.recommendation_service import RecommendationService
 from app.services.audit_service import AuditService
 from app.services.physio_audit_service import PhysioAuditService
 
 router = APIRouter()
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# ESTADÍSTICAS DEL FISIOTERAPEUTA
+# ──────────────────────────────────────────────────────────────────────────────
+
+@router.get(
+    "/stats",
+    response_model=PhysioStatsOut,
+    summary="Estadísticas propias del fisioterapeuta",
+)
+async def get_physio_stats(
+    current_physio: User = Depends(check_physio_role),
+    session_manager: SessionManager = Depends(get_session),
+) -> PhysioStatsOut:
+    db = session_manager.pg_session
+    physio_id = current_physio.id_usuario
+
+    creados = await db.scalar(
+        select(func.count()).where(Ejercicio.created_by == physio_id)
+    )
+    verificados_ej = await db.scalar(
+        select(func.count()).where(
+            Ejercicio.is_verified_by_physio == True,
+            Ejercicio.activo == True,
+        )
+    )
+    sin_verificar = await db.scalar(
+        select(func.count()).where(
+            Ejercicio.is_verified_by_physio == False,
+            Ejercicio.activo == True,
+        )
+    )
+    pendientes_rutinas = await db.scalar(
+        select(func.count()).where(
+            Rutina.is_machine_learning_generated == True,
+            Rutina.is_verified_by_physio == False,
+        )
+    )
+    verificadas_por_mi = await db.scalar(
+        select(func.count()).where(Rutina.verified_by == physio_id)
+    )
+
+    return PhysioStatsOut(
+        ejercicios_creados=creados or 0,
+        ejercicios_verificados=verificados_ej or 0,
+        ejercicios_sin_verificar=sin_verificar or 0,
+        rutinas_pendientes=pendientes_rutinas or 0,
+        rutinas_verificadas_por_mi=verificadas_por_mi or 0,
+    )
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -167,6 +223,112 @@ async def verify_exercise(
     return ejercicio
 
 
+@router.get(
+    "/exercises/unverified",
+    response_model=List[EjercicioOut],
+    summary="Listar ejercicios sin verificación clínica",
+)
+async def list_unverified_exercises(
+    skip: int = 0,
+    limit: int = 100,
+    current_physio: User = Depends(check_physio_role),
+    session_manager: SessionManager = Depends(get_session),
+) -> List[EjercicioOut]:
+    result = await session_manager.pg_session.execute(
+        select(Ejercicio)
+        .where(Ejercicio.is_verified_by_physio == False, Ejercicio.activo == True)
+        .offset(skip)
+        .limit(limit)
+    )
+    return list(result.scalars().all())
+
+
+@router.patch(
+    "/exercises/{id_ejercicio}",
+    response_model=EjercicioOut,
+    summary="Editar datos de un ejercicio",
+)
+async def update_exercise(
+    id_ejercicio: int,
+    data: EjercicioUpdateIn,
+    current_physio: User = Depends(check_physio_role),
+    session_manager: SessionManager = Depends(get_session),
+) -> EjercicioOut:
+    db = session_manager.pg_session
+    result = await db.execute(select(Ejercicio).where(Ejercicio.id_ejercicio == id_ejercicio))
+    ejercicio = result.scalar_one_or_none()
+    if not ejercicio:
+        raise HTTPException(status_code=404, detail=f"Ejercicio {id_ejercicio} no encontrado")
+
+    update_data = data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(ejercicio, field, value)
+
+    await AuditService.log_action(
+        session=db,
+        id_admin=current_physio.id_usuario,
+        accion="EXERCISE_UPDATED",
+        entidad_afectada=f"ejercicios:{id_ejercicio}",
+        descripcion=f"Fisio {current_physio.correo} editó ejercicio id={id_ejercicio}; campos: {list(update_data.keys())}",
+    )
+    try:
+        await PhysioAuditService.log_from_user(
+            mongo_db=session_manager.mongo,
+            action="EXERCISE_UPDATED",
+            actor=current_physio,
+            entity_type="ejercicios",
+            entity_id=id_ejercicio,
+            metadata={"campos_modificados": list(update_data.keys())},
+        )
+    except Exception:
+        pass
+    await db.commit()
+    await db.refresh(ejercicio)
+    return ejercicio
+
+
+@router.patch(
+    "/exercises/{id_ejercicio}/toggle-active",
+    response_model=EjercicioOut,
+    summary="Activar o desactivar un ejercicio",
+)
+async def toggle_exercise_active(
+    id_ejercicio: int,
+    current_physio: User = Depends(check_physio_role),
+    session_manager: SessionManager = Depends(get_session),
+) -> EjercicioOut:
+    db = session_manager.pg_session
+    result = await db.execute(select(Ejercicio).where(Ejercicio.id_ejercicio == id_ejercicio))
+    ejercicio = result.scalar_one_or_none()
+    if not ejercicio:
+        raise HTTPException(status_code=404, detail=f"Ejercicio {id_ejercicio} no encontrado")
+
+    ejercicio.activo = not ejercicio.activo
+    nuevo_estado = "activado" if ejercicio.activo else "desactivado"
+
+    await AuditService.log_action(
+        session=db,
+        id_admin=current_physio.id_usuario,
+        accion="EXERCISE_TOGGLED",
+        entidad_afectada=f"ejercicios:{id_ejercicio}",
+        descripcion=f"Fisio {current_physio.correo} {nuevo_estado} ejercicio id={id_ejercicio}",
+    )
+    try:
+        await PhysioAuditService.log_from_user(
+            mongo_db=session_manager.mongo,
+            action="EXERCISE_TOGGLED",
+            actor=current_physio,
+            entity_type="ejercicios",
+            entity_id=id_ejercicio,
+            metadata={"activo": ejercicio.activo},
+        )
+    except Exception:
+        pass
+    await db.commit()
+    await db.refresh(ejercicio)
+    return ejercicio
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # RUTINAS
 # ──────────────────────────────────────────────────────────────────────────────
@@ -298,6 +460,62 @@ async def verify_routine(
             entity_type="rutinas",
             entity_id=id_rutina,
             metadata={"verified_at": rutina.verified_at.isoformat() if rutina.verified_at else None},
+        )
+    except Exception:
+        pass
+    await db.commit()
+    await db.refresh(rutina)
+    return rutina
+
+
+@router.patch(
+    "/routines/{id_rutina}/reject",
+    response_model=RutinaPublicOut,
+    summary="Rechazar rutina ML (marcar como no apta clínicamente)",
+)
+async def reject_routine(
+    id_rutina: int,
+    motivo: str = Body(..., description="Motivo clínico del rechazo"),
+    current_physio: User = Depends(check_physio_role),
+    session_manager: SessionManager = Depends(get_session),
+) -> RutinaPublicOut:
+    """
+    Rechaza una rutina ML — queda is_verified_by_physio=False con trazabilidad
+    del fisio que la rechazó y el motivo en el log clínico.
+    No volverá a aparecer en la cola de pendientes porque tiene verified_by asignado.
+    """
+    from datetime import datetime, timezone
+
+    db = session_manager.pg_session
+    result = await db.execute(select(Rutina).where(Rutina.id_rutina == id_rutina))
+    rutina = result.scalar_one_or_none()
+    if not rutina:
+        raise HTTPException(status_code=404, detail=f"Rutina {id_rutina} no encontrada")
+
+    if rutina.is_verified_by_physio:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="La rutina ya fue verificada; no puede rechazarse.",
+        )
+
+    rutina.verified_by = current_physio.id_usuario
+    rutina.verified_at = datetime.now(timezone.utc).replace(tzinfo=None)
+
+    await AuditService.log_action(
+        session=db,
+        id_admin=current_physio.id_usuario,
+        accion="ROUTINE_ML_REJECTED",
+        entidad_afectada=f"rutinas:{id_rutina}",
+        descripcion=f"Fisio {current_physio.correo} rechazó rutina ML id={id_rutina} — motivo: {motivo}",
+    )
+    try:
+        await PhysioAuditService.log_from_user(
+            mongo_db=session_manager.mongo,
+            action="ROUTINE_ML_REJECTED",
+            actor=current_physio,
+            entity_type="rutinas",
+            entity_id=id_rutina,
+            metadata={"motivo": motivo},
         )
     except Exception:
         pass

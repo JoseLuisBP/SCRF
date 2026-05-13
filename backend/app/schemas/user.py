@@ -33,6 +33,10 @@ class UserUpdate(UserBase):
     contrasena: Optional[str] = Field(None, min_length=8, max_length=50, description="Contraseña del usuario")
     perfil_medico: Optional[MedicalProfileUpdate] = Field(None, description="Datos del perfil médico")
 
+# Schema para cambio de rol (solo admin)
+class UserRoleChange(BaseModel):
+    id_rol: int = Field(..., ge=1, le=3, description="Nuevo rol del usuario (1=usuario, 2=entrenador, 3=admin)")
+
 # Schema para cambio de contraseña
 class UserChangePassword(BaseModel):
     contrasena_actual: str = Field(..., min_length=4, max_length=50, description="Contraseña actual del usuario")

@@ -2,11 +2,17 @@
  * usePhysioRoutines — Hook de Axios para operaciones del Fisioterapeuta.
  *
  * Expone:
- *   - getPendingRoutines(): GET  /physio/routines/pending
- *   - verifyRoutine(id):    PATCH /physio/routines/{id}/verify
- *   - createRoutine(data):  POST  /physio/routines
- *   - createExercise(data): POST  /physio/exercises
- *   - verifyExercise(id, notes): PATCH /physio/exercises/{id}/verify
+ *   - getStats():                     GET  /physio/stats
+ *   - getAllExercises(skip, limit):    GET  /physio/exercises
+ *   - getUnverifiedExercises():        GET  /physio/exercises/unverified
+ *   - createExercise(data):            POST  /physio/exercises
+ *   - verifyExercise(id, notes):       PATCH /physio/exercises/{id}/verify
+ *   - updateExercise(id, data):        PATCH /physio/exercises/{id}
+ *   - toggleExerciseActive(id):        PATCH /physio/exercises/{id}/toggle-active
+ *   - getPendingRoutines(skip, limit): GET  /physio/routines/pending
+ *   - createRoutine(data):             POST  /physio/routines
+ *   - verifyRoutine(id):               PATCH /physio/routines/{id}/verify
+ *   - rejectRoutine(id, motivo):       PATCH /physio/routines/{id}/reject
  */
 import { useState, useCallback } from 'react';
 import axiosInstance from '../api/axios';
@@ -33,84 +39,49 @@ export function usePhysioRoutines() {
         }
     }, []);
 
+    // ─── ESTADÍSTICAS ────────────────────────────────────────────────────────
+
+    const getStats = useCallback(
+        () =>
+            handleRequest(async () => {
+                const { data } = await axiosInstance.get('/v1/physio/stats');
+                return data;
+            }),
+        [handleRequest]
+    );
+
+    // ─── EJERCICIOS ──────────────────────────────────────────────────────────
+
     /**
-     * Obtiene las rutinas ML pendientes de verificación.
-     * Un estado vacío (0 rutinas) se trata como 200 [] — nunca propaga error.
-     * Un 404 real (endpoint no encontrado) se captura silenciosamente → [].
-     * Otros errores (401, 403, 500) sí propagan a handleRequest.
-     *
-     * @param {number} [skip=0]
-     * @param {number} [limit=20]
-     * @returns {Promise<Array>} Lista de rutinas con badge="ml_generated" o []
+     * Lista todos los ejercicios (activos e inactivos) para gestión del fisio.
      */
-    const getPendingRoutines = useCallback(
-        async (skip = 0, limit = 20) => {
-            setLoading(true);
-            setError(null);
-            try {
-                const { data } = await axiosInstance.get('/v1/physio/routines/pending', {
+    const getAllExercises = useCallback(
+        (skip = 0, limit = 200) =>
+            handleRequest(async () => {
+                const { data } = await axiosInstance.get('/v1/physio/exercises', {
                     params: { skip, limit },
-                    // Le indicamos al interceptor que NO dispare alert() para este request.
-                    // El interceptor lee este flag antes de mostrar dialogs natívos.
-                    metadata: { silentNotFound: true },
                 });
                 return Array.isArray(data) ? data : [];
-            } catch (err) {
-                const status = err?.response?.status;
-                // 404 o respuesta vacía = estado normal, no un error del usuario
-                if (status === 404 || status === undefined) {
-                    return [];
-                }
-                // Cualquier otro error sí se propaga al estado de error del hook
-                const message =
-                    err?.response?.data?.detail ??
-                    err?.message ??
-                    'Error desconocido';
-                setError(message);
-                return [];
-            } finally {
-                setLoading(false);
-            }
-        },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        []
-    );
-
-    /**
-     * El Fisio valida una rutina ML.
-     * El badge cambia de "ml_generated" → "ml_verified".
-     * @param {number} id_rutina
-     * @returns {Promise<Object>} Rutina actualizada
-     */
-    const verifyRoutine = useCallback(
-        (id_rutina) =>
-            handleRequest(async () => {
-                const { data } = await axiosInstance.patch(
-                    `/v1/physio/routines/${id_rutina}/verify`
-                );
-                return data;
             }),
         [handleRequest]
     );
 
     /**
-     * El Fisio crea una rutina manual (badge="physio_verified" automático).
-     * @param {Object} routinePayload - { nombre_rutina, descripcion, nivel, duracion_estimada, categoria, ejercicio_ids }
-     * @returns {Promise<Object>} Rutina creada
+     * Lista ejercicios activos sin verificación clínica.
      */
-    const createRoutine = useCallback(
-        (routinePayload) =>
+    const getUnverifiedExercises = useCallback(
+        (skip = 0, limit = 100) =>
             handleRequest(async () => {
-                const { data } = await axiosInstance.post('/v1/physio/routines', routinePayload);
-                return data;
+                const { data } = await axiosInstance.get('/v1/physio/exercises/unverified', {
+                    params: { skip, limit },
+                });
+                return Array.isArray(data) ? data : [];
             }),
         [handleRequest]
     );
 
     /**
-     * El Fisio crea un ejercicio clínico verificado.
-     * @param {Object} exercisePayload
-     * @returns {Promise<Object>} Ejercicio creado
+     * Crea un ejercicio clínico verificado.
      */
     const createExercise = useCallback(
         (exercisePayload) =>
@@ -122,10 +93,9 @@ export function usePhysioRoutines() {
     );
 
     /**
-     * El Fisio verifica clínicamente un ejercicio existente.
+     * Verifica clínicamente un ejercicio existente.
      * @param {number} id_ejercicio
-     * @param {string|null} [notes] - Notas clínicas opcionales
-     * @returns {Promise<Object>} Ejercicio actualizado
+     * @param {string|null} notes - Notas clínicas opcionales
      */
     const verifyExercise = useCallback(
         (id_ejercicio, notes = null) =>
@@ -139,13 +109,130 @@ export function usePhysioRoutines() {
         [handleRequest]
     );
 
+    /**
+     * Edita los datos de un ejercicio existente.
+     * @param {number} id_ejercicio
+     * @param {Object} updateData - Campos a actualizar (parcial)
+     */
+    const updateExercise = useCallback(
+        (id_ejercicio, updateData) =>
+            handleRequest(async () => {
+                const { data } = await axiosInstance.patch(
+                    `/v1/physio/exercises/${id_ejercicio}`,
+                    updateData
+                );
+                return data;
+            }),
+        [handleRequest]
+    );
+
+    /**
+     * Activa o desactiva un ejercicio.
+     * @param {number} id_ejercicio
+     */
+    const toggleExerciseActive = useCallback(
+        (id_ejercicio) =>
+            handleRequest(async () => {
+                const { data } = await axiosInstance.patch(
+                    `/v1/physio/exercises/${id_ejercicio}/toggle-active`
+                );
+                return data;
+            }),
+        [handleRequest]
+    );
+
+    // ─── RUTINAS ─────────────────────────────────────────────────────────────
+
+    /**
+     * Lista rutinas ML pendientes de verificación.
+     * 404 o respuesta vacía se tratan como estado normal → [].
+     */
+    const getPendingRoutines = useCallback(
+        async (skip = 0, limit = 20) => {
+            setLoading(true);
+            setError(null);
+            try {
+                const { data } = await axiosInstance.get('/v1/physio/routines/pending', {
+                    params: { skip, limit },
+                    metadata: { silentNotFound: true },
+                });
+                return Array.isArray(data) ? data : [];
+            } catch (err) {
+                const status = err?.response?.status;
+                if (status === 404 || status === undefined) return [];
+                const message =
+                    err?.response?.data?.detail ?? err?.message ?? 'Error desconocido';
+                setError(message);
+                return [];
+            } finally {
+                setLoading(false);
+            }
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        []
+    );
+
+    /**
+     * Crea una rutina clínica manual con verificación automática.
+     */
+    const createRoutine = useCallback(
+        (routinePayload) =>
+            handleRequest(async () => {
+                const { data } = await axiosInstance.post('/v1/physio/routines', routinePayload);
+                return data;
+            }),
+        [handleRequest]
+    );
+
+    /**
+     * Valida una rutina ML — badge cambia a "ml_verified".
+     */
+    const verifyRoutine = useCallback(
+        (id_rutina) =>
+            handleRequest(async () => {
+                const { data } = await axiosInstance.patch(
+                    `/v1/physio/routines/${id_rutina}/verify`
+                );
+                return data;
+            }),
+        [handleRequest]
+    );
+
+    /**
+     * Rechaza una rutina ML con motivo clínico.
+     * La rutina sale de la cola de pendientes y queda en el log de auditoría.
+     * @param {number} id_rutina
+     * @param {string} motivo - Motivo clínico del rechazo
+     */
+    const rejectRoutine = useCallback(
+        (id_rutina, motivo) =>
+            handleRequest(async () => {
+                const { data } = await axiosInstance.patch(
+                    `/v1/physio/routines/${id_rutina}/reject`,
+                    motivo,
+                    { headers: { 'Content-Type': 'application/json' } }
+                );
+                return data;
+            }),
+        [handleRequest]
+    );
+
     return {
         loading,
         error,
-        getPendingRoutines,
-        verifyRoutine,
-        createRoutine,
+        // estadísticas
+        getStats,
+        // ejercicios
+        getAllExercises,
+        getUnverifiedExercises,
         createExercise,
         verifyExercise,
+        updateExercise,
+        toggleExerciseActive,
+        // rutinas
+        getPendingRoutines,
+        createRoutine,
+        verifyRoutine,
+        rejectRoutine,
     };
 }

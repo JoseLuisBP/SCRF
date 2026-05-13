@@ -261,6 +261,7 @@ class RecommendationService:
             .where(
                 Rutina.is_machine_learning_generated == True,
                 Rutina.is_verified_by_physio == False,
+                Rutina.verified_by == None,  # excluye rechazadas
             )
             .order_by(Rutina.fecha_creacion.desc())
             .offset(skip)

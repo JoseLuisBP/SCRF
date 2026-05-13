@@ -4,7 +4,7 @@ import {
     Box, Container, Typography, Button, Chip,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     Paper, Avatar, CircularProgress, Alert, Tooltip, IconButton,
-    Stack, Grid, Card, CardContent, Divider, useTheme,
+    Stack, Grid, Card, CardContent, Divider, useTheme, Skeleton,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -13,6 +13,9 @@ import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import NewReleasesIcon from '@mui/icons-material/NewReleases';
+import TaskAltIcon from '@mui/icons-material/TaskAlt';
 
 import Header from '../../components/layout/Header';
 import Footer from '../../components/layout/Footer';
@@ -24,45 +27,100 @@ export default function PhysioDashboard() {
     const navigate = useNavigate();
     const theme = useTheme();
     const { user } = useAuth();
-    const { getPendingRoutines, verifyRoutine, loading, error } = usePhysioRoutines();
+    const { getPendingRoutines, verifyRoutine, getStats, loading, error } = usePhysioRoutines();
+
     const [pendingRoutines, setPendingRoutines] = useState([]);
+    const [stats, setStats] = useState(null);
+    const [statsLoading, setStatsLoading] = useState(true);
     const [verifyingId, setVerifyingId] = useState(null);
 
     useEffect(() => {
         getPendingRoutines().then(setPendingRoutines).catch(() => {});
+
+        getStats()
+            .then(setStats)
+            .catch(() => setStats(null))
+            .finally(() => setStatsLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleVerify = async (id_rutina) => {
         setVerifyingId(id_rutina);
         try {
             await verifyRoutine(id_rutina);
-            setPendingRoutines(prev => prev.filter(r => r.id_rutina !== id_rutina));
+            setPendingRoutines((prev) => prev.filter((r) => r.id_rutina !== id_rutina));
+            // Actualiza el contador de stats sin recargar todo
+            setStats((s) => s ? {
+                ...s,
+                rutinas_pendientes: Math.max(0, (s.rutinas_pendientes ?? 1) - 1),
+                rutinas_verificadas_por_mi: (s.rutinas_verificadas_por_mi ?? 0) + 1,
+            } : s);
         } finally {
             setVerifyingId(null);
         }
     };
 
+    const StatCard = ({ label, value, icon, color, bg }) => (
+        <Paper
+            elevation={2}
+            sx={{
+                p: 2,
+                borderRadius: 3,
+                border: `1px solid ${theme.palette.divider}`,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+            }}
+        >
+            <Avatar sx={{ bgcolor: bg, color: color, width: 52, height: 52 }}>
+                {icon}
+            </Avatar>
+            <Box>
+                {statsLoading && value === null ? (
+                    <Skeleton variant="text" width={40} height={32} />
+                ) : (
+                    <Typography variant="h5" fontWeight={700}>{value}</Typography>
+                )}
+                <Typography variant="body2" color="text.secondary">{label}</Typography>
+            </Box>
+        </Paper>
+    );
+
     const kpiCards = [
         {
             label: 'Rutinas ML Pendientes',
-            value: pendingRoutines.length,
+            value: stats ? stats.rutinas_pendientes : (statsLoading ? null : pendingRoutines.length),
             icon: <HourglassEmptyIcon />,
             color: '#D97706',
             bg: '#FEF3C7',
         },
         {
-            label: 'Scope Clínico',
-            value: 'Activo',
+            label: 'Ejercicios Verificados',
+            value: stats ? stats.ejercicios_verificados : null,
             icon: <VerifiedUserIcon />,
             color: '#10B981',
             bg: '#D1FAE5',
         },
         {
-            label: 'Rol',
-            value: 'Fisioterapeuta',
-            icon: <PlaylistAddCheckIcon />,
+            label: 'Sin Verificar',
+            value: stats ? stats.ejercicios_sin_verificar : null,
+            icon: <NewReleasesIcon />,
+            color: '#EF4444',
+            bg: '#FEE2E2',
+        },
+        {
+            label: 'Creados por mí',
+            value: stats ? stats.ejercicios_creados : null,
+            icon: <TaskAltIcon />,
             color: '#6366F1',
             bg: '#E0E7FF',
+        },
+        {
+            label: 'Rutinas Verificadas por mí',
+            value: stats ? stats.rutinas_verificadas_por_mi : null,
+            icon: <PlaylistAddCheckIcon />,
+            color: '#0EA5E9',
+            bg: '#E0F2FE',
         },
     ];
 
@@ -70,10 +128,10 @@ export default function PhysioDashboard() {
         <Box
             sx={{
                 minHeight: '100vh',
-                background: (theme) =>
-                    theme.palette.mode === 'dark'
+                background: (t) =>
+                    t.palette.mode === 'dark'
                         ? '#000000'
-                        : `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.main} 100%)`,
+                        : `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${t.palette.secondary.main} 100%)`,
                 transition: 'background 0.3s ease',
             }}
         >
@@ -81,7 +139,7 @@ export default function PhysioDashboard() {
 
             <Container maxWidth="lg" sx={{ py: 4 }}>
 
-                {/* Encabezado del panel — mismo patrón que AdminPanel */}
+                {/* Encabezado del panel */}
                 <Stack direction="row" alignItems="center" spacing={2} mb={4}>
                     <Avatar sx={{ bgcolor: 'success.main', width: 48, height: 48 }}>
                         <MedicalServicesIcon />
@@ -101,26 +159,8 @@ export default function PhysioDashboard() {
                 {/* KPI Cards */}
                 <Grid container spacing={3} sx={{ mb: 4 }}>
                     {kpiCards.map((card) => (
-                        <Grid item xs={12} sm={4} key={card.label}>
-                            <Paper
-                                elevation={2}
-                                sx={{
-                                    p: 2,
-                                    borderRadius: 3,
-                                    border: `1px solid ${theme.palette.divider}`,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 2,
-                                }}
-                            >
-                                <Avatar sx={{ bgcolor: card.bg, color: card.color, width: 52, height: 52 }}>
-                                    {card.icon}
-                                </Avatar>
-                                <Box>
-                                    <Typography variant="h5" fontWeight={700}>{card.value}</Typography>
-                                    <Typography variant="body2" color="text.secondary">{card.label}</Typography>
-                                </Box>
-                            </Paper>
+                        <Grid item xs={12} sm={6} md={4} key={card.label}>
+                            <StatCard {...card} />
                         </Grid>
                     ))}
                 </Grid>
@@ -151,6 +191,14 @@ export default function PhysioDashboard() {
                             sx={{ borderRadius: 2 }}
                         >
                             Nueva Rutina
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            startIcon={<ManageSearchIcon />}
+                            onClick={() => navigate('/physio/exercises')}
+                            sx={{ borderRadius: 2 }}
+                        >
+                            Gestionar Ejercicios
                         </Button>
                         <Button
                             variant="outlined"

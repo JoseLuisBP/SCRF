@@ -18,6 +18,7 @@ const Profile = lazy(() => import('../pages/Profile'));
 // Fisioterapeuta (Rol 2)
 const PhysioDashboard = lazy(() => import('../pages/physio/PhysioDashboard'));
 const ExerciseCreator = lazy(() => import('../pages/physio/ExerciseCreator'));
+const ExerciseManager = lazy(() => import('../pages/physio/ExerciseManager'));
 const RoutineCreator = lazy(() => import('../pages/physio/RoutineCreator'));
 const PendingValidation = lazy(() => import('../pages/physio/PendingValidation'));
 
@@ -59,6 +60,7 @@ export default function AppRoutes() {
                     {/* Rutas del Fisioterapeuta (requieren login + id_rol=2 o 3) */}
                     <Route element={<PhysioRoute />}>
                         <Route path="/physio" element={<PhysioDashboard />} />
+                        <Route path="/physio/exercises" element={<ExerciseManager />} />
                         <Route path="/physio/exercises/new" element={<ExerciseCreator />} />
                         <Route path="/physio/routines/new" element={<RoutineCreator />} />
                         <Route path="/physio/routines/pending" element={<PendingValidation />} />

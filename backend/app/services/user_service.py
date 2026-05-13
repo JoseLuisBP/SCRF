@@ -1,5 +1,5 @@
 from typing import Optional, List
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, update, delete, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
@@ -529,6 +529,93 @@ class UserService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error al eliminar el usuario",
             ) from e
+
+    @staticmethod
+    async def change_role(
+        session: AsyncSession, user_id: int, new_rol_id: int, current_user: User
+    ) -> User:
+        """
+        Cambia el rol de un usuario a cualquier rol válido (1, 2, 3).
+
+        Args:
+            session: Sesión de base de datos
+            user_id: ID del usuario
+            new_rol_id: Nuevo ID de rol (1=usuario, 2=entrenador, 3=admin)
+            current_user: Administrador que realiza el cambio
+
+        Returns:
+            Usuario con el rol actualizado
+
+        Raises:
+            HTTPException: Si no hay permisos, el usuario no existe o el rol es inválido
+        """
+        user = await UserService.get_user_by_id(session, user_id)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado"
+            )
+
+        if not current_user.is_admin:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Solo los administradores pueden cambiar roles",
+            )
+
+        if current_user.id_usuario == user_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No puedes cambiar tu propio rol",
+            )
+
+        if new_rol_id not in (1, 2, 3):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Rol no válido. Use 1 (usuario), 2 (entrenador) o 3 (admin)",
+            )
+
+        try:
+            await session.execute(
+                update(User).where(User.id_usuario == user_id).values(id_rol=new_rol_id)
+            )
+            await session.commit()
+            return await UserService.get_user_by_id(session, user_id)
+        except Exception as e:
+            await session.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error al cambiar el rol",
+            ) from e
+
+    @staticmethod
+    async def get_stats(session: AsyncSession) -> dict:
+        """
+        Retorna estadísticas agregadas del sistema de usuarios.
+
+        Args:
+            session: Sesión de base de datos
+
+        Returns:
+            Diccionario con conteos de usuarios por rol y estado
+        """
+        result = await session.execute(text("""
+            SELECT
+                COUNT(*) AS total,
+                SUM(CASE WHEN is_active = true THEN 1 ELSE 0 END) AS activos,
+                SUM(CASE WHEN is_active = false THEN 1 ELSE 0 END) AS inactivos,
+                SUM(CASE WHEN id_rol = 3 THEN 1 ELSE 0 END) AS admins,
+                SUM(CASE WHEN id_rol = 2 THEN 1 ELSE 0 END) AS entrenadores,
+                SUM(CASE WHEN id_rol = 1 THEN 1 ELSE 0 END) AS usuarios_rol
+            FROM usuarios
+        """))
+        row = result.fetchone()
+        return {
+            "total_usuarios": row.total or 0,
+            "usuarios_activos": row.activos or 0,
+            "usuarios_inactivos": row.inactivos or 0,
+            "total_admins": row.admins or 0,
+            "total_entrenadores": row.entrenadores or 0,
+            "total_usuarios_rol": row.usuarios_rol or 0,
+        }
 
     @staticmethod
     async def toggle_admin_status(

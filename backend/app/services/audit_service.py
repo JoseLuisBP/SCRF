@@ -1,6 +1,7 @@
 """Servicio de auditoría para registrar acciones de administradores."""
+from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import insert
+from sqlalchemy import insert, select
 
 from app.models.auditoria import AuditoriaAdmin
 
@@ -39,3 +40,26 @@ class AuditService:
         )
         # No se hace commit aquí — el caller controla la transacción
         # para que la auditoría sea atómica con la operación principal.
+
+    @staticmethod
+    async def get_audit_logs(
+        session: AsyncSession, skip: int = 0, limit: int = 50
+    ) -> List[AuditoriaAdmin]:
+        """
+        Retorna los registros de auditoría ordenados por fecha descendente.
+
+        Args:
+            session: Sesión de base de datos asíncrona
+            skip: Número de registros a saltar (paginación)
+            limit: Máximo de registros a retornar
+
+        Returns:
+            Lista de registros de auditoría
+        """
+        result = await session.execute(
+            select(AuditoriaAdmin)
+            .order_by(AuditoriaAdmin.fecha_accion.desc())
+            .offset(skip)
+            .limit(limit)
+        )
+        return result.scalars().all()
