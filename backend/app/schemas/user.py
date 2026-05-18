@@ -3,6 +3,21 @@ from typing import Optional
 from datetime import date
 from app.schemas.medical_profile import MedicalProfileResponse, MedicalProfileUpdate
 
+
+# ── Perfil Médico ────────────────────────────────────────────────────────────
+
+class PerfilMedicoCreate(BaseModel):
+    """
+    Datos del perfil médico que se reciben en el registro.
+    Todos los campos son opcionales y por defecto son listas vacías.
+    """
+    condiciones_fisicas: list[str] = Field(default_factory=list, description="Lista de condiciones físicas del usuario")
+    lesiones: list[str] = Field(default_factory=list, description="Lista de lesiones del usuario")
+    limitaciones: list[str] = Field(default_factory=list, description="Lista de limitaciones físicas del usuario")
+
+
+# ── Usuario ──────────────────────────────────────────────────────────────────
+
 # Schema base para Usuario
 class UserBase(BaseModel):
     nombre: str = Field(..., min_length=4, max_length=100, description="Nombre completo del usuario")
@@ -14,12 +29,19 @@ class UserBase(BaseModel):
     tiempo_disponible: Optional[int] = Field(None, ge=0, description="Tiempo disponible para entrenar en minutos por día")
     objetivo_principal: Optional[str] = Field(None, max_length=50, description="Objetivo principal (ej. Hipertrofia, Rehabilitación)")
 
+
 # Schema para creación de Usuario (endpoint público /auth/register)
 # SEGURIDAD: id_rol NO se acepta aquí. El servicio siempre asigna id_rol=1 (Usuario normal).
 # Un usuario no puede escalar sus propios privilegios en el registro.
 class UserCreate(UserBase):
     contrasena: str = Field(..., min_length=8, max_length=50, description="Contraseña del usuario")
     confirmado: bool = Field(default=False, description="Indica si el usuario aceptó los términos")
+    # Campo opcional: si no viene en el request, se guarda con arrays vacíos
+    perfil_medico: Optional[PerfilMedicoCreate] = Field(
+        default=None,
+        description="Datos del perfil médico del usuario (condiciones, lesiones, limitaciones)"
+    )
+
 
 # Schema exclusivo para crear administradores desde el Panel Admin.
 # Solo disponible en POST /admin/create-admin (requiere id_rol==3 en el token).
@@ -28,19 +50,23 @@ class AdminCreate(UserBase):
     contrasena: str = Field(..., min_length=8, max_length=50, description="Contraseña del nuevo administrador")
     confirmado: bool = Field(default=True, description="Los admins se consideran confirmados por defecto")
 
+
 # Schema para actualización de Usuario
 class UserUpdate(UserBase):
     contrasena: Optional[str] = Field(None, min_length=8, max_length=50, description="Contraseña del usuario")
     perfil_medico: Optional[MedicalProfileUpdate] = Field(None, description="Datos del perfil médico")
 
+
 # Schema para cambio de rol (solo admin)
 class UserRoleChange(BaseModel):
     id_rol: int = Field(..., ge=1, le=3, description="Nuevo rol del usuario (1=usuario, 2=entrenador, 3=admin)")
+
 
 # Schema para cambio de contraseña
 class UserChangePassword(BaseModel):
     contrasena_actual: str = Field(..., min_length=4, max_length=50, description="Contraseña actual del usuario")
     nueva_contrasena: str = Field(..., min_length=4, max_length=50, description="Nueva contraseña del usuario")
+
 
 # Schema para respuesta
 class UserResponse(UserBase):
@@ -53,4 +79,3 @@ class UserResponse(UserBase):
     perfil_medico: Optional[MedicalProfileResponse] = Field(None, description="Perfil médico del usuario")
 
     model_config = ConfigDict(from_attributes=True)
-

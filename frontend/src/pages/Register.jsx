@@ -15,6 +15,9 @@ import MuiButton from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import FormHelperText from '@mui/material/FormHelperText';
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
+import Chip from '@mui/material/Chip';
 
 // React Hook Form
 import { useForm, Controller } from 'react-hook-form';
@@ -28,6 +31,25 @@ import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import Header from '../components/layout/Header';
 import { authAPI } from '../api';
+
+/* Opciones para los campos de perfil médico */
+const opcionesCondiciones = [
+  { value: 'Hipertension', label: 'Hipertensión' },
+  { value: 'Asma', label: 'Asma' },
+  { value: 'Diabetes', label: 'Diabetes' },
+  { value: 'Artritis', label: 'Artritis' },
+];
+
+const opcionesLesiones = [
+  { value: 'Rodilla', label: 'Rodilla' },
+  { value: 'Espalda', label: 'Espalda' },
+  { value: 'Hombro', label: 'Hombro' },
+];
+
+const opcionesLimitaciones = [
+  { value: 'Impacto', label: 'Sin impacto' },
+  { value: 'Carga', label: 'Evitar cargas' },
+];
 
 /* Validación */
 const registerSchema = yup.object({
@@ -70,6 +92,11 @@ const registerSchema = yup.object({
   acceptedTerms: yup
     .boolean()
     .oneOf([true], 'Debes aceptar los términos y condiciones'),
+  perfil_medico: yup.object({
+    condiciones_fisicas: yup.array().of(yup.object()).nullable(),
+    lesiones: yup.array().of(yup.object()).nullable(),
+    limitaciones: yup.array().of(yup.object()).nullable(),
+  }).nullable(),
 }).required();
 
 export default function Register() {
@@ -101,6 +128,11 @@ export default function Register() {
       tiempoDisponible: '',
       objetivo_principal: '',
       acceptedTerms: false,
+      perfil_medico: {
+        condiciones_fisicas: [],
+        lesiones: [],
+        limitaciones: [],
+      },
     },
   });
 
@@ -143,6 +175,11 @@ export default function Register() {
         tiempo_disponible: data.tiempoDisponible ? parseInt(data.tiempoDisponible, 10) : 0,
         objetivo_principal: data.objetivo_principal || null,
         confirmado: data.acceptedTerms,
+        perfil_medico: {
+          condiciones_fisicas: data.perfil_medico?.condiciones_fisicas?.map((item) => item.value) || [],
+          lesiones: data.perfil_medico?.lesiones?.map((item) => item.value) || [],
+          limitaciones: data.perfil_medico?.limitaciones?.map((item) => item.value) || [],
+        },
       };
 
       await authAPI.register(userData);
@@ -342,6 +379,123 @@ export default function Register() {
             {...register('tiempoDisponible')}
             sx={{ maxWidth: 400, mx: 'auto', mb: 3 }}
           />
+
+          {/* ── Perfil Médico ── */}
+
+          <Typography
+            variant="h6"
+            component="h2"
+            sx={{ maxWidth: 400, mx: 'auto', mb: 2, textAlign: 'left', fontWeight: 'bold' }}
+          >
+            Perfil Médico
+          </Typography>
+
+          {/* Condiciones físicas */}
+          <Controller
+            name="perfil_medico.condiciones_fisicas"
+            control={control}
+            render={({ field }) => (
+              <Autocomplete
+                multiple
+                options={opcionesCondiciones}
+                getOptionLabel={(option) => option.label}
+                isOptionEqualToValue={(option, value) => option.value === value.value}
+                value={field.value ?? []}
+                onChange={(_, newValue) => field.onChange(newValue)}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip
+                      label={option.label}
+                      {...getTagProps({ index })}
+                      key={option.value}
+                    />
+                  ))
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Condiciones físicas"
+                    placeholder="Selecciona o busca condiciones"
+                    error={!!errors.perfil_medico?.condiciones_fisicas}
+                    helperText={errors.perfil_medico?.condiciones_fisicas?.message}
+                  />
+                )}
+                sx={{ maxWidth: 400, mx: 'auto', mb: 2, display: 'flex' }}
+              />
+            )}
+          />
+
+          {/* Lesiones */}
+          <Controller
+            name="perfil_medico.lesiones"
+            control={control}
+            render={({ field }) => (
+              <Autocomplete
+                multiple
+                options={opcionesLesiones}
+                getOptionLabel={(option) => option.label}
+                isOptionEqualToValue={(option, value) => option.value === value.value}
+                value={field.value ?? []}
+                onChange={(_, newValue) => field.onChange(newValue)}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip
+                      label={option.label}
+                      {...getTagProps({ index })}
+                      key={option.value}
+                    />
+                  ))
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Lesiones"
+                    placeholder="Selecciona o busca lesiones"
+                    error={!!errors.perfil_medico?.lesiones}
+                    helperText={errors.perfil_medico?.lesiones?.message}
+                  />
+                )}
+                sx={{ maxWidth: 400, mx: 'auto', mb: 2, display: 'flex' }}
+              />
+            )}
+          />
+
+          {/* Limitaciones */}
+          <Controller
+            name="perfil_medico.limitaciones"
+            control={control}
+            render={({ field }) => (
+              <Autocomplete
+                multiple
+                options={opcionesLimitaciones}
+                getOptionLabel={(option) => option.label}
+                isOptionEqualToValue={(option, value) => option.value === value.value}
+                value={field.value ?? []}
+                onChange={(_, newValue) => field.onChange(newValue)}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip
+                      label={option.label}
+                      {...getTagProps({ index })}
+                      key={option.value}
+                    />
+                  ))
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Limitaciones"
+                    placeholder="Selecciona o busca limitaciones"
+                    error={!!errors.perfil_medico?.limitaciones}
+                    helperText={errors.perfil_medico?.limitaciones?.message}
+                  />
+                )}
+                sx={{ maxWidth: 400, mx: 'auto', mb: 3, display: 'flex' }}
+              />
+            )}
+          />
+
+          {/* ── Fin Perfil Médico ── */}
 
           <Box sx={{ maxWidth: 400, mx: 'auto', mb: 4, textAlign: 'left' }}>
 

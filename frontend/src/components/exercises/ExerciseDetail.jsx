@@ -48,7 +48,13 @@ export default function ExerciseDetail({ exercise, onClose }) {
           sx={{ mb: 2 }}
         />
 
-        <Typography paragraph>
+        <Typography
+          color="text.secondary"
+          sx={{
+            fontSize: { xs: '1.05rem', sm: '1.3rem', md: '1.55rem' },
+            whiteSpace: 'pre-line',
+          }}
+        >
           {exercise.descripcion}
         </Typography>
 

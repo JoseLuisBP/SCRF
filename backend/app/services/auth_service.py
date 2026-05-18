@@ -9,6 +9,7 @@ from app.core.security import (
     create_access_token
 )
 from app.models.user import User
+from app.models.medical_profile import MedicalProfile
 from app.schemas.user import UserCreate
 from app.schemas.token import Token
 from app.services.user_service import UserService
@@ -54,19 +55,57 @@ class AuthService:
         user_data: UserCreate
     ) -> User:
         """
-        Registra un nuevo usuario.
+        Registra un nuevo usuario y crea su perfil médico asociado.
+
+        El flujo es:
+          1. Crear el usuario en la tabla `usuarios` vía UserService.
+          2. Usar el id_usuario recién generado para insertar un registro
+             en `perfil_medico`. Si el request no incluye `perfil_medico`,
+             se guardan arrays vacíos como valor por defecto.
+          3. Hacer refresh del usuario para que la relación
+             `usuario.perfil_medico` quede cargada antes de devolverlo.
 
         Args:
-            session: Sesión de base de datos
-            user_data: Datos del usuario a crear
+            session: Sesión de base de datos (AsyncSession)
+            user_data: Datos del usuario + perfil médico opcional
 
         Returns:
-            Usuario creado
+            Usuario creado con su perfil médico ya relacionado
 
         Raises:
-            HTTPException: Si el email ya está registrado o hay error de integridad
+            HTTPException 409: Si el correo ya está registrado
+            HTTPException 500: Si ocurre un error inesperado al crear el perfil
         """
-        return await UserService.create_user(session, user_data)
+        # ── 1. Crear usuario ──────────────────────────────────────────────────
+        # UserService.create_user ya maneja el error de correo duplicado
+        # (lanza HTTPException 409) y hace commit + refresh del usuario.
+        user = await UserService.create_user(session, user_data)
+
+        # ── 2. Crear perfil médico ────────────────────────────────────────────
+        # Extraer datos del perfil médico si vienen en el request;
+        # de lo contrario usar listas vacías como valor por defecto.
+        perfil_data = user_data.perfil_medico
+
+        perfil_medico = MedicalProfile(
+            id_usuario=user.id_usuario,
+            condiciones_fisicas=perfil_data.condiciones_fisicas if perfil_data else [],
+            lesiones=perfil_data.lesiones if perfil_data else [],
+            limitaciones=perfil_data.limitaciones if perfil_data else [],
+        )
+
+        try:
+            session.add(perfil_medico)
+            await session.commit()
+            # Refrescar para que la relación user.perfil_medico quede poblada
+            await session.refresh(user)
+        except Exception as exc:
+            await session.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error al crear el perfil médico: {str(exc)}"
+            ) from exc
+
+        return user
 
     @staticmethod
     def create_token(user: User) -> Token:
