@@ -17,6 +17,7 @@ class HistorialProgresoOut(BaseModel):
     duracion_real: Optional[int]
     estado: Optional[str]
     notas: Optional[str]
-
+    grupo_trabajado: Optional[str]
+    
     class Config:
         orm_mode = True

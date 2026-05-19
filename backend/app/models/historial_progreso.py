@@ -40,3 +40,6 @@ class HistorialProgreso(Base):
 
     # Notas adicionales
     notas = Column(Text, nullable=True)
+
+    # Grupo muscular trabajado (solo en sesiones libres, sin id_rutina)
+    grupo_trabajado = Column(String(100), nullable=True)
