@@ -17,7 +17,11 @@ const usersAPI = {
     },
 
     changePassword: async (passwordData) => {
-        const response = await axiosInstance.post('/v1/users/me/change-password', passwordData);
+        const payload = {
+            contrasena_actual: passwordData.currentPassword,
+            nueva_contrasena: passwordData.newPassword,
+        };
+        const response = await axiosInstance.post('/v1/users/me/change-password', payload);
         return response.data;
     },
 
