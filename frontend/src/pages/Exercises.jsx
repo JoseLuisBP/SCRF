@@ -1,5 +1,6 @@
 //React
 import { useState, useEffect } from 'react';
+import exercisesAPI from '../api/exercises';
 
 //Material UI
 import {
@@ -44,14 +45,8 @@ export default function Exercises() {
   useEffect(() => {
     const loadExercises = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/v1/exercises');
-
-        if (!response.ok) {
-          throw new Error('No se pudieron cargar los ejercicios');
-        }
-
-        const data = await response.json();
-        setExercises(data);
+        const response = await exercisesAPI.getAll();
+        setExercises(response.data);
       } catch (err) {
         console.error('Error cargando ejercicios:', err);
         setError('No se pudieron cargar los ejercicios');

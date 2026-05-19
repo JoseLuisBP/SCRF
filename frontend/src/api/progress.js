@@ -4,7 +4,7 @@ const progressAPI = {
   // Registrar entrenamiento completado
   logWorkout: async workoutData => {
     const response = await axiosInstance.post(
-      '/progress/workouts',
+      '/v1/progress/workouts',
       workoutData
     );
     return response;
@@ -12,7 +12,7 @@ const progressAPI = {
 
   // Obtener historial de entrenamientos
   getWorkoutHistory: async (params = {}) => {
-    const response = await axiosInstance.get('/progress/workouts', {
+    const response = await axiosInstance.get('/v1/progress/workouts', {
       params,
     });
     return response;
@@ -20,14 +20,14 @@ const progressAPI = {
 
   // Obtener entrenamiento específico
   getWorkoutById: async id => {
-    const response = await axiosInstance.get(`/progress/workouts/${id}`);
+    const response = await axiosInstance.get(`/v1/progress/workouts/${id}`);
     return response;
   },
-  
+
   // Actualizar entrenamiento
   updateWorkout: async (id, workoutData) => {
     const response = await axiosInstance.put(
-      `/progress/workouts/${id}`,
+      `/v1/progress/workouts/${id}`,
       workoutData
     );
     return response;
@@ -35,13 +35,13 @@ const progressAPI = {
 
   // Eliminar entrenamiento
   deleteWorkout: async id => {
-    const response = await axiosInstance.delete(`/progress/workouts/${id}`);
+    const response = await axiosInstance.delete(`/v1/progress/workouts/${id}`);
     return response;
   },
 
   // Obtener estadísticas generales
   getStats: async (dateRange = {}) => {
-    const response = await axiosInstance.get('/progress/stats', {
+    const response = await axiosInstance.get('/v1/progress/stats', {
       params: dateRange,
     });
     return response;
@@ -49,13 +49,13 @@ const progressAPI = {
 
   // Obtener progreso semanal
   getWeeklyProgress: async () => {
-    const response = await axiosInstance.get('/progress/weekly');
+    const response = await axiosInstance.get('/v1/progress/weekly');
     return response;
   },
 
   // Obtener progreso mensual
   getMonthlyProgress: async () => {
-    const response = await axiosInstance.get('/progress/monthly');
+    const response = await axiosInstance.get('/v1/progress/monthly');
     return response;
   },
 };
