@@ -10,3 +10,10 @@ node_modules/
 .coverage
 
 .claude/
+
+# Variables de entorno — NUNCA commitear secretos
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env

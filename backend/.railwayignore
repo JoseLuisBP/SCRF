@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+tests/
+*.log
+.env
+.env.local
+.git/
+requirements.dev.txt
